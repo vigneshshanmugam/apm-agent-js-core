@@ -111,7 +111,7 @@ function prepareConfig (defaultConfig) {
 
   var testConfig = defaultConfig.testConfig || {}
   var isTravis = process.env.TRAVIS
-  var isSauce = testConfig
+  var isSauce = testConfig.sauceLabs
   var version = '' // userConfig.packageVersion || ''
   var buildId = 'ApmJs@' + version
 
@@ -168,7 +168,7 @@ function prepareConfig (defaultConfig) {
       fs.mkdirSync(dir)
     }
 
-    console.log('globalConfigs:', defaultConfig.globalConfigs)
+    // console.log('globalConfigs:', defaultConfig.globalConfigs)
     var globalConfigs = defaultConfig.globalConfigs
     fs.writeFileSync(dir + '/globals.js', 'window.globalConfigs = ' + JSON.stringify(globalConfigs) + ';', 'utf8')
     defaultConfig.files.unshift('tmp/globals.js')

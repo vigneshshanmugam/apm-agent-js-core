@@ -22,6 +22,7 @@ module.exports = function (config) {
   if (customeConfig.testConfig.sauceLabs) {
     customeConfig.globalConfigs.useMocks = true
   }
+  console.log('customeConfig:', customeConfig)
   config.set(customeConfig)
   config.files.unshift('test/utils/polyfill.js')
   config.files.unshift('node_modules/opbeat-zone/dist/zone.js')
