@@ -4,8 +4,8 @@ node_js:
 - '4'
 env:
   global:
-  - SAUCE_USERNAME=elastic
-  - SAUCE_ACCESS_KEY=de42e589-1450-41a2-8a44-90aa00c15168
+  - SAUCE_USERNAME=elastic-apm
+  - SAUCE_ACCESS_KEY=8e8b688d-cee9-4a7b-9fd4-bb4e01f0421c
   matrix:
   - MODE=saucelabs
 cache:

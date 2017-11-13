@@ -23,8 +23,8 @@ require('gulp-release-tasks')(gulp)
 var jeditor = require('gulp-json-editor')
 
 var saucelabsConfig = {
-  user: process.env.SAUCE_USERNAME || 'opbeat',
-  key: process.env.SAUCE_ACCESS_KEY || 'de42e589-1450-41a2-8a44-90aa00c15168',
+  user: process.env.SAUCE_USERNAME || 'elastic-apm',
+  key: process.env.SAUCE_ACCESS_KEY || '8e8b688d-cee9-4a7b-9fd4-bb4e01f0421c',
   host: process.env.SAUCE_HOST || 'ondemand.saucelabs.com',
   port: process.env.SAUCE_PORT || 80,
   baseUrl: process.env.SAUCE_BASEURL || 'http://localhost:8000'
