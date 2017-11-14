@@ -15,7 +15,8 @@
   },
   "files": [
     "src/**/*.js",
-    "test/**/*.js"
+    "test/**/*.js",
+    "dev-utils/**/*.js"
   ],
   "browser": {
     "opbeat-zone": "./node_modules/opbeat-zone/dist/zone.js"
