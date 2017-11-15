@@ -184,23 +184,12 @@ gulp.task('deploy', ['build:release'], function () {
     .pipe(awspublish.reporter())
 })
 
-function runKarma (configFile, done) {
-  var exec = require('child_process').exec
-
-  var cmd = process.platform === 'win32' ? 'node_modules\\.bin\\karma run ' :
-    'node node_modules/.bin/karma run '
-  cmd += configFile
-  exec(cmd, function (e, stdout) {
-    // ignore errors, we don't want to fail the build in the interactive (non-ci) mode
-    // karma server will print all test failures
-    done()
-  })
-}
+var karmaUtils = require('./dev-utils/karma')
 
 gulp.task('karma-run', function (done) {
   // run the run command in a new process to avoid duplicate logging by both server and runner from
   // a single process
-  runKarma('karma.conf.js', done)
+  karmaUtils.runKarma('karma.conf.js', done)
 })
 
 gulp.task('test', function (done) {
@@ -212,33 +201,14 @@ gulp.task('test', function (done) {
 
 // Launch sauce connect and connect
 gulp.task('test:launchsauceconnect', function (done) {
-  var sauceConnectLauncher = require('sauce-connect-launcher')
-
+  var sauceUtils = require('./dev-utils/saucelabs')
   var config = {
     username: saucelabsConfig.user,
     accessKey: saucelabsConfig.key,
     logger: console.log,
     noSslBumpDomains: 'all'
   }
-
-  var tryConnect = function (maxAttempts, currAttempts, done) {
-    sauceConnectLauncher(config, function (err, sauceConnectProcess) {
-      if (err) {
-        console.error(err.message)
-        if (currAttempts <= maxAttempts) {
-          console.log('Retrying... (attempt ' + currAttempts + ' of ' + maxAttempts + ')')
-          tryConnect(maxAttempts, ++currAttempts, done)
-        } else {
-          return process.exit(1)
-        }
-      } else {
-        console.log('Sauce Connect ready')
-        done()
-      }
-    })
-  }
-
-  tryConnect(3, 1, done)
+  sauceUtils.launchSauceConnect(config, done)
 })
 
 function onExit (callback) {
