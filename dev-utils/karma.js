@@ -157,7 +157,7 @@ function prepareConfig (defaultConfig) {
       console.log('saucelabs.build:', buildId)
     }
     defaultConfig.reporters = ['dots', 'saucelabs']
-    defaultConfig.browsers = Object.keys(baseLaunchers)
+    defaultConfig.browsers = Object.keys(defaultConfig.customLaunchers)
     defaultConfig.transports = ['polling']
   }
 
