@@ -1,5 +1,5 @@
 // dependencies
-// npm i --save-dev jasmine karma-sauce-launcher karma-failed-reporter karma-jasmine karma-spec-reporter webpack karma-webpack karma-chrome-launcher karma-sourcemap-loader babel-core babel-loader babel-preset-es2015 babel-plugin-istanbul
+// npm i --save-dev jasmine karma karma-sauce-launcher karma-failed-reporter karma-jasmine karma-spec-reporter webpack karma-webpack karma-chrome-launcher karma-sourcemap-loader babel-core babel-loader babel-preset-es2015 babel-plugin-istanbul
 var baseLaunchers = {
   'SL_CHROME': {
     base: 'SauceLabs',
@@ -175,8 +175,18 @@ function prepareConfig (defaultConfig) {
   }
   return defaultConfig
 }
+
+var karma = require('karma')
+function singleRunKarma (configFile, done) {
+  new karma.Server({
+    configFile: configFile,
+    singleRun: true
+  }, done).start()
+}
+
 module.exports = {
   prepareConfig: prepareConfig,
   baseConfig: baseConfig,
-  baseLaunchers: baseLaunchers
+  baseLaunchers: baseLaunchers,
+  singleRunKarma: singleRunKarma
 }
