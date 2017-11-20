@@ -6,8 +6,7 @@ function Config () {
   this.defaults = {
     appName: '',
     agentName: 'apm-js',
-    agentVersion: '0.0.0',
-    // VERSION: '%%VERSION%%',
+    agentVersion: '%%agent-version%%',
     apiOrigin: 'http://localhost:8200',
     apiUrlPrefix: '/v1/client-side',
     active: true,
@@ -152,8 +151,6 @@ function _getDataAttributesFromNode (node) {
 
   return dataAttrs
 }
-
-Config.prototype.VERSION = '%%VERSION%%'
 
 Config.prototype.isPlatformSupported = function () {
   return typeof Array.prototype.forEach === 'function' &&

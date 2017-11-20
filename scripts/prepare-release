@@ -12,7 +12,7 @@ git diff-index --quiet HEAD
 GITSTATUS=$?
 if [ $GITSTATUS -ne 0 ];
 then
-    echo "Git working directory not clean. Aborting.";
+    echo "Git working directory is not clean. Aborting.";
     exit 1
 fi
 
@@ -44,12 +44,12 @@ TAG_NAME="v$PACKAGE_VERSION"
 {
     conventional-changelog -p angular -i CHANGELOG.md -s
 } || {
-    read -r -p "Could not generate changelog automatically. Please write the it manually and press ENTER." TRASH
+    read -r -p "Could not generate changelog. Please write it manually and press ENTER." TRASH
 }
 
 git diff
 
-read -r -p "Are these changes OK (Make changes if necessary)? [y/N] " RESPONSE
+read -r -p "Are these changes OK (edit if necessary)? [y/N] " RESPONSE
 echo " "
 
 if ! [[ $RESPONSE =~ ^([yY][eE][sS]|[yY])$ ]];
