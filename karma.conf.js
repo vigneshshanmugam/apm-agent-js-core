@@ -25,7 +25,7 @@ module.exports = function (config) {
   console.log('customeConfig:', customeConfig)
   config.set(customeConfig)
   config.files.unshift('test/utils/polyfill.js')
-  config.files.unshift('node_modules/opbeat-zone/dist/zone.js')
+  config.files.unshift('node_modules/elastic-apm-js-zone/dist/zone.js')
   // config.files.push({ pattern: 'test/exceptions/data/*.js', included: false, watched: false })
   config.files.push({ pattern: 'src/**/*.js', included: false, watched: true })
   delete config.customLaunchers['SL_IOS8']

@@ -11,7 +11,7 @@ describe('StackTraceService', function () {
         throw new Error('test error')
       } catch(error) {
         var stackTraces = stackTraceService.createStackTraces({error})
-        expect(stackTraces.length).toBe(4)
+        expect(stackTraces.length).toBeGreaterThan(4)
         done()
       }
     }, 1)

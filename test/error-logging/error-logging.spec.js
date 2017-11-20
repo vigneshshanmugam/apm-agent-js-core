@@ -63,14 +63,37 @@ describe('ErrorLogging', function () {
         })
     }
   })
+  function createErrorEvent (message) {
+    var errorEvent
+    var errorEventData = {
+      type: 'error',
+      message: 'Uncaught Error: ' + message,
+      lineno: 1,
+      filename: 'test.js'
+    }
+
+    try {
+      throw new Error(message)
+    } catch (e) {
+      errorEventData.error = e
+    }
+
+    try {
+      errorEvent = new ErrorEvent('error', errorEventData)
+    } catch (e) {
+      console.log("Doesn't support creating ErrorEvent, using pure object instead.")
+      errorEvent = errorEventData
+    }
+    return errorEvent
+  }
 
   it('should support ErrorEvent', function (done) {
-    var _onError = window.onerror
     spyOn(apmServer, 'sendErrors').and.callThrough()
 
-    var testEventListener = function (errorEvent) {
-      expect(typeof errorEvent).toBe('object')
-      errorLogging.logErrorEvent(errorEvent).then(function () {
+    var errorEvent = createErrorEvent(testErrorMessage)
+
+    errorLogging.logErrorEvent(errorEvent)
+      .then(function () {
         expect(apmServer.sendErrors).toHaveBeenCalled()
         var errors = apmServer.sendErrors.calls.argsFor(0)[0]
         expect(errors.length).toBe(1)
@@ -81,22 +104,10 @@ describe('ErrorLogging', function () {
         expect(errorData.exception.stacktrace.length).toBeGreaterThan(0)
         done()
       })
-      window.removeEventListener('error', testEventListener)
-      window.onerror = _onError
-    }
-    window.addEventListener('error', testEventListener)
-
-    // can't use ErrorEvent constructor so need to throw an actual error
-    setTimeout(function () {
-      // need this to prevent karma from failing the test
-      window.onerror = null
-      throw new Error(testErrorMessage)
-    })
   })
 
   it('should install onerror and accept ErrorEvents', function (done) {
     var count = 0
-    debugger
     spyOn(apmServer, 'sendErrors').and.callFake(function (errors) {
       expect(errors.length).toBe(1)
       var error = errors[0]
@@ -108,21 +119,11 @@ describe('ErrorLogging', function () {
       }
     })
 
-    var _onError = window.onerror
     window.onerror = null
     errorLogging.registerGlobalEventListener()
 
     expect(typeof window.onerror).toBe('function')
     var apmOnError = window.onerror
-    window.onerror = _onError
-
-    var testEventListener = function (errorEvent) {
-      apmOnError(errorEvent)
-      window.removeEventListener('error', testEventListener)
-      window.onerror = _onError
-      return true
-    }
-    window.addEventListener('error', testEventListener)
 
     try {
       throw new Error(testErrorMessage)
@@ -133,14 +134,8 @@ describe('ErrorLogging', function () {
     apmOnError(testErrorMessage, 'filename', 1, 2, undefined)
     apmOnError(testErrorMessage, undefined, undefined, undefined, undefined)
     apmOnError('Test:' + testErrorMessage, 'filename', 1, 2, undefined)
-    // apmOnError('Script error.', undefined, undefined, undefined, undefined)
     apmOnError('Script error.' + testErrorMessage, undefined, undefined, undefined, undefined)
-
-    setTimeout(function () {
-      window.onerror = null
-      throw new Error(testErrorMessage)
-    })
-    window.onerror = _onError
+    apmOnError(createErrorEvent(testErrorMessage))
   })
 
   it('should handle edge cases', function (done) {

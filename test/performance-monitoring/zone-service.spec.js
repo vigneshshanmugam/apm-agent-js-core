@@ -28,7 +28,7 @@ describe('ZoneService', function () {
 
   it('should call registered event listeners for XHR', function (done) {
     var response
-
+    var readyStateChangeSpy = jasmine.createSpy('readyStateChangeSpy')
     zoneService.spec.onScheduleTask = function (task) {
       expect(response).toBeUndefined()
       expect(task.XHR.url).toBe('/')
@@ -40,6 +40,7 @@ describe('ZoneService', function () {
     zoneService.spec.onInvokeTask = function (task) {
       expect(response).toBeDefined()
       expect(zoneService.spec.onBeforeInvokeTask).toHaveBeenCalled()
+      expect(readyStateChangeSpy).toHaveBeenCalled()
 
       // should call done asynchronously since we're spying in this function in multiple tests
       zoneService.runOuter(function () {
@@ -59,6 +60,8 @@ describe('ZoneService', function () {
       }
 
       var oReq = new window.XMLHttpRequest()
+      // In zone.js@0.8.12-prm readystatechange is not registered by default on every request
+      oReq.addEventListener('readystatechange', readyStateChangeSpy)
       oReq.addEventListener('load', reqListener)
       oReq.addEventListener('error', function (event) {
         console.log('failed')
@@ -71,7 +74,8 @@ describe('ZoneService', function () {
 
   it('should keep track of task for XHR if the event listeners are registered after send', function (done) {
     var response
-
+    var readyStateChangeSpy = jasmine.createSpy('readyStateChangeSpy')
+    
     zoneService.spec.onScheduleTask = function (task) {
       expect(response).toBeUndefined()
     }
@@ -81,6 +85,7 @@ describe('ZoneService', function () {
     zoneService.spec.onInvokeTask = function (task) {
       expect(response).toBeDefined()
       expect(zoneService.spec.onBeforeInvokeTask).toHaveBeenCalled()
+      expect(readyStateChangeSpy).toHaveBeenCalled()
 
       // should call done asynchronously since we're spying in this function in multiple tests
       zoneService.runOuter(function () {
@@ -103,6 +108,7 @@ describe('ZoneService', function () {
 
       oReq.open('GET', '/', true)
       oReq.send(null)
+      oReq.addEventListener('readystatechange', readyStateChangeSpy)
       oReq.addEventListener('load', reqListener)
       oReq.addEventListener('error', function (event) {
         console.log('failed')
@@ -113,11 +119,8 @@ describe('ZoneService', function () {
   it('should keep track of tasks even if no event listeners are registered', function (done) {
     resetZoneCallbacks(zoneService)
 
-    zoneService.spec.onBeforeInvokeTask = function (task) {
-      expect(zoneService.spec.onScheduleTask).toHaveBeenCalled()
-    }
     zoneService.spec.onInvokeTask = function (task) {
-      expect(zoneService.spec.onBeforeInvokeTask).toHaveBeenCalled()
+      expect(zoneService.spec.onScheduleTask).toHaveBeenCalled()
 
       // should call done asynchronously since we're spying in this function in multiple tests
       zoneService.runOuter(function () {
@@ -128,7 +131,6 @@ describe('ZoneService', function () {
     }
 
     spyOn(zoneService.spec, 'onScheduleTask').and.callThrough()
-    spyOn(zoneService.spec, 'onBeforeInvokeTask').and.callThrough()
     spyOn(zoneService.spec, 'onInvokeTask').and.callThrough()
 
     zoneService.zone.run(function () {
