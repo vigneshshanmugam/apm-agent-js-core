@@ -5,8 +5,8 @@
   "license": "MIT",
   "main": "src/index.js",
   "scripts": {
-    "prepare-patch": "sh ./scripts/prepare-release patch && npm run push-release",
-    "prepare-minor": "sh ./scripts/prepare-release minor && npm run push-release",
+    "prepare-patch": "sh ./dev-utils/prepare-release patch && npm run push-release",
+    "prepare-minor": "sh ./dev-utils/prepare-release minor && npm run push-release",
     "push-release": "git push origin master --follow-tags && npm publish",
     "build": "gulp build:release",
     "karma": "node node_modules/karma/bin/karma start",
