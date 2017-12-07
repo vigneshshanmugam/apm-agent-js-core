@@ -19,8 +19,8 @@ function Config () {
     checkBrowserResponsiveness: true,
     enable: true,
     enableStackFrames: false,
-    groupSimilarTraces: true,
-    similarTraceThreshold: 0.05,
+    groupSimilarSpans: true,
+    similarSpanThreshold: 0.05,
     captureInteractions: false,
     sendVerboseDebugInfo: false,
     includeXHRQueryString: false,
@@ -114,7 +114,7 @@ Config.prototype.subscribeToChange = function (fn) {
 }
 
 Config.prototype.isValid = function () {
-  var requiredKeys = ['appId', 'orgId']
+  var requiredKeys = ['appName']
   var values = utils.arrayMap(requiredKeys, utils.functionBind(function (key) {
     return (this.config[key] === null) || (this.config[key] === undefined)
   }, this))

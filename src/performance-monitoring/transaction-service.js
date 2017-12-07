@@ -27,8 +27,8 @@ function TransactionService (zoneService, logger, config) {
   this._alreadyCapturedPageLoad = false
 
   function onBeforeInvokeTask (task) {
-    if (task.source === 'XMLHttpRequest.send' && task.trace && !task.trace.ended) {
-      task.trace.end()
+    if (task.source === 'XMLHttpRequest.send' && task.span && !task.span.ended) {
+      task.span.end()
     }
     transactionService.logInTransaction('Executing', task.taskId)
   }
@@ -39,16 +39,16 @@ function TransactionService (zoneService, logger, config) {
   function onScheduleTask (task) {
     if (task.source === 'XMLHttpRequest.send') {
       var url = task['XHR']['url']
-      var traceSignature = task['XHR']['method'] + ' '
+      var spanSignature = task['XHR']['method'] + ' '
       if (transactionService._config.get('includeXHRQueryString')) {
-        traceSignature = traceSignature + url
+        spanSignature = spanSignature + url
       } else {
         var parsed = utils.parseUrl(url)
-        traceSignature = traceSignature + parsed.path
+        spanSignature = spanSignature + parsed.path
       }
 
-      var trace = transactionService.startTrace(traceSignature, 'ext.HttpRequest', {'enableStackFrames': false})
-      task.trace = trace
+      var span = transactionService.startSpan(spanSignature, 'ext.HttpRequest', {'enableStackFrames': false})
+      task.span = span
     } else if (task.type === 'interaction') {
       if (typeof self.interactionStarted === 'function') {
         self.interactionStarted(task)
@@ -59,8 +59,8 @@ function TransactionService (zoneService, logger, config) {
   zoneService.spec.onScheduleTask = onScheduleTask
 
   function onInvokeTask (task) {
-    if (task.source === 'XMLHttpRequest.send' && task.trace && !task.trace.ended) {
-      task.trace.end()
+    if (task.source === 'XMLHttpRequest.send' && task.span && !task.span.ended) {
+      task.span.end()
       transactionService.logInTransaction('xhr late ending')
       transactionService.setDebugDataOnTransaction('xhrLateEnding', true)
     }
@@ -195,7 +195,7 @@ TransactionService.prototype.startTransaction = function (name, type) {
 
   if (tr) {
     if (tr.name !== 'ZoneTransaction') {
-      // todo: need to handle cases in which the transaction has active traces and/or scheduled tasks
+      // todo: need to handle cases in which the transaction has active spans and/or scheduled tasks
       this.logInTransaction('Ending early to start a new transaction:', name, type)
       this._logger.debug('Ending old transaction', tr)
       tr.end()
@@ -212,7 +212,7 @@ TransactionService.prototype.startTransaction = function (name, type) {
     self.applyAsync(function () {
       self._logger.debug('TransactionService transaction finished', tr)
 
-      if (tr.traces.length > 1 && !self.shouldIgnoreTransaction(tr.name)) {
+      if (tr.spans.length > 1 && !self.shouldIgnoreTransaction(tr.name)) {
         self.capturePageLoadMetrics(tr)
         self.add(tr)
         self._subscription.applyAll(self, [tr])
@@ -249,13 +249,13 @@ TransactionService.prototype.shouldIgnoreTransaction = function (transaction_nam
   return false
 }
 
-TransactionService.prototype.startTrace = function (signature, type, options) {
+TransactionService.prototype.startSpan = function (signature, type, options) {
   var trans = this.getCurrentTransaction()
 
   if (trans) {
-    this._logger.debug('TransactionService.startTrace', signature, type)
-    var trace = trans.startTrace(signature, type, options)
-    return trace
+    this._logger.debug('TransactionService.startSpan', signature, type)
+    var span = trans.startSpan(signature, type, options)
+    return span
   }
 }
 

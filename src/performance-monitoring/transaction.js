@@ -1,4 +1,4 @@
-var Trace = require('./trace')
+var Span = require('./span')
 var utils = require('../common/utils')
 const uuidv4 = require('uuid/v4')
 
@@ -9,7 +9,6 @@ var Transaction = function (name, type, options, logger) {
   this.name = name
   this.type = type
   this.ended = false
-  this._markDoneAfterLastTrace = false
   this._isDone = false
   this._options = options
   this._logger = logger
@@ -26,8 +25,8 @@ var Transaction = function (name, type, options, logger) {
     this.debugLog('Transaction', name, type)
   }
 
-  this.traces = []
-  this._activeTraces = {}
+  this.spans = []
+  this._activeSpans = {}
 
   this._scheduledTasks = {}
 
@@ -35,12 +34,12 @@ var Transaction = function (name, type, options, logger) {
 
   this.doneCallback = function noop () {}
 
-  // A transaction should always have a root trace spanning the entire transaction.
-  this._rootTrace = this.startTrace('transaction', 'transaction', {enableStackFrames: false})
+  // A transaction should always have a root span spanning the entire transaction.
+  this._rootSpan = this.startSpan('transaction', 'transaction', {enableStackFrames: false})
   this._startStamp = new Date()
-  this._start = this._rootTrace._start
+  this._start = this._rootSpan._start
 
-  this.duration = this._rootTrace.duration.bind(this._rootTrace)
+  this.duration = this._rootSpan.duration.bind(this._rootSpan)
   this.nextId = 0
 
   this.isHardNavigation = false
@@ -75,38 +74,26 @@ Transaction.prototype.redefine = function (name, type, options) {
   this._options = options
 }
 
-Transaction.prototype.startTrace = function (signature, type, options) {
-  // todo: should not accept more traces if the transaction is alreadyFinished
+Transaction.prototype.startSpan = function (signature, type, options) {
+  // todo: should not accept more spans if the transaction is alreadyFinished
   var transaction = this
-  this.debugLog('startTrace', signature, type)
+  this.debugLog('startSpan', signature, type)
   var opts = typeof options === 'undefined' ? {} : options
   opts.enableStackFrames = this._options.enableStackFrames === true && opts.enableStackFrames !== false
 
-  opts.onTraceEnd = function (trc) {
-    transaction._onTraceEnd(trc)
+  opts.onSpanEnd = function (trc) {
+    transaction._onSpanEnd(trc)
   }
 
-  var trace = new Trace(signature, type, opts)
-  trace.traceId = this.nextId
+  var span = new Span(signature, type, opts)
+  span.id = this.nextId
   this.nextId++
-  if (this._rootTrace) {
-    trace.setParent(this._rootTrace)
-    this._activeTraces[trace.traceId] = trace
+  if (this._rootSpan) {
+    span.setParent(this._rootSpan)
+    this._activeSpans[span.id] = span
   }
 
-  return trace
-}
-
-Transaction.prototype.recordEvent = function (e) {
-  var event = this.events[e.name]
-  if (utils.isUndefined(event)) {
-    event = { name: e.name, start: e.start, end: e.end, time: e.end - e.start, count: 0 }
-    this.events[event.name] = event
-  } else {
-    event.time += (e.end - e.start)
-    event.count++
-    event.end = e.end
-  }
+  return span
 }
 
 Transaction.prototype.isFinished = function () {
@@ -131,7 +118,7 @@ Transaction.prototype.end = function () {
       location: window.location.href
     }
   })
-  this._rootTrace.end()
+  this._rootSpan.end()
 
   if (this.isFinished() === true) {
     this._finish()
@@ -150,15 +137,15 @@ Transaction.prototype.removeTask = function (taskId) {
   delete this._scheduledTasks[taskId]
 }
 
-Transaction.prototype.addEndedTraces = function (existingTraces) {
-  this.traces = this.traces.concat(existingTraces)
+Transaction.prototype.addEndedSpans = function (existingSpans) {
+  this.spans = this.spans.concat(existingSpans)
 }
 
-Transaction.prototype._onTraceEnd = function (trace) {
-  this.traces.push(trace)
-  trace._scheduledTasks = Object.keys(this._scheduledTasks)
-  // Remove trace from _activeTraces
-  delete this._activeTraces[trace.traceId]
+Transaction.prototype._onSpanEnd = function (span) {
+  this.spans.push(span)
+  span._scheduledTasks = Object.keys(this._scheduledTasks)
+  // Remove span from _activeSpans
+  delete this._activeSpans[span.id]
 }
 
 Transaction.prototype._finish = function () {
@@ -168,64 +155,64 @@ Transaction.prototype._finish = function () {
 
   this._alreadFinished = true
 
-  this._adjustStartToEarliestTrace()
-  this._adjustEndToLatestTrace()
+  this._adjustStartToEarliestSpan()
+  this._adjustEndToLatestSpan()
   this.doneCallback(this)
 }
 
-Transaction.prototype._adjustEndToLatestTrace = function () {
-  var latestTrace = findLatestNonXHRTrace(this.traces)
+Transaction.prototype._adjustEndToLatestSpan = function () {
+  var latestSpan = findLatestNonXHRSpan(this.spans)
 
-  if (latestTrace) {
-    this._rootTrace._end = latestTrace._end
+  if (latestSpan) {
+    this._rootSpan._end = latestSpan._end
 
-    // set all traces that now are longer than the transaction to
-    // be truncated traces
-    for (var i = 0; i < this.traces.length; i++) {
-      var trace = this.traces[i]
-      if (trace._end > this._rootTrace._end) {
-        trace._end = this._rootTrace._end
-        trace.type = trace.type + '.truncated'
+    // set all spans that now are longer than the transaction to
+    // be truncated spans
+    for (var i = 0; i < this.spans.length; i++) {
+      var span = this.spans[i]
+      if (span._end > this._rootSpan._end) {
+        span._end = this._rootSpan._end
+        span.type = span.type + '.truncated'
       }
     }
   }
 }
 
-Transaction.prototype._adjustStartToEarliestTrace = function () {
-  var trace = getEarliestTrace(this.traces)
+Transaction.prototype._adjustStartToEarliestSpan = function () {
+  var span = getEarliestSpan(this.spans)
 
-  if (trace) {
-    this._rootTrace._start = trace._start
-    this._start = this._rootTrace._start
+  if (span) {
+    this._rootSpan._start = span._start
+    this._start = this._rootSpan._start
   }
 }
 
-function findLatestNonXHRTrace (traces) {
-  var latestTrace = null
-  for (var i = 0; i < traces.length; i++) {
-    var trace = traces[i]
-    if (trace.type && trace.type.indexOf('ext') === -1 &&
-      trace.type !== 'transaction' &&
-      (!latestTrace || latestTrace._end < trace._end)) {
-      latestTrace = trace
+function findLatestNonXHRSpan (spans) {
+  var latestSpan = null
+  for (var i = 0; i < spans.length; i++) {
+    var span = spans[i]
+    if (span.type && span.type.indexOf('ext') === -1 &&
+      span.type !== 'transaction' &&
+      (!latestSpan || latestSpan._end < span._end)) {
+      latestSpan = span
     }
   }
-  return latestTrace
+  return latestSpan
 }
 
-function getEarliestTrace (traces) {
-  var earliestTrace = null
+function getEarliestSpan (spans) {
+  var earliestSpan = null
 
-  traces.forEach(function (trace) {
-    if (!earliestTrace) {
-      earliestTrace = trace
+  spans.forEach(function (span) {
+    if (!earliestSpan) {
+      earliestSpan = span
     }
-    if (earliestTrace && earliestTrace._start > trace._start) {
-      earliestTrace = trace
+    if (earliestSpan && earliestSpan._start > span._start) {
+      earliestSpan = span
     }
   })
 
-  return earliestTrace
+  return earliestSpan
 }
 
 module.exports = Transaction

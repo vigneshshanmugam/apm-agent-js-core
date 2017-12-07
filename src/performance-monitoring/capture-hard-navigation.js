@@ -1,4 +1,4 @@
-var Trace = require('./trace')
+var Span = require('./span')
 
 var eventPairs = [
   ['domainLookupStart', 'domainLookupEnd', 'DNS lookup'],
@@ -14,10 +14,10 @@ var navigationTimingKeys = [
   'navigationStart', 'unloadEventStart', 'unloadEventEnd', 'redirectStart', 'redirectEnd', 'fetchStart', 'domainLookupStart', 'domainLookupEnd', 'connectStart',
   'connectEnd', 'secureConnectionStart', 'requestStart', 'responseStart', 'responseEnd', 'domLoading', 'domInteractive', 'domContentLoadedEventStart', 'domContentLoadedEventEnd', 'domComplete', 'loadEventStart', 'loadEventEnd']
 
-var traceThreshold = 5 * 60 * 1000 // 5 minutes
-function isValidTrace (transaction, trace) {
-  var d = trace.duration()
-  return (d < traceThreshold && d > 0 && trace._start <= transaction._rootTrace._end && trace._end <= transaction._rootTrace._end)
+var spanThreshold = 5 * 60 * 1000 // 5 minutes
+function isValidSpan (transaction, span) {
+  var d = span.duration()
+  return (d < spanThreshold && d > 0 && span._start <= transaction._rootSpan._end && span._end <= transaction._rootSpan._end)
 }
 
 module.exports = function captureHardNavigation (transaction) {
@@ -25,21 +25,21 @@ module.exports = function captureHardNavigation (transaction) {
     var baseTime = window.performance.timing.fetchStart
     var timings = window.performance.timing
 
-    transaction._rootTrace._start = transaction._start = 0
+    transaction._rootSpan._start = transaction._start = 0
     transaction.type = 'page-load'
     for (var i = 0; i < eventPairs.length; i++) {
       // var transactionStart = eventPairs[0]
       var start = timings[eventPairs[i][0]]
       var end = timings[eventPairs[i][1]]
       if (start && end && end - start !== 0) {
-        var trace = new Trace(eventPairs[i][2], 'hard-navigation.browser-timing')
-        trace._start = timings[eventPairs[i][0]] - baseTime
-        trace.ended = true
-        trace.setParent(transaction._rootTrace)
-        trace.end()
-        trace._end = timings[eventPairs[i][1]] - baseTime
-        if (isValidTrace(transaction, trace)) {
-          transaction.traces.push(trace)
+        var span = new Span(eventPairs[i][2], 'hard-navigation.browser-timing')
+        span._start = timings[eventPairs[i][0]] - baseTime
+        span.ended = true
+        span.setParent(transaction._rootSpan)
+        span.end()
+        span._end = timings[eventPairs[i][1]] - baseTime
+        if (isValidSpan(transaction, span)) {
+          transaction.spans.push(span)
         }
       }
     }
@@ -47,9 +47,9 @@ module.exports = function captureHardNavigation (transaction) {
     if (window.performance.getEntriesByType) {
       var entries = window.performance.getEntriesByType('resource')
 
-      var ajaxUrls = transaction.traces
-        .filter(function (trace) { return trace.type.indexOf('ext.HttpRequest') > -1 })
-        .map(function (trace) { return trace.signature.split(' ')[1] })
+      var ajaxUrls = transaction.spans
+        .filter(function (span) { return span.type.indexOf('ext.HttpRequest') > -1 })
+        .map(function (span) { return span.signature.split(' ')[1] })
 
       for (i = 0; i < entries.length; i++) {
         var entry = entries[i]
@@ -75,23 +75,23 @@ module.exports = function captureHardNavigation (transaction) {
             kind += '.' + entry.initiatorType
           }
 
-          trace = new Trace(entry.name, kind)
-          trace._start = entry.startTime
-          trace.ended = true
-          trace.setParent(transaction._rootTrace)
-          trace.end()
-          trace._end = entry.responseEnd
-          if (isValidTrace(transaction, trace)) {
-            transaction.traces.push(trace)
+          span = new Span(entry.name, kind)
+          span._start = entry.startTime
+          span.ended = true
+          span.setParent(transaction._rootSpan)
+          span.end()
+          span._end = entry.responseEnd
+          if (isValidSpan(transaction, span)) {
+            transaction.spans.push(span)
           }
         }
       }
     }
-    transaction._adjustStartToEarliestTrace()
-    transaction._adjustEndToLatestTrace()
+    transaction._adjustStartToEarliestSpan()
+    transaction._adjustEndToLatestSpan()
 
     var metrics = {
-      timeToComplete: transaction._rootTrace._end
+      timeToComplete: transaction._rootSpan._end
     }
     var navigationStart = window.performance.timing.navigationStart
     navigationTimingKeys.forEach(function (timingKey) {

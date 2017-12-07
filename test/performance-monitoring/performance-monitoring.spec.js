@@ -1,6 +1,6 @@
 var createServiceFactory = require('..').createServiceFactory
 var Transaction = require('../../src/performance-monitoring/transaction')
-var Trace = require('../../src/performance-monitoring/trace')
+var Span = require('../../src/performance-monitoring/span')
 var apmTestConfig = require('../apm-test-config')()
 
 describe('PerformanceMonitoring', function () {
@@ -23,51 +23,51 @@ describe('PerformanceMonitoring', function () {
 
     // performanceMonitoring._transactionService
     var tr = new Transaction('tr-name', 'tr-type', configService.config, logger)
-    var trace1 = new Trace('trace 1', 'test-trace')
-    trace1.end()
-    tr.traces.push(trace1)
+    var span1 = new Span('span 1', 'test-span')
+    span1.end()
+    tr.spans.push(span1)
     tr.end()
     var payload = performanceMonitoring.convertTransactionsToServerModel([tr])
     apmServer.sendTransactions(payload)
   })
 
-  it('should group small continuously similar traces up until the last one', function () {
+  it('should group small continuously similar spans up until the last one', function () {
     var tr = new Transaction('transaction', 'transaction')
-    var trace1 = tr.startTrace('signature', 'type')
-    trace1.end()
-    var trace2 = tr.startTrace('signature', 'type')
-    trace2.end()
-    var trace3 = tr.startTrace('another-signature', 'type')
-    trace3.end()
-    var trace4 = tr.startTrace('signature', 'type')
-    trace4.end()
-    var trace5 = tr.startTrace('signature', 'type')
-    trace5.end()
+    var span1 = tr.startSpan('signature', 'type')
+    span1.end()
+    var span2 = tr.startSpan('signature', 'type')
+    span2.end()
+    var span3 = tr.startSpan('another-signature', 'type')
+    span3.end()
+    var span4 = tr.startSpan('signature', 'type')
+    span4.end()
+    var span5 = tr.startSpan('signature', 'type')
+    span5.end()
 
     tr.end()
 
-    tr._rootTrace._start = 10
-    tr._rootTrace._end = 1000
+    tr._rootSpan._start = 10
+    tr._rootSpan._end = 1000
 
-    trace1._start = 20
-    trace1._end = 30
+    span1._start = 20
+    span1._end = 30
 
-    trace2._start = 31
-    trace2._end = 35
+    span2._start = 31
+    span2._end = 35
 
-    trace3._start = 35
-    trace3._end = 45
+    span3._start = 35
+    span3._end = 45
 
-    trace4._start = 50
-    trace4._end = 60
+    span4._start = 50
+    span4._end = 60
 
-    trace5._start = 61
-    trace5._end = 70
+    span5._start = 61
+    span5._end = 70
 
-    tr.traces.sort(function (traceA, traceB) {
-      return traceA._start - traceB._start
+    tr.spans.sort(function (spanA, spanB) {
+      return spanA._start - spanB._start
     })
-    var grouped = performanceMonitoring.groupSmallContinuouslySimilarTraces(tr, 0.05)
+    var grouped = performanceMonitoring.groupSmallContinuouslySimilarSpans(tr, 0.05)
 
     expect(grouped.length).toBe(4)
     expect(grouped[0].signature).toBe('transaction')
@@ -76,44 +76,44 @@ describe('PerformanceMonitoring', function () {
     expect(grouped[3].signature).toBe('2x signature')
   })
 
-  it('should group small continuously similar traces', function () {
+  it('should group small continuously similar spans', function () {
     var tr = new Transaction('transaction', 'transaction', { 'performance.enableStackFrames': true })
-    var trace1 = tr.startTrace('signature', 'type')
-    trace1.end()
-    var trace2 = tr.startTrace('signature', 'type')
-    trace2.end()
-    var trace3 = tr.startTrace('signature', 'type')
-    trace3.end()
-    var trace4 = tr.startTrace('signature', 'type')
-    trace4.end()
-    var trace5 = tr.startTrace('another-signature', 'type')
-    trace5.end()
+    var span1 = tr.startSpan('signature', 'type')
+    span1.end()
+    var span2 = tr.startSpan('signature', 'type')
+    span2.end()
+    var span3 = tr.startSpan('signature', 'type')
+    span3.end()
+    var span4 = tr.startSpan('signature', 'type')
+    span4.end()
+    var span5 = tr.startSpan('another-signature', 'type')
+    span5.end()
 
     tr.end()
 
-    tr._rootTrace._start = 10
-    tr._rootTrace._end = 1000
+    tr._rootSpan._start = 10
+    tr._rootSpan._end = 1000
 
-    trace1._start = 20
-    trace1._end = 30
+    span1._start = 20
+    span1._end = 30
 
-    trace2._start = 31
-    trace2._end = 35
+    span2._start = 31
+    span2._end = 35
 
-    trace3._start = 35
-    trace3._end = 45
+    span3._start = 35
+    span3._end = 45
 
-    trace4._start = 50
-    trace4._end = 60
+    span4._start = 50
+    span4._end = 60
 
-    trace5._start = 60
-    trace5._end = 70
+    span5._start = 60
+    span5._end = 70
 
-    tr.traces.sort(function (traceA, traceB) {
-      return traceA._start - traceB._start
+    tr.spans.sort(function (spanA, spanB) {
+      return spanA._start - spanB._start
     })
 
-    var grouped = performanceMonitoring.groupSmallContinuouslySimilarTraces(tr, 0.05)
+    var grouped = performanceMonitoring.groupSmallContinuouslySimilarSpans(tr, 0.05)
 
     expect(grouped.length).toBe(3)
     expect(grouped[0].signature).toBe('transaction')
@@ -125,26 +125,46 @@ describe('PerformanceMonitoring', function () {
     var tr = new Transaction('transaction', 'transaction', { 'performance.enableStackFrames': true })
     tr.end()
 
-    tr._rootTrace._start = 1
+    tr._rootSpan._start = 1
 
-    tr._rootTrace._end = 400
+    tr._rootSpan._end = 400
     tr.browserResponsivenessCounter = 0
     var resp = performanceMonitoring.checkBrowserResponsiveness(tr, 500, 2)
     expect(resp).toBe(true)
 
-    tr._rootTrace._end = 1001
+    tr._rootSpan._end = 1001
     tr.browserResponsivenessCounter = 2
     resp = performanceMonitoring.checkBrowserResponsiveness(tr, 500, 2)
     expect(resp).toBe(true)
 
-    tr._rootTrace._end = 1601
+    tr._rootSpan._end = 1601
     tr.browserResponsivenessCounter = 2
     resp = performanceMonitoring.checkBrowserResponsiveness(tr, 500, 2)
     expect(resp).toBe(true)
 
-    tr._rootTrace._end = 3001
+    tr._rootSpan._end = 3001
     tr.browserResponsivenessCounter = 3
     resp = performanceMonitoring.checkBrowserResponsiveness(tr, 500, 2)
     expect(resp).toBe(false)
+  })
+
+  it('should scheduleTransactionSend', function () {
+    expect(performanceMonitoring._sendIntervalId).toBeUndefined()
+    performanceMonitoring.scheduleTransactionSend()
+    expect(performanceMonitoring._sendIntervalId).toBeDefined()
+    clearInterval(performanceMonitoring._sendIntervalId)
+  })
+
+  it('should sendTransactionInterval', function () {
+    var result = performanceMonitoring.sendTransactionInterval()
+    expect(result).toBeUndefined()
+    var transactionService = serviceFactory.getService('TransactionService')
+    var tr = new Transaction('test transaction', 'transaction', {}, logger)
+    var span = tr.startSpan('test span', 'test span thype')
+    span.end()
+    tr.detectFinish()
+    transactionService._queue.push(tr)
+    result = performanceMonitoring.sendTransactionInterval()
+    expect(result).toBeDefined()
   })
 })

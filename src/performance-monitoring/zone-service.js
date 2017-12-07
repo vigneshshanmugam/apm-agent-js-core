@@ -159,7 +159,7 @@ function ZoneService (logger, config) {
 
         spec.onScheduleTask(opbeatTask)
 
-        // clear traces on the zone transaction
+        // clear spans on the zone transaction
         result = parentZoneDelegate.invokeTask(targetZone, task, applyThis, applyArgs)
         spec.onInvokeTask(opbeatTask)
       } else {

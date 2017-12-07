@@ -1,82 +1,82 @@
 var Transaction = require('../../src/performance-monitoring/transaction')
-var Trace = require('../../src/performance-monitoring/trace')
+var Span = require('../../src/performance-monitoring/span')
 
 describe('transaction.Transaction', function () {
   beforeEach(function () {})
 
-  it('should contain correct number of traces in the end', function (done) {
-    var firstTrace = new Trace('first-trace-signature', 'first-trace')
-    firstTrace.end()
+  it('should contain correct number of spans in the end', function (done) {
+    var firstSpan = new Span('first-span-signature', 'first-span')
+    firstSpan.end()
 
     var transaction = new Transaction('/', 'transaction', {})
 
-    firstTrace.transaction = transaction
-    firstTrace.setParent(transaction._rootTrace)
-    transaction.addEndedTraces([firstTrace])
+    firstSpan.transaction = transaction
+    firstSpan.setParent(transaction._rootSpan)
+    transaction.addEndedSpans([firstSpan])
 
-    var lastTrace = transaction.startTrace('last-trace-signature', 'last-trace')
-    lastTrace.end()
+    var lastSpan = transaction.startSpan('last-span-signature', 'last-span')
+    lastSpan.end()
     transaction.end()
 
-    expect(transaction.traces.length).toBe(3)
+    expect(transaction.spans.length).toBe(3)
     done()
   })
 
-  it('should adjust rootTrace to earliest trace', function (done) {
-    var firstTrace = new Trace('first-trace-signature', 'first-trace')
-    firstTrace.end()
+  it('should adjust rootSpan to earliest span', function (done) {
+    var firstSpan = new Span('first-span-signature', 'first-span')
+    firstSpan.end()
 
     var transaction = new Transaction('/', 'transaction', {})
     transaction.doneCallback = function () {
-      expect(transaction._rootTrace._start).toBe(firstTrace._start)
-      expect(transaction._rootTrace._end >= lastTrace._end).toBeTruthy()
+      expect(transaction._rootSpan._start).toBe(firstSpan._start)
+      expect(transaction._rootSpan._end >= lastSpan._end).toBeTruthy()
       done()
     }
-    firstTrace.transaction = transaction
-    firstTrace.setParent(transaction._rootTrace)
-    transaction.addEndedTraces([firstTrace])
+    firstSpan.transaction = transaction
+    firstSpan.setParent(transaction._rootSpan)
+    transaction.addEndedSpans([firstSpan])
 
-    var lastTrace = transaction.startTrace('last-trace-signature', 'last-trace')
+    var lastSpan = transaction.startSpan('last-span-signature', 'last-span')
 
-    lastTrace.end()
+    lastSpan.end()
     transaction.detectFinish()
   })
 
-  it('should adjust rootTrace to latest trace', function (done) {
+  it('should adjust rootSpan to latest span', function (done) {
     var transaction = new Transaction('/', 'transaction', {})
-    var rootTraceStart = transaction._rootTrace._start
+    var rootSpanStart = transaction._rootSpan._start
 
-    var firstTrace = transaction.startTrace('first-trace-signature', 'first-trace')
-    firstTrace.end()
+    var firstSpan = transaction.startSpan('first-span-signature', 'first-span')
+    firstSpan.end()
 
-    var longTrace = transaction.startTrace('long-trace-signature', 'long-trace')
+    var longSpan = transaction.startSpan('long-span-signature', 'long-span')
 
-    var lastTrace = transaction.startTrace('last-trace-signature', 'last-trace')
-    lastTrace.end()
+    var lastSpan = transaction.startSpan('last-span-signature', 'last-span')
+    lastSpan.end()
 
     setTimeout(function () {
-      longTrace.end()
+      longSpan.end()
       transaction.detectFinish()
 
       setTimeout(function () {
-        expect(transaction._rootTrace._start).toBe(rootTraceStart)
-        expect(transaction._rootTrace._end).toEqual(longTrace._end)
+        expect(transaction._rootSpan._start).toBe(rootSpanStart)
+        expect(transaction._rootSpan._end).toEqual(longSpan._end)
         done()
       })
     }, 500)
   })
 
-  xit('should not start any traces after transaction has been added to queue', function (done) {
+  xit('should not start any spans after transaction has been added to queue', function (done) {
     var transaction = new Transaction('/', 'transaction', {})
     transaction.end()
-    var firstTrace = transaction.startTrace('first-trace-signature', 'first-trace')
-    firstTrace.end()
+    var firstSpan = transaction.startSpan('first-span-signature', 'first-span')
+    firstSpan.end()
     setTimeout(function () {
-      // todo: transaction has already been added to the queue, shouldn't accept more traces
+      // todo: transaction has already been added to the queue, shouldn't accept more spans
 
-      var lastTrace = transaction.startTrace('last-trace-signature', 'last-trace')
-      fail('done transaction should not accept more traces, now we simply ignore the newly stared trace.')
-      lastTrace.end()
+      var lastSpan = transaction.startSpan('last-span-signature', 'last-span')
+      fail('done transaction should not accept more spans, now we simply ignore the newly stared span.')
+      lastSpan.end()
     })
   })
 
@@ -84,25 +84,25 @@ describe('transaction.Transaction', function () {
     var tr = new Transaction('/', 'transaction', {'enableStackFrames': true})
     var trPromise = new Promise(function (resolve, reject) {
       tr.doneCallback = function () {
-        // expect(firstTrace.frames).not.toBeUndefined()
-        expect(secondTrace.frames).toBeUndefined()
+        // expect(firstSpan.frames).not.toBeUndefined()
+        expect(secondSpan.frames).toBeUndefined()
         resolve()
       }
     })
 
-    var firstTrace = tr.startTrace('first-trace-signature', 'first-trace')
-    firstTrace.end()
+    var firstSpan = tr.startSpan('first-span-signature', 'first-span')
+    firstSpan.end()
 
-    var secondTrace = tr.startTrace('second-trace', 'second-trace', {'enableStackFrames': false})
-    secondTrace.end()
+    var secondSpan = tr.startSpan('second-span', 'second-span', {'enableStackFrames': false})
+    secondSpan.end()
 
     var noStackTrace = new Transaction('/', 'transaction', {'enableStackFrames': false})
-    var thirdTrace = noStackTrace.startTrace('third-trace', 'third-trace', {'enableStackFrames': true})
-    thirdTrace.end()
+    var thirdSpan = noStackTrace.startSpan('third-span', 'third-span', {'enableStackFrames': true})
+    thirdSpan.end()
 
     var noStackTracePromise = new Promise(function (resolve, reject) {
       noStackTrace.doneCallback = function () {
-        expect(thirdTrace.frames).toBeUndefined()
+        expect(thirdSpan.frames).toBeUndefined()
         resolve()
       }
     })
@@ -117,15 +117,15 @@ describe('transaction.Transaction', function () {
   it('should not generate stacktrace if the option is not passed', function (done) {
     var tr = new Transaction('/', 'transaction')
     tr.doneCallback = function () {
-      expect(firstTrace.frames).toBeUndefined()
-      expect(secondTrace.frames).toBeUndefined()
+      expect(firstSpan.frames).toBeUndefined()
+      expect(secondSpan.frames).toBeUndefined()
       done()
     }
-    var firstTrace = tr.startTrace('first-trace-signature', 'first-trace', {'enableStackFrames': true})
-    firstTrace.end()
+    var firstSpan = tr.startSpan('first-span-signature', 'first-span', {'enableStackFrames': true})
+    firstSpan.end()
 
-    var secondTrace = tr.startTrace('second-trace', 'second-trace')
-    secondTrace.end()
+    var secondSpan = tr.startSpan('second-span', 'second-span')
+    secondSpan.end()
 
     tr.end()
   })

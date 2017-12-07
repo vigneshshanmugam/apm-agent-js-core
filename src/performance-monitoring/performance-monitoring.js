@@ -5,6 +5,7 @@ class PerformanceMonitoring {
     this._logginService = loggingService
     this._zoneService = zoneService
     this._transactionService = transactionService
+    this._sendIntervalId = undefined
   }
 
   init () {
@@ -13,21 +14,9 @@ class PerformanceMonitoring {
   }
 
   scheduleTransactionSend () {
-    var logger = this._logginService
     var self = this
-    var trService = this._transactionService
-
-    setInterval(function () {
-      var transactions = trService.getTransactions()
-      if (transactions.length > 0) {
-        var promise = self.sendTransactions(transactions)
-        if (promise) {
-          promise.then(undefined, function () {
-            logger.debug('Failed sending transactions!')
-          })
-        }
-        trService.clearTransactions()
-      }
+    this._sendIntervalId = setInterval(function () {
+      self.sendTransactionInterval()
     }, 5000)
   }
 
@@ -38,19 +27,36 @@ class PerformanceMonitoring {
     }
   }
 
+  sendTransactionInterval () {
+    var logger = this._logginService
+    var self = this
+    var trService = this._transactionService
+
+    var transactions = trService.getTransactions()
+    if (transactions.length > 0) {
+      var promise = self.sendTransactions(transactions)
+      if (promise) {
+        promise.then(undefined, function () {
+          logger.debug('Failed sending transactions!')
+        })
+      }
+      trService.clearTransactions()
+      return promise
+    }
+  }
   sendTransactions (transactions) {
     var performanceMonitoring = this
     var browserResponsivenessInterval = this._configService.get('browserResponsivenessInterval')
     var checkBrowserResponsiveness = this._configService.get('checkBrowserResponsiveness')
 
     transactions.forEach(function (transaction) {
-      transaction.traces.sort(function (traceA, traceB) {
-        return traceA._start - traceB._start
+      transaction.spans.sort(function (spanA, spanB) {
+        return spanA._start - spanB._start
       })
 
-      if (performanceMonitoring._configService.get('groupSimilarTraces')) {
-        var similarTraceThreshold = performanceMonitoring._configService.get('similarTraceThreshold')
-        transaction.traces = performanceMonitoring.groupSmallContinuouslySimilarTraces(transaction, similarTraceThreshold)
+      if (performanceMonitoring._configService.get('groupSimilarSpans')) {
+        var similarSpanThreshold = performanceMonitoring._configService.get('similarSpanThreshold')
+        transaction.spans = performanceMonitoring.groupSmallContinuouslySimilarSpans(transaction, similarSpanThreshold)
       }
       performanceMonitoring.setTransactionContextInfo(transaction)
     })
@@ -59,7 +65,7 @@ class PerformanceMonitoring {
       if (checkBrowserResponsiveness && !tr.isHardNavigation) {
         var buffer = performanceMonitoring._configService.get('browserResponsivenessBuffer')
 
-        var duration = tr._rootTrace.duration()
+        var duration = tr._rootSpan.duration()
         var wasBrowserResponsive = performanceMonitoring.checkBrowserResponsiveness(tr, browserResponsivenessInterval, buffer)
         if (!wasBrowserResponsive) {
           performanceMonitoring._logginService.debug('Transaction was discarded! browser was not responsive enough during the transaction.', ' duration:', duration, ' browserResponsivenessCounter:', tr.browserResponsivenessCounter, 'interval:', browserResponsivenessInterval)
@@ -79,12 +85,12 @@ class PerformanceMonitoring {
 
   convertTransactionsToServerModel (transactions) {
     return transactions.map(function (transaction) {
-      var traces = transaction.traces.map(function (trace) {
+      var spans = transaction.spans.map(function (span) {
         return {
-          name: trace.signature,
-          type: trace.type,
-          start: trace._start,
-          duration: trace.duration()
+          name: span.signature,
+          type: span.type,
+          start: span._start,
+          duration: span.duration()
         }
       })
       return {
@@ -93,47 +99,47 @@ class PerformanceMonitoring {
         name: transaction.name,
         type: transaction.type,
         duration: transaction.duration(),
-        traces: traces,
+        spans: spans,
         context: transaction.contextInfo,
         unknownName: transaction.unknownName
       }
     })
   }
 
-  groupSmallContinuouslySimilarTraces (transaction, threshold) {
+  groupSmallContinuouslySimilarSpans (transaction, threshold) {
     var transDuration = transaction.duration()
-    var traces = []
+    var spans = []
     var lastCount = 1
-    transaction.traces
-      .forEach(function (trace, index) {
-        if (traces.length === 0) {
-          traces.push(trace)
+    transaction.spans
+      .forEach(function (span, index) {
+        if (spans.length === 0) {
+          spans.push(span)
         } else {
-          var lastTrace = traces[traces.length - 1]
+          var lastSpan = spans[spans.length - 1]
 
-          var isContinuouslySimilar = lastTrace.type === trace.type &&
-            lastTrace.signature === trace.signature &&
-            trace.duration() / transDuration < threshold &&
-            (trace._start - lastTrace._end) / transDuration < threshold
+          var isContinuouslySimilar = lastSpan.type === span.type &&
+            lastSpan.signature === span.signature &&
+            span.duration() / transDuration < threshold &&
+            (span._start - lastSpan._end) / transDuration < threshold
 
-          var isLastTrace = transaction.traces.length === index + 1
+          var isLastSpan = transaction.spans.length === index + 1
 
           if (isContinuouslySimilar) {
             lastCount++
-            lastTrace._end = trace._end
+            lastSpan._end = span._end
           }
 
-          if (lastCount > 1 && (!isContinuouslySimilar || isLastTrace)) {
-            lastTrace.signature = lastCount + 'x ' + lastTrace.signature
+          if (lastCount > 1 && (!isContinuouslySimilar || isLastSpan)) {
+            lastSpan.signature = lastCount + 'x ' + lastSpan.signature
             lastCount = 1
           }
 
           if (!isContinuouslySimilar) {
-            traces.push(trace)
+            spans.push(span)
           }
         }
       })
-    return traces
+    return spans
   }
 
   checkBrowserResponsiveness (transaction, interval, buffer) {
@@ -142,7 +148,7 @@ class PerformanceMonitoring {
       return true
     }
 
-    var duration = transaction._rootTrace.duration()
+    var duration = transaction._rootSpan.duration()
     var expectedCount = Math.floor(duration / interval)
     var wasBrowserResponsive = counter + buffer >= expectedCount
 
