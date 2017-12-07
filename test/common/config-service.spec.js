@@ -8,29 +8,29 @@ describe('ConfigService', function () {
   })
   it('should merge configs with already set configs', function () {
     expect(configService.get('debug')).toBe(false)
-    expect(configService.get('appName')).toBe('')
+    expect(configService.get('serviceName')).toBe('')
 
     configService.setConfig({
-      appName: 'appName'
+      serviceName: 'serviceName'
     })
 
     expect(configService.get('debug')).toBe(false)
-    expect(configService.get('appName')).toBe('appName')
+    expect(configService.get('serviceName')).toBe('serviceName')
 
     configService.setConfig({
       debug: true
     })
 
     expect(configService.get('debug')).toBe(true)
-    expect(configService.get('appName')).toBe('appName')
+    expect(configService.get('serviceName')).toBe('serviceName')
 
     configService.setConfig({
       debug: false,
-      appName: null
+      serviceName: null
     })
 
     expect(configService.get('debug')).toBe(false)
-    expect(configService.get('appName')).toBe(null)
+    expect(configService.get('serviceName')).toBe(null)
   })
 
   xit('should deep merge configs', function () {

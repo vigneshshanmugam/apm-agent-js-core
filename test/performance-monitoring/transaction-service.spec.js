@@ -264,7 +264,6 @@ describe('TransactionService', function () {
   })
 
   it('should capture resources from navigation timing', function (done) {
-    debugger
     var _getEntriesByType = window.performance.getEntriesByType
 
     window.performance.getEntriesByType = function (type) {

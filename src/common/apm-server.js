@@ -3,16 +3,16 @@ class ApmServer {
     this._configService = configService
   }
 
-  createAppObject () {
+  createServiceObject () {
     var cfg = this._configService
-    var appObject = {
-      name: cfg.get('appName'),
+    var serviceObject = {
+      name: cfg.get('serviceName'),
       agent: {
         name: cfg.get('agentName'),
         version: cfg.get('agentVersion')
       }
     }
-    return appObject
+    return serviceObject
   }
   _postJson (endPoint, payload) {
     return this._makeHttpRequest('POST',
@@ -59,7 +59,7 @@ class ApmServer {
 
   sendErrors (errors) {
     var payload = {
-      app: this.createAppObject(),
+      service: this.createServiceObject(),
       errors: errors
     }
     payload = this._configService.applyFilters(payload)
@@ -72,7 +72,7 @@ class ApmServer {
       return
     }
     var payload = {
-      app: this.createAppObject(),
+      service: this.createServiceObject(),
       transactions: transactions
     }
     payload = this._configService.applyFilters(payload)

@@ -19,7 +19,7 @@ describe('PerformanceMonitoring', function () {
     apmServer = serviceFactory.getService('ApmServer')
     performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
   })
-  it('should send performance monitoring data to apm-server', function () {
+  it('should send performance monitoring data to apm-server', function (done) {
 
     // performanceMonitoring._transactionService
     var tr = new Transaction('tr-name', 'tr-type', configService.config, logger)
@@ -28,7 +28,13 @@ describe('PerformanceMonitoring', function () {
     tr.spans.push(span1)
     tr.end()
     var payload = performanceMonitoring.convertTransactionsToServerModel([tr])
-    apmServer.sendTransactions(payload)
+    var promise = apmServer.sendTransactions(payload)
+    expect(promise).toBeDefined()
+    promise.then(function () {
+      done()
+    }, function (reason) {
+      fail('Failed sending transactions to the server, reason: ' + reason)
+    })
   })
 
   it('should group small continuously similar spans up until the last one', function () {

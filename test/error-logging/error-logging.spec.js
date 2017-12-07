@@ -27,7 +27,7 @@ describe('ErrorLogging', function () {
       .then(function () {
         done()
       }, function (reason) {
-        console.log('rejected:', reason)
+        fail('Failed to send errors to the server, reason: ' + reason)
       })
   })
 
@@ -103,6 +103,8 @@ describe('ErrorLogging', function () {
         // the number of frames is different in different platforms
         expect(errorData.exception.stacktrace.length).toBeGreaterThan(0)
         done()
+      }, function (reason) {
+        fail('Failed to send errors to the server, reason: ' + reason)
       })
   })
 

@@ -20,7 +20,7 @@ describe('ApmServer', function () {
 
   it('should report http errors', function (done) {
     configService.setConfig({
-      apiOrigin: 'http://non-existing.com'
+      apiOrigin: 'http://localhost:54321'
     })
     var result = apmServer.sendTransactions([{test: 'test'}])
     expect(result).toBeDefined()

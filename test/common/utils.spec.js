@@ -26,7 +26,7 @@ describe('lib/utils', function () {
   it('should get opbeat script', function () {
     var script = window.document.createElement('script')
     script.src = './opbeat-hamid.js'
-    script.setAttribute('data-app-id', 'appId')
+    script.setAttribute('data-service-name', 'serviceName')
     var html = document.getElementsByTagName('html')[0]
     // html.appendChild(script)
     var theFirstChild = html.firstChild
@@ -34,7 +34,7 @@ describe('lib/utils', function () {
 
     var result = utils.getOpbeatScript()
     expect(result).toBe(script)
-    expect(result.getAttribute('data-app-id')).toBe('appId')
+    expect(result.getAttribute('data-service-name')).toBe('serviceName')
 
     html.removeChild(script)
   })

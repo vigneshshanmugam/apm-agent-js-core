@@ -4,7 +4,7 @@ var Subscription = require('../common/subscription')
 function Config () {
   this.config = {}
   this.defaults = {
-    appName: '',
+    serviceName: '',
     agentName: 'apm-js',
     agentVersion: '%%agent-version%%',
     apiOrigin: 'http://localhost:8200',
@@ -114,7 +114,7 @@ Config.prototype.subscribeToChange = function (fn) {
 }
 
 Config.prototype.isValid = function () {
-  var requiredKeys = ['appName']
+  var requiredKeys = ['serviceName']
   var values = utils.arrayMap(requiredKeys, utils.functionBind(function (key) {
     return (this.config[key] === null) || (this.config[key] === undefined)
   }, this))
