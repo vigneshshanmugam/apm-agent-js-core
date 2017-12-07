@@ -7,8 +7,8 @@ function Config () {
     serviceName: '',
     agentName: 'apm-js',
     agentVersion: '%%agent-version%%',
-    apiOrigin: 'http://localhost:8200',
-    apiUrlPrefix: '/v1/client-side',
+    serverUrl: 'http://localhost:8200',
+    serverUrlPrefix: '/v1/client-side',
     active: true,
     isInstalled: false,
     debug: false,
@@ -71,7 +71,7 @@ Config.prototype.get = function (key) {
 }
 
 Config.prototype.getEndpointUrl = function getEndpointUrl (endpoint) {
-  var url = this.get('apiOrigin') + this.get('apiUrlPrefix') + '/' + endpoint
+  var url = this.get('serverUrl') + this.get('serverUrlPrefix') + '/' + endpoint
   return url
 }
 

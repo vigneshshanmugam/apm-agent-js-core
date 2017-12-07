@@ -6,7 +6,7 @@ module.exports = function (config) {
     globalConfigs: {
       useMocks: false,
       agentConfig: {
-        apiOrigin: 'http://localhost:8200',
+        serverUrl: 'http://localhost:8200',
         serviceName: 'test',
         agentName: 'apm-js-core',
         agentVersion: '0.0.1'
