@@ -7,8 +7,8 @@ describe('ApmServer', function () {
   var configService
   beforeEach(function () {
     serviceFactory = createServiceFactory()
-    apmServer = serviceFactory.getService('ApmServer')
     configService = serviceFactory.getService('ConfigService')
+    apmServer = new ApmServer(configService)
   })
 
   it('should not send transctions when the list is empty', function () {
@@ -24,7 +24,9 @@ describe('ApmServer', function () {
     })
     var result = apmServer.sendTransactions([{test: 'test'}])
     expect(result).toBeDefined()
-    result.then(undefined, function (reason) {
+    result.then(function () {
+      fail('Request should have failed!')
+    }, function (reason) {
       expect(reason).toBeDefined()
       done()
     })

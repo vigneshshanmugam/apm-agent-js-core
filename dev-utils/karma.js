@@ -4,6 +4,11 @@ var baseLaunchers = {
   'SL_CHROME': {
     base: 'SauceLabs',
     browserName: 'chrome',
+    version: '62'
+  },
+  'SL_CHROME': {
+    base: 'SauceLabs',
+    browserName: 'chrome',
     version: '46'
   },
   'SL_FIREFOX': {

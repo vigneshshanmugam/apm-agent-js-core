@@ -2,7 +2,7 @@ var karmaUtils = require('./dev-utils/karma.js')
 
 module.exports = function (config) {
   config.set(karmaUtils.baseConfig)
-  var customeConfig = {
+  var customConfig = {
     globalConfigs: {
       useMocks: false,
       agentConfig: {
@@ -19,11 +19,11 @@ module.exports = function (config) {
     }
   }
 
-  if (customeConfig.testConfig.sauceLabs) {
-    customeConfig.globalConfigs.useMocks = true
+  if (customConfig.testConfig.sauceLabs) {
+    customConfig.globalConfigs.useMocks = true
   }
-  console.log('customeConfig:', customeConfig)
-  config.set(customeConfig)
+  console.log('customConfig:', customConfig)
+  config.set(customConfig)
   config.files.unshift('test/utils/polyfill.js')
   config.files.unshift('node_modules/elastic-apm-js-zone/dist/zone.js')
   // config.files.push({ pattern: 'test/exceptions/data/*.js', included: false, watched: false })
