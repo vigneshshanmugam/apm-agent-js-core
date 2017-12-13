@@ -16,7 +16,7 @@
   "files": [
     "src/**/*.js",
     "test/**/*.js",
-    "dev-utils/**/*.js"
+    "dev-utils/**/*"
   ],
   "browser": {
     "elastic-apm-js-zone": "./node_modules/elastic-apm-js-zone/dist/zone.js"
