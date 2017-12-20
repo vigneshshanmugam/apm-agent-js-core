@@ -58,26 +58,27 @@ class ApmServer {
   }
 
   sendErrors (errors) {
-    var payload = {
-      service: this.createServiceObject(),
-      errors: errors
+    if (errors && errors.length > 0) {
+      var payload = {
+        service: this.createServiceObject(),
+        errors: errors
+      }
+      payload = this._configService.applyFilters(payload)
+      var endPoint = this._configService.getEndpointUrl('errors')
+      return this._postJson(endPoint, payload)
     }
-    payload = this._configService.applyFilters(payload)
-    var endPoint = this._configService.getEndpointUrl('errors')
-    return this._postJson(endPoint, payload)
   }
 
   sendTransactions (transactions) {
-    if (transactions.length === 0) {
-      return
+    if (transactions && transactions.length > 0) {
+      var payload = {
+        service: this.createServiceObject(),
+        transactions: transactions
+      }
+      payload = this._configService.applyFilters(payload)
+      var endPoint = this._configService.getEndpointUrl('transactions')
+      return this._postJson(endPoint, payload)
     }
-    var payload = {
-      service: this.createServiceObject(),
-      transactions: transactions
-    }
-    payload = this._configService.applyFilters(payload)
-    var endPoint = this._configService.getEndpointUrl('transactions')
-    return this._postJson(endPoint, payload)
   }
 }
 
