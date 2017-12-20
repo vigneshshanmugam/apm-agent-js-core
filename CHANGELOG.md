@@ -1,3 +1,13 @@
+<a name="0.1.2"></a>
+## [0.1.2](https://github.com/jahtalab/apm-agent-js-core/compare/v0.1.1...v0.1.2) (2017-12-20)
+
+
+### Bug Fixes
+
+* **ApmServer:** don't send empty payload ([78c58ad](https://github.com/jahtalab/apm-agent-js-core/commit/78c58ad))
+
+
+
 <a name="0.1.1"></a>
 ## [0.1.1](https://github.com/jahtalab/apm-agent-js-core/compare/v0.1.0...v0.1.1) (2017-12-13)
 
