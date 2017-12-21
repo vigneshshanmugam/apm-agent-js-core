@@ -35,18 +35,24 @@ function ZoneService (logger, config) {
   this.zoneConfig = {
     name: 'apmRootZone',
     onScheduleTask: function (parentZoneDelegate, currentZone, targetZone, task) {
-      if (task.type === 'eventTask' && task.data.eventName === 'apmImmediatelyFiringEvent') {
-        task.data.handler(task.data)
-        return task
-      }
-
-      var hasTarget = task.data && task.data.target
-      if (hasTarget && typeof task.data.target[apmDataSymbol] === 'undefined') {
-        task.data.target[apmDataSymbol] = {registeredEventListeners: {}}
-      }
-
       logger.trace('zoneservice.onScheduleTask', task.source, ' type:', task.type)
-      if (task.type === 'macroTask') {
+      if (task.type === 'eventTask') {
+        var target = task.data && task.data.target
+        var eventName = task.data.eventName
+
+        if (target && typeof target[apmDataSymbol] === 'undefined') {
+          task.data.target[apmDataSymbol] = {registeredEventListeners: {}}
+        }
+
+        if (task.type === 'eventTask' && eventName === 'apmImmediatelyFiringEvent') {
+          task.data.handler(task.data)
+          return task
+        }
+
+        if (target && (eventName === 'readystatechange' || eventName === 'load')) {
+          target[apmDataSymbol].registeredEventListeners[eventName] = {resolved: false}
+        }
+      } else if (task.type === 'macroTask') {
         logger.trace('Zone: ', targetZone.name)
         var taskId = nextId++
         var apmTask = {
@@ -91,8 +97,6 @@ function ZoneService (logger, config) {
 
           spec.onScheduleTask(apmTask)
         }
-      } else if (task.type === 'eventTask' && hasTarget && (task.data.eventName === 'readystatechange' || task.data.eventName === 'load')) {
-        task.data.target[apmDataSymbol].registeredEventListeners[task.data.eventName] = {resolved: false}
       } else if (task.type === 'microTask' && task.source === 'Promise.then') {
         taskId = nextId++
         apmTask = {
