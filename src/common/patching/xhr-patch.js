@@ -1,8 +1,8 @@
 var patchUtils = require('./patch-utils')
 
-var urlSympbol = patchUtils.opbeatSymbol('url')
-var methodSymbol = patchUtils.opbeatSymbol('method')
-var isAsyncSymbol = patchUtils.opbeatSymbol('isAsync')
+var urlSympbol = patchUtils.apmSymbol('url')
+var methodSymbol = patchUtils.apmSymbol('method')
+var isAsyncSymbol = patchUtils.apmSymbol('isAsync')
 
 module.exports = function patchXMLHttpRequest () {
   patchUtils.patchMethod(window.XMLHttpRequest.prototype, 'open', function (delegate) {

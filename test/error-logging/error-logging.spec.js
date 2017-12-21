@@ -38,7 +38,7 @@ describe('ErrorLogging', function () {
     try {
       throw new Error('unittest error')
     } catch (error) {
-      // error['_opbeat_extra_context'] = {test: 'hamid'}
+      // error['_elastic_extra_context'] = {test: 'hamid'}
       error.test = 'hamid'
       error.aDate = new Date('2017-01-12T00:00:00.000Z')
       var obj = {test: 'test'}

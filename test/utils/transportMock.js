@@ -19,7 +19,7 @@ TransportMock.prototype.sendTransaction = function (data, headers) {
       .then(function () {
         trMock.subscription.applyAll(this, ['sendTransaction', transactinData])
       }, function (reason) {
-        console.log('Failed to send to opbeat: ', reason)
+        console.log('Failed to send to apm server: ', reason)
       })
   } else {
     this.subscription.applyAll(this, ['sendTransaction', transactinData])

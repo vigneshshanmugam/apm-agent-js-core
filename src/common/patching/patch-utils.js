@@ -1,15 +1,10 @@
 module.exports = {
-  opbeatSymbol: opbeatSymbol,
   apmSymbol: apmSymbol,
   patchMethod: patchMethod
 }
 
 function apmSymbol (name) {
   return '__apm_symbol__' + name
-}
-
-function opbeatSymbol (name) {
-  return '__opbeat_symbol__' + name
 }
 
 function patchMethod (target, name, patchFn) {
@@ -21,7 +16,7 @@ function patchMethod (target, name, patchFn) {
     // somehow we did not find it, but we can see it. This happens on IE for Window properties.
     proto = target
   }
-  var delegateName = opbeatSymbol(name)
+  var delegateName = apmSymbol(name)
   var delegate
   if (proto && !(delegate = proto[delegateName])) {
     delegate = proto[delegateName] = proto[name]

@@ -7,14 +7,14 @@ function ZoneServiceMock () {
     onCancelTask: noop
   }
 
-  this.zone = {name: 'opbeatMockZone'}
+  this.zone = {name: 'apmMockZone'}
   this.get = function (key) {
     return this.zone[key]
   }
   this.set = function (key, value) {
     this.zone[key] = value
   }
-  this.getFromOpbeatZone = function (key) {
+  this.getFromApmZone = function (key) {
     return this.get(key)
   }
   this.runOuter = function (fn) {
@@ -24,11 +24,11 @@ function ZoneServiceMock () {
     return callback.apply(applyThis, applyArgs)
   }
 
-  this.runInOpbeatZone = function (fn, applyThis, applyArgs) {
+  this.runInApmZone = function (fn, applyThis, applyArgs) {
     return fn.apply(applyThis, applyArgs)
   }
 
-  this.isOpbeatZone = function () {
+  this.isApmZone = function () {
     return true
   }
 

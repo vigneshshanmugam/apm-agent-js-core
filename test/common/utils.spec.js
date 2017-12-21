@@ -23,16 +23,16 @@ describe('lib/utils', function () {
     expect(deepMerged).toEqual(Object({a: null, b: 'b'}))
   })
 
-  it('should get opbeat script', function () {
+  it('should get elastic script', function () {
     var script = window.document.createElement('script')
-    script.src = './opbeat-hamid.js'
+    script.src = './elastic-hamid.js'
     script.setAttribute('data-service-name', 'serviceName')
     var html = document.getElementsByTagName('html')[0]
     // html.appendChild(script)
     var theFirstChild = html.firstChild
     html.insertBefore(script, theFirstChild)
 
-    var result = utils.getOpbeatScript()
+    var result = utils.getElasticScript()
     expect(result).toBe(script)
     expect(result.getAttribute('data-service-name')).toBe('serviceName')
 

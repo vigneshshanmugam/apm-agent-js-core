@@ -155,7 +155,7 @@ gulp.task('deploy', ['build:release'], function () {
 
   // Hardcoded bucketname, to avoid mistakes
   awsoptions.params = {
-    Bucket: 'opbeat-js-cdn'
+    Bucket: 'elastic-js-cdn'
   }
 
   // Create new publisher

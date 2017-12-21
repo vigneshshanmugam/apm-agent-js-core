@@ -91,7 +91,7 @@ TransactionService.prototype.createTransaction = function (name, type, options) 
   if (utils.isUndefined(perfOptions)) {
     perfOptions = this._config.config
   }
-  if (!this._config.isActive() || !this._zoneService.isOpbeatZone()) {
+  if (!this._config.isActive() || !this._zoneService.isApmZone()) {
     return
   }
 
@@ -109,7 +109,7 @@ TransactionService.prototype.createZoneTransaction = function () {
 }
 
 TransactionService.prototype.getCurrentTransaction = function () {
-  if (!this._config.isActive() || !this._zoneService.isOpbeatZone()) {
+  if (!this._config.isActive() || !this._zoneService.isApmZone()) {
     return
   }
   var tr = this._zoneService.get('transaction')
@@ -142,7 +142,7 @@ TransactionService.prototype.sendPageLoadMetrics = function (name) {
   var perfOptions = this._config.config
   var tr
 
-  tr = this._zoneService.getFromOpbeatZone('transaction')
+  tr = this._zoneService.getFromApmZone('transaction')
 
   var trName = name || this.initialPageLoadName
   var unknownName = false

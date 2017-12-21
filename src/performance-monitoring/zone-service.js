@@ -1,13 +1,13 @@
 var Subscription = require('../common/subscription')
 var patchUtils = require('../common/patching/patch-utils')
-var opbeatTaskSymbol = patchUtils.opbeatSymbol('taskData')
+var apmTaskSymbol = patchUtils.apmSymbol('taskData')
 
-var urlSympbol = patchUtils.opbeatSymbol('url')
-var methodSymbol = patchUtils.opbeatSymbol('method')
+var urlSympbol = patchUtils.apmSymbol('url')
+var methodSymbol = patchUtils.apmSymbol('method')
 
 var XMLHttpRequest_send = 'XMLHttpRequest.send'
 
-var opbeatDataSymbol = patchUtils.opbeatSymbol('opbeatData')
+var apmDataSymbol = patchUtils.apmSymbol('apmData')
 
 var testTransactionAfterEvents = ['click', 'contextmenu', 'dblclick', 'mousedown', 'keydown', 'keypress', 'keyup'] // leave these out for now: 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover',
 var testTransactionAfterEventsObj = {}
@@ -33,23 +33,23 @@ function ZoneService (logger, config) {
   }
 
   this.zoneConfig = {
-    name: 'opbeatRootZone',
+    name: 'apmRootZone',
     onScheduleTask: function (parentZoneDelegate, currentZone, targetZone, task) {
-      if (task.type === 'eventTask' && task.data.eventName === 'opbeatImmediatelyFiringEvent') {
+      if (task.type === 'eventTask' && task.data.eventName === 'apmImmediatelyFiringEvent') {
         task.data.handler(task.data)
         return task
       }
 
       var hasTarget = task.data && task.data.target
-      if (hasTarget && typeof task.data.target[opbeatDataSymbol] === 'undefined') {
-        task.data.target[opbeatDataSymbol] = {registeredEventListeners: {}}
+      if (hasTarget && typeof task.data.target[apmDataSymbol] === 'undefined') {
+        task.data.target[apmDataSymbol] = {registeredEventListeners: {}}
       }
 
       logger.trace('zoneservice.onScheduleTask', task.source, ' type:', task.type)
       if (task.type === 'macroTask') {
         logger.trace('Zone: ', targetZone.name)
         var taskId = nextId++
-        var opbeatTask = {
+        var apmTask = {
           taskId: task.source + taskId,
           source: task.source,
           type: task.type
@@ -57,8 +57,8 @@ function ZoneService (logger, config) {
 
         if (task.source === 'setTimeout') {
           if (task.data.args[1] === 0 || typeof task.data.args[1] === 'undefined') {
-            task[opbeatTaskSymbol] = opbeatTask
-            spec.onScheduleTask(opbeatTask)
+            task[apmTaskSymbol] = apmTask
+            spec.onScheduleTask(apmTask)
           }
         } else if (task.source === XMLHttpRequest_send) {
           /*
@@ -69,7 +69,7 @@ function ZoneService (logger, config) {
                   "XMLHttpRequest.addEventListener:readystatechange"
           */
 
-          opbeatTask['XHR'] = {
+          apmTask['XHR'] = {
             resolved: false,
             'send': false,
             url: task.data.target[urlSympbol],
@@ -78,31 +78,31 @@ function ZoneService (logger, config) {
 
           // target for event tasks is different instance from the XMLHttpRequest, on mobile browsers
           // A hack to get the correct target for event tasks
-          task.data.target.addEventListener('opbeatImmediatelyFiringEvent', function (event) {
-            if (typeof event.target[opbeatDataSymbol] !== 'undefined') {
-              task.data.target[opbeatDataSymbol] = event.target[opbeatDataSymbol]
+          task.data.target.addEventListener('apmImmediatelyFiringEvent', function (event) {
+            if (typeof event.target[apmDataSymbol] !== 'undefined') {
+              task.data.target[apmDataSymbol] = event.target[apmDataSymbol]
             } else {
-              task.data.target[opbeatDataSymbol] = event.target[opbeatDataSymbol] = {registeredEventListeners: {}}
+              task.data.target[apmDataSymbol] = event.target[apmDataSymbol] = {registeredEventListeners: {}}
             }
           })
 
-          task.data.target[opbeatDataSymbol].task = opbeatTask
-          task.data.target[opbeatDataSymbol].typeName = 'XMLHttpRequest'
+          task.data.target[apmDataSymbol].task = apmTask
+          task.data.target[apmDataSymbol].typeName = 'XMLHttpRequest'
 
-          spec.onScheduleTask(opbeatTask)
+          spec.onScheduleTask(apmTask)
         }
       } else if (task.type === 'eventTask' && hasTarget && (task.data.eventName === 'readystatechange' || task.data.eventName === 'load')) {
-        task.data.target[opbeatDataSymbol].registeredEventListeners[task.data.eventName] = {resolved: false}
+        task.data.target[apmDataSymbol].registeredEventListeners[task.data.eventName] = {resolved: false}
       } else if (task.type === 'microTask' && task.source === 'Promise.then') {
         taskId = nextId++
-        opbeatTask = {
+        apmTask = {
           taskId: task.source + taskId,
           source: task.source,
           type: task.type
         }
 
-        task[opbeatTaskSymbol] = opbeatTask
-        spec.onScheduleTask(opbeatTask)
+        task[apmTaskSymbol] = apmTask
+        spec.onScheduleTask(apmTask)
       }
 
       var delegateTask = parentZoneDelegate.scheduleTask(targetZone, task)
@@ -110,14 +110,14 @@ function ZoneService (logger, config) {
     },
     onInvoke: function (parentZoneDelegate, currentZone, targetZone, delegate, applyThis, applyArgs, source) {
       var taskId = nextId++
-      var opbeatTask = {
+      var apmTask = {
         taskId: source + taskId,
         source: source,
         type: 'invoke'
       }
-      spec.onInvokeStart(opbeatTask)
+      spec.onInvokeStart(apmTask)
       var result = delegate.apply(applyThis, applyArgs)
-      spec.onInvokeEnd(opbeatTask)
+      spec.onInvokeEnd(apmTask)
       return result
     },
     onInvokeTask: function (parentZoneDelegate, currentZone, targetZone, task, applyThis, applyArgs) {
@@ -126,42 +126,42 @@ function ZoneService (logger, config) {
       var hasTarget = task.data && task.data.target
       var result
 
-      if (hasTarget && task.data.target[opbeatDataSymbol].typeName === 'XMLHttpRequest') {
-        var opbeatData = task.data.target[opbeatDataSymbol]
-        logger.trace('opbeatData', opbeatData)
-        var opbeatTask = opbeatData.task
+      if (hasTarget && task.data.target[apmDataSymbol].typeName === 'XMLHttpRequest') {
+        var apmData = task.data.target[apmDataSymbol]
+        logger.trace('apmData', apmData)
+        var apmTask = apmData.task
 
-        if (opbeatTask && task.data.eventName === 'readystatechange' && task.data.target.readyState === task.data.target.DONE) {
-          opbeatData.registeredEventListeners['readystatechange'].resolved = true
-          spec.onBeforeInvokeTask(opbeatTask)
-        } else if (opbeatTask && task.data.eventName === 'load' && 'load' in opbeatData.registeredEventListeners) {
-          opbeatData.registeredEventListeners.load.resolved = true
-        } else if (opbeatTask && task.source === XMLHttpRequest_send) {
-          opbeatTask.XHR.resolved = true
+        if (apmTask && task.data.eventName === 'readystatechange' && task.data.target.readyState === task.data.target.DONE) {
+          apmData.registeredEventListeners['readystatechange'].resolved = true
+          spec.onBeforeInvokeTask(apmTask)
+        } else if (apmTask && task.data.eventName === 'load' && 'load' in apmData.registeredEventListeners) {
+          apmData.registeredEventListeners.load.resolved = true
+        } else if (apmTask && task.source === XMLHttpRequest_send) {
+          apmTask.XHR.resolved = true
         }
 
         result = parentZoneDelegate.invokeTask(targetZone, task, applyThis, applyArgs)
-        if (opbeatTask && (!opbeatData.registeredEventListeners['load'] || opbeatData.registeredEventListeners['load'].resolved) && (!opbeatData.registeredEventListeners['readystatechange'] || opbeatData.registeredEventListeners['readystatechange'].resolved) && opbeatTask.XHR.resolved) {
-          spec.onInvokeTask(opbeatTask)
+        if (apmTask && (!apmData.registeredEventListeners['load'] || apmData.registeredEventListeners['load'].resolved) && (!apmData.registeredEventListeners['readystatechange'] || apmData.registeredEventListeners['readystatechange'].resolved) && apmTask.XHR.resolved) {
+          spec.onInvokeTask(apmTask)
         }
-      } else if (task[opbeatTaskSymbol] && (task.source === 'setTimeout' || task.source === 'Promise.then')) {
-        spec.onBeforeInvokeTask(task[opbeatTaskSymbol])
+      } else if (task[apmTaskSymbol] && (task.source === 'setTimeout' || task.source === 'Promise.then')) {
+        spec.onBeforeInvokeTask(task[apmTaskSymbol])
         result = parentZoneDelegate.invokeTask(targetZone, task, applyThis, applyArgs)
-        spec.onInvokeTask(task[opbeatTaskSymbol])
+        spec.onInvokeTask(task[apmTaskSymbol])
       } else if (task.type === 'eventTask' && hasTarget && task.data.eventName in testTransactionAfterEventsObj) {
         var taskId = nextId++
-        opbeatTask = {
+        apmTask = {
           taskId: task.source + taskId,
           source: task.source,
           type: 'interaction',
           applyArgs: applyArgs
         }
 
-        spec.onScheduleTask(opbeatTask)
+        spec.onScheduleTask(apmTask)
 
         // clear spans on the zone transaction
         result = parentZoneDelegate.invokeTask(targetZone, task, applyThis, applyArgs)
-        spec.onInvokeTask(opbeatTask)
+        spec.onInvokeTask(apmTask)
       } else {
         result = parentZoneDelegate.invokeTask(targetZone, task, applyThis, applyArgs)
       }
@@ -170,14 +170,14 @@ function ZoneService (logger, config) {
     },
     onCancelTask: function (parentZoneDelegate, currentZone, targetZone, task) {
       // logger.trace('Zone: ', targetZone.name)
-      var opbeatTask
+      var apmTask
       if (task.type === 'macroTask') {
         if (task.source === XMLHttpRequest_send) {
-          opbeatTask = task.data.target[opbeatDataSymbol].task
-          spec.onCancelTask(opbeatTask)
-        } else if (task[opbeatTaskSymbol] && (task.source === 'setTimeout')) {
-          opbeatTask = task[opbeatTaskSymbol]
-          spec.onCancelTask(opbeatTask)
+          apmTask = task.data.target[apmDataSymbol].task
+          spec.onCancelTask(apmTask)
+        } else if (task[apmTaskSymbol] && (task.source === 'setTimeout')) {
+          apmTask = task[apmTaskSymbol]
+          spec.onCancelTask(apmTask)
         }
       }
       return parentZoneDelegate.cancelTask(targetZone, task)
@@ -187,28 +187,6 @@ function ZoneService (logger, config) {
   //   parentZoneDelegate.handleError(targetZone, error)
   // }
   }
-
-  // if (config.get('debug') === true) {
-  //   zoneConfig.properties = {opbeatZoneData: {name: 'opbeatRootZone', children: []}}
-  //   zoneConfig.onFork = function (parentZoneDelegate, currentZone, targetZone, zoneSpec) {
-  //     var childZone = parentZoneDelegate.fork(targetZone, zoneSpec)
-  //     console.log('onFork: ', arguments)
-  //     console.log('onFork: ', childZone)
-
-  //     var childZoneData = {name: childZone.name}
-
-//     if (targetZone._properties['opbeatZoneData']) {
-//       targetZone._properties['opbeatZoneData'].children.push(childZoneData)
-//     } else {
-//       targetZone._properties['opbeatZoneData'] = {
-//         name: targetZone.name,
-//         children: [childZoneData]
-//       }
-//     }
-//     console.log('onFork:opbeatZoneData:', targetZone._properties['opbeatZoneData'])
-//     return childZone
-//   }
-// }
 }
 
 ZoneService.prototype.initialize = function (zone) {
@@ -223,10 +201,10 @@ ZoneService.prototype.get = function (key) {
   return window.Zone.current.get(key)
 }
 
-ZoneService.prototype.getFromOpbeatZone = function (key) {
+ZoneService.prototype.getFromApmZone = function (key) {
   return this.zone.get(key)
 }
-ZoneService.prototype.setOnOpbeatZone = function (key, value) {
+ZoneService.prototype.setOnApmZone = function (key, value) {
   this.zone._properties[key] = value
 }
 
@@ -234,7 +212,7 @@ ZoneService.prototype.getCurrentZone = function () {
   return window.Zone.current
 }
 
-ZoneService.prototype.isOpbeatZone = function () {
+ZoneService.prototype.isApmZone = function () {
   return this.zone.name === window.Zone.current.name
 }
 
@@ -246,8 +224,8 @@ ZoneService.prototype.runOuter = function (fn, applyThis, applyArgs) {
   }
 }
 
-ZoneService.prototype.runInOpbeatZone = function runInOpbeatZone (fn, applyThis, applyArgs, source) {
-  return this.zone.run(fn, applyThis, applyArgs, source || 'runInOpbeatZone:' + fn.name)
+ZoneService.prototype.runInApmZone = function runInApmZone (fn, applyThis, applyArgs, source) {
+  return this.zone.run(fn, applyThis, applyArgs, source || 'runInApmZone:' + fn.name)
 }
 
 module.exports = ZoneService

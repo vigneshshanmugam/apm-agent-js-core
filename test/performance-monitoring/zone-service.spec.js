@@ -284,7 +284,7 @@ describe('ZoneService', function () {
   it('should run in the outer zone', function () {
     resetZoneCallbacks(zoneService)
     zoneService.zone.run(function () {
-      expect(window.Zone.current.name).toBe('opbeatRootZone')
+      expect(window.Zone.current.name).toBe('apmRootZone')
       zoneService.runOuter(function () {
         expect(window.Zone.current.name).toBe('<root>')
       })
@@ -309,7 +309,7 @@ describe('ZoneService', function () {
   })
 
   it('should work when canceling setTimeout', function () {
-    zoneService.runInOpbeatZone(function () {
+    zoneService.runInApmZone(function () {
       var id = setTimeout(function () {}, 0)
       clearTimeout(id)
     })
@@ -329,27 +329,27 @@ describe('ZoneService', function () {
       expect(window.Zone.current.get('testKey')).toBe('testValue')
     })
 
-    zoneService.setOnOpbeatZone('opbeatKey', 'opbeatValue')
-    var opbeatValue = zoneService.getFromOpbeatZone('opbeatKey')
-    expect(opbeatValue).toBe('opbeatValue')
+    zoneService.setOnApmZone('apmKey', 'apmValue')
+    var apmValue = zoneService.getFromApmZone('apmKey')
+    expect(apmValue).toBe('apmValue')
   })
 
-  it('should test for opbeat zone', function () {
+  it('should test for apm zone', function () {
     zoneService.runOuter(function () {
-      expect(zoneService.isOpbeatZone()).toBe(false)
+      expect(zoneService.isApmZone()).toBe(false)
     })
-    var result = zoneService.runInOpbeatZone(function () {
-      expect(zoneService.isOpbeatZone()).toBe(true)
-      return zoneService.runInOpbeatZone(function () {
-        expect(zoneService.isOpbeatZone()).toBe(true)
+    var result = zoneService.runInApmZone(function () {
+      expect(zoneService.isApmZone()).toBe(true)
+      return zoneService.runInApmZone(function () {
+        expect(zoneService.isApmZone()).toBe(true)
         return 'hamid'
       })
     })
     expect(result).toBe('hamid')
     zoneService.runOuter(function () {
-      expect(zoneService.isOpbeatZone()).toBe(false)
-      zoneService.runInOpbeatZone(function () {
-        expect(zoneService.isOpbeatZone()).toBe(true)
+      expect(zoneService.isApmZone()).toBe(false)
+      zoneService.runInApmZone(function () {
+        expect(zoneService.isApmZone()).toBe(true)
       })
     })
   })

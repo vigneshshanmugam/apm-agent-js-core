@@ -57,8 +57,8 @@ describe('TransactionService', function () {
     expect(result).toBeUndefined()
   })
 
-  it('should not start transaction when not in opbeat zone', function () {
-    zoneServiceMock.isOpbeatZone = function () {
+  it('should not start transaction when not in apm zone', function () {
+    zoneServiceMock.isApmZone = function () {
       return false
     }
     transactionService = new TransactionService(zoneServiceMock, logger, config)

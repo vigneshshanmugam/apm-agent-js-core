@@ -206,12 +206,12 @@ module.exports = {
     var xhr = new window.XMLHttpRequest()
     return 'withCredentials' in xhr
   },
-  getOpbeatScript: function () {
+  getElasticScript: function () {
     if (typeof document !== 'undefined') {
       var scripts = document.getElementsByTagName('script')
       for (var i = 0, l = scripts.length; i < l; i++) {
         var sc = scripts[i]
-        if (sc.src.indexOf('opbeat') > 0) {
+        if (sc.src.indexOf('elastic') > 0) {
           return sc
         }
       }
@@ -223,7 +223,7 @@ module.exports = {
       // Source http://www.2ality.com/2014/05/current-script.html
       var currentScript = document.currentScript
       if (!currentScript) {
-        return this.getOpbeatScript()
+        return this.getElasticScript()
       }
       return currentScript
     }
