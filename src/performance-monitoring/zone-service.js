@@ -41,7 +41,7 @@ function ZoneService (logger, config) {
         var eventName = task.data.eventName
 
         if (target && typeof target[apmDataSymbol] === 'undefined') {
-          task.data.target[apmDataSymbol] = {registeredEventListeners: {}}
+          target[apmDataSymbol] = {registeredEventListeners: {}}
         }
 
         if (task.type === 'eventTask' && eventName === 'apmImmediatelyFiringEvent') {
@@ -127,18 +127,18 @@ function ZoneService (logger, config) {
     onInvokeTask: function (parentZoneDelegate, currentZone, targetZone, task, applyThis, applyArgs) {
       spec.onInvokeStart({source: task.source, type: task.type})
       logger.trace('zoneservice.onInvokeTask', task.source, ' type:', task.type)
-      var hasTarget = task.data && task.data.target
+      var target = task.data && task.data.target
+      var eventName = task.data && task.data.eventName
       var result
 
-      if (hasTarget && task.data.target[apmDataSymbol].typeName === 'XMLHttpRequest') {
-        var apmData = task.data.target[apmDataSymbol]
+      if (target && target[apmDataSymbol].typeName === 'XMLHttpRequest') {
+        var apmData = target[apmDataSymbol]
         logger.trace('apmData', apmData)
         var apmTask = apmData.task
-
-        if (apmTask && task.data.eventName === 'readystatechange' && task.data.target.readyState === task.data.target.DONE) {
+        if (apmTask && eventName === 'readystatechange' && target.readyState === target.DONE) {
           apmData.registeredEventListeners['readystatechange'].resolved = true
           spec.onBeforeInvokeTask(apmTask)
-        } else if (apmTask && task.data.eventName === 'load' && 'load' in apmData.registeredEventListeners) {
+        } else if (apmTask && eventName === 'load' && 'load' in apmData.registeredEventListeners) {
           apmData.registeredEventListeners.load.resolved = true
         } else if (apmTask && task.source === XMLHttpRequest_send) {
           apmTask.XHR.resolved = true
@@ -152,7 +152,7 @@ function ZoneService (logger, config) {
         spec.onBeforeInvokeTask(task[apmTaskSymbol])
         result = parentZoneDelegate.invokeTask(targetZone, task, applyThis, applyArgs)
         spec.onInvokeTask(task[apmTaskSymbol])
-      } else if (task.type === 'eventTask' && hasTarget && task.data.eventName in testTransactionAfterEventsObj) {
+      } else if (task.type === 'eventTask' && target && eventName in testTransactionAfterEventsObj) {
         var taskId = nextId++
         apmTask = {
           taskId: task.source + taskId,
