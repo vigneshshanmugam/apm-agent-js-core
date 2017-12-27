@@ -37,15 +37,15 @@ function ZoneService (logger, config) {
     onScheduleTask: function (parentZoneDelegate, currentZone, targetZone, task) {
       logger.trace('zoneservice.onScheduleTask', task.source, ' type:', task.type)
       if (task.type === 'eventTask') {
-        var target = task.data && task.data.target
-        var eventName = task.data.eventName
+        var target = task.data.taskData.target
+        var eventName = task.data.taskData.eventName
 
         if (target && typeof target[apmDataSymbol] === 'undefined') {
           target[apmDataSymbol] = {registeredEventListeners: {}}
         }
 
         if (task.type === 'eventTask' && eventName === 'apmImmediatelyFiringEvent') {
-          task.data.handler(task.data)
+          task.callback(task.data.taskData)
           return task
         }
 
@@ -127,8 +127,8 @@ function ZoneService (logger, config) {
     onInvokeTask: function (parentZoneDelegate, currentZone, targetZone, task, applyThis, applyArgs) {
       spec.onInvokeStart({source: task.source, type: task.type})
       logger.trace('zoneservice.onInvokeTask', task.source, ' type:', task.type)
-      var target = task.data && task.data.target
-      var eventName = task.data && task.data.eventName
+      var target = task.target || task.data && task.data.target
+      var eventName = task.eventName
       var result
 
       if (target && target[apmDataSymbol].typeName === 'XMLHttpRequest') {
