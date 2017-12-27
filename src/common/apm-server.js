@@ -7,6 +7,7 @@ class ApmServer {
     var cfg = this._configService
     var serviceObject = {
       name: cfg.get('serviceName'),
+      version: cfg.get('serviceVersion'),
       agent: {
         name: cfg.get('agentName'),
         version: cfg.get('agentVersion')

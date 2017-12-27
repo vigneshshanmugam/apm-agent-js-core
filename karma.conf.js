@@ -8,6 +8,7 @@ module.exports = function (config) {
       agentConfig: {
         serverUrl: 'http://localhost:8200',
         serviceName: 'test',
+        serviceVersion: 'test-version',
         agentName: 'apm-js-core',
         agentVersion: '0.0.1'
       }
