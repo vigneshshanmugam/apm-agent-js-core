@@ -45,17 +45,11 @@ class StackTraceService {
         'filename': fileName,
         'function': stack.functionName || '<anonymous>',
         'lineno': stack.lineNumber,
-        'colno': stack.columnNumber,
-        'in_app': stackTraceService.isFileInApp(stack.filename)
+        'colno': stack.columnNumber
       }
     })
 
     return stackTraces
-  }
-
-  isFileInApp (filename) {
-    var pattern = this._configService.get('libraryPathPattern')
-    return !RegExp(pattern).test(filename)
   }
 
   filterInvalidFrames (frames) {

@@ -30,7 +30,6 @@ function Config () {
 
     hasRouterLibrary: false,
 
-    libraryPathPattern: '(node_modules|bower_components|webpack)',
     context: {},
     platform: {}
   }
