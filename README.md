@@ -11,6 +11,8 @@ This is the core JavaScript module for Elastic APM.
 
 **Only use this repo if you want to implement an integration for a framework Elastic APM does not support yet.**
 
+Use [our base agent](https://github.com/elastic/apm-agent-js-base) for error logging and performance monitoring.
+
 ## Development
 
 Use `npm run karma` to continuously run unit tests during development.
