@@ -34,10 +34,9 @@ var Transaction = function (name, type, options, logger) {
 
   this.doneCallback = function noop () {}
 
-  // A transaction should always have a root span spanning the entire transaction.
-  this._rootSpan = this.startSpan('transaction', 'transaction', {enableStackFrames: false})
+  this._rootSpan = new Span('transaction', 'transaction', {enableStackFrames: false})
+
   this._startStamp = new Date()
-  this._start = this._rootSpan._start
 
   this.duration = this._rootSpan.duration.bind(this._rootSpan)
   this.nextId = 0
@@ -88,9 +87,7 @@ Transaction.prototype.startSpan = function (signature, type, options) {
   var span = new Span(signature, type, opts)
   span.id = this.nextId
   this.nextId++
-  if (this._rootSpan) {
-    this._activeSpans[span.id] = span
-  }
+  this._activeSpans[span.id] = span
 
   return span
 }
@@ -180,9 +177,8 @@ Transaction.prototype._adjustEndToLatestSpan = function () {
 Transaction.prototype._adjustStartToEarliestSpan = function () {
   var span = getEarliestSpan(this.spans)
 
-  if (span) {
+  if (span && span._start < this._rootSpan._start) {
     this._rootSpan._start = span._start
-    this._start = this._rootSpan._start
   }
 }
 

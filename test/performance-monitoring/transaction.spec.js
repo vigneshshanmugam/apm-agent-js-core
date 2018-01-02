@@ -17,7 +17,7 @@ describe('transaction.Transaction', function () {
     lastSpan.end()
     transaction.end()
 
-    expect(transaction.spans.length).toBe(3)
+    expect(transaction.spans.length).toBe(2)
     done()
   })
 

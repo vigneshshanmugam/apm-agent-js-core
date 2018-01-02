@@ -65,7 +65,7 @@ class PerformanceMonitoring {
       if (checkBrowserResponsiveness && !tr.isHardNavigation) {
         var buffer = performanceMonitoring._configService.get('browserResponsivenessBuffer')
 
-        var duration = tr._rootSpan.duration()
+        var duration = tr.duration()
         var wasBrowserResponsive = performanceMonitoring.checkBrowserResponsiveness(tr, browserResponsivenessInterval, buffer)
         if (!wasBrowserResponsive) {
           performanceMonitoring._logginService.debug('Transaction was discarded! browser was not responsive enough during the transaction.', ' duration:', duration, ' browserResponsivenessCounter:', tr.browserResponsivenessCounter, 'interval:', browserResponsivenessInterval)
@@ -148,7 +148,7 @@ class PerformanceMonitoring {
       return true
     }
 
-    var duration = transaction._rootSpan.duration()
+    var duration = transaction.duration()
     var expectedCount = Math.floor(duration / interval)
     var wasBrowserResponsive = counter + buffer >= expectedCount
 

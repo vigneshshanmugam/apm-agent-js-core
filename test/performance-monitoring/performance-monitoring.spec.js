@@ -75,11 +75,10 @@ describe('PerformanceMonitoring', function () {
     })
     var grouped = performanceMonitoring.groupSmallContinuouslySimilarSpans(tr, 0.05)
 
-    expect(grouped.length).toBe(4)
-    expect(grouped[0].signature).toBe('transaction')
-    expect(grouped[1].signature).toBe('2x signature')
-    expect(grouped[2].signature).toBe('another-signature')
-    expect(grouped[3].signature).toBe('2x signature')
+    expect(grouped.length).toBe(3)
+    expect(grouped[0].signature).toBe('2x signature')
+    expect(grouped[1].signature).toBe('another-signature')
+    expect(grouped[2].signature).toBe('2x signature')
   })
 
   it('should group small continuously similar spans', function () {
@@ -121,10 +120,9 @@ describe('PerformanceMonitoring', function () {
 
     var grouped = performanceMonitoring.groupSmallContinuouslySimilarSpans(tr, 0.05)
 
-    expect(grouped.length).toBe(3)
-    expect(grouped[0].signature).toBe('transaction')
-    expect(grouped[1].signature).toBe('4x signature')
-    expect(grouped[2].signature).toBe('another-signature')
+    expect(grouped.length).toBe(2)
+    expect(grouped[0].signature).toBe('4x signature')
+    expect(grouped[1].signature).toBe('another-signature')
   })
 
   it('should calculate browser responsiveness', function () {
