@@ -11,7 +11,6 @@ describe('transaction.Transaction', function () {
     var transaction = new Transaction('/', 'transaction', {})
 
     firstSpan.transaction = transaction
-    firstSpan.setParent(transaction._rootSpan)
     transaction.addEndedSpans([firstSpan])
 
     var lastSpan = transaction.startSpan('last-span-signature', 'last-span')
@@ -33,7 +32,6 @@ describe('transaction.Transaction', function () {
       done()
     }
     firstSpan.transaction = transaction
-    firstSpan.setParent(transaction._rootSpan)
     transaction.addEndedSpans([firstSpan])
 
     var lastSpan = transaction.startSpan('last-span-signature', 'last-span')

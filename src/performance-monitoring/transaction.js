@@ -89,7 +89,6 @@ Transaction.prototype.startSpan = function (signature, type, options) {
   span.id = this.nextId
   this.nextId++
   if (this._rootSpan) {
-    span.setParent(this._rootSpan)
     this._activeSpans[span.id] = span
   }
 

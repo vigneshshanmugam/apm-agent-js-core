@@ -35,7 +35,6 @@ module.exports = function captureHardNavigation (transaction) {
         var span = new Span(eventPairs[i][2], 'hard-navigation.browser-timing')
         span._start = timings[eventPairs[i][0]] - baseTime
         span.ended = true
-        span.setParent(transaction._rootSpan)
         span.end()
         span._end = timings[eventPairs[i][1]] - baseTime
         if (isValidSpan(transaction, span)) {
@@ -78,7 +77,6 @@ module.exports = function captureHardNavigation (transaction) {
           span = new Span(entry.name, kind)
           span._start = entry.startTime
           span.ended = true
-          span.setParent(transaction._rootSpan)
           span.end()
           span._end = entry.responseEnd
           if (isValidSpan(transaction, span)) {

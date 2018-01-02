@@ -10,7 +10,6 @@ function Span (signature, type, options) {
   this.signature = signature
   this.type = type
   this.ended = false
-  this._parent = null
   this._end = null
 
   // Start timers
@@ -32,14 +31,6 @@ Span.prototype.duration = function () {
   var diff = this._end - this._start
 
   return parseFloat(diff)
-}
-
-Span.prototype.parent = function () {
-  return this._parent
-}
-
-Span.prototype.setParent = function (val) {
-  this._parent = val
 }
 
 module.exports = Span
