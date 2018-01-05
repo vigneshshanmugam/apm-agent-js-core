@@ -94,6 +94,24 @@ Config.prototype.set = function (key, value) {
   })
 }
 
+Config.prototype.setUserContext = function (userContext) {
+  var context = {}
+  if (typeof userContext.id === 'string' || typeof userContext.id === 'number') {
+    context.id = userContext.id
+  }
+  if (typeof userContext.username === 'string') {
+    context.username = userContext.username
+  }
+  if (typeof userContext.email === 'string') {
+    context.email = userContext.email
+  }
+  this.set('context.user', context)
+}
+
+Config.prototype.setCustomContext = function (customContext) {
+  this.set('context.custom', customContext)
+}
+
 Config.prototype.getAgentName = function () {
   var version = this.config['agentVersion']
   if (!version) {

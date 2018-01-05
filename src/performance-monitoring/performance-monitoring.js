@@ -1,3 +1,4 @@
+var utils = require('../common/utils')
 class PerformanceMonitoring {
   constructor (apmServer, configService, loggingService, zoneService, transactionService) {
     this._apmServer = apmServer
@@ -84,6 +85,7 @@ class PerformanceMonitoring {
   }
 
   convertTransactionsToServerModel (transactions) {
+    var configContext = this._configService.get('context')
     return transactions.map(function (transaction) {
       var spans = transaction.spans.map(function (span) {
         return {
@@ -93,6 +95,8 @@ class PerformanceMonitoring {
           duration: span.duration()
         }
       })
+
+      var context = utils.merge({}, configContext, transaction.contextInfo)
       return {
         id: transaction.id,
         timestamp: transaction.timestamp,
@@ -100,7 +104,7 @@ class PerformanceMonitoring {
         type: transaction.type,
         duration: transaction.duration(),
         spans: spans,
-        context: transaction.contextInfo,
+        context: context,
         marks: transaction.marks,
         unknownName: transaction.unknownName
       }

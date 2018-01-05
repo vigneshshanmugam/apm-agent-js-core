@@ -82,4 +82,21 @@ describe('ConfigService', function () {
     result = configService.applyFilters('hamid-test')
     expect(result).toBeUndefined()
   })
+  it('should set userContext and customContext', function () {
+    configService.setCustomContext({test: 'test'})
+    var customContext = configService.get('context.custom')
+    expect(customContext).toEqual({test: 'test'})
+
+    configService.setUserContext({test: 'test',id: 'userId', username: 'username',email: 'email'})
+    var userContext = configService.get('context.user')
+    expect(userContext).toEqual({id: 'userId',username: 'username',email: 'email'})
+
+    configService.setUserContext({test: 'test',id: 1, username: 1,email: 'email'})
+    userContext = configService.get('context.user')
+    expect(userContext).toEqual({id: 1,email: 'email'})
+
+    configService.setUserContext({test: 'test', username: {}})
+    userContext = configService.get('context.user')
+    expect(userContext).toEqual({})
+  })
 })
