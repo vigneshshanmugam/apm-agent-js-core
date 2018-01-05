@@ -1,3 +1,19 @@
+<a name="0.1.4"></a>
+## [0.1.4](https://github.com/elastic/apm-agent-js-core/compare/v0.1.3...v0.1.4) (2018-01-05)
+
+
+### Bug Fixes
+
+* set default agentName to js-base ([3bfeb55](https://github.com/elastic/apm-agent-js-core/commit/3bfeb55))
+
+
+### Features
+
+* add marks data to the payload ([ec17bc7](https://github.com/elastic/apm-agent-js-core/commit/ec17bc7))
+* add user context and custom context ([319e131](https://github.com/elastic/apm-agent-js-core/commit/319e131))
+
+
+
 <a name="0.1.3"></a>
 ## [0.1.3](https://github.com/elastic/apm-agent-js-core/compare/v0.1.2...v0.1.3) (2018-01-05)
 
