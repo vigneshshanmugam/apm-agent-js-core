@@ -1,5 +1,20 @@
 var slice = [].slice
 
+function isCORSSupported () {
+  var xhr = new window.XMLHttpRequest()
+  return 'withCredentials' in xhr
+}
+
+function isPlatformSupported () {
+  return typeof window !== 'undefined' &&
+    typeof Array.prototype.forEach === 'function' &&
+    typeof JSON.stringify === 'function' &&
+    typeof Function.bind === 'function' &&
+    window.performance &&
+    typeof window.performance.now === 'function' &&
+    isCORSSupported()
+}
+
 module.exports = {
   getViewPortInfo: function getViewPort () {
     var e = document.documentElement
@@ -202,10 +217,7 @@ module.exports = {
     return (typeof obj) === 'undefined'
   },
 
-  isCORSSupported: function () {
-    var xhr = new window.XMLHttpRequest()
-    return 'withCredentials' in xhr
-  },
+  isCORSSupported: isCORSSupported,
   getElasticScript: function () {
     if (typeof document !== 'undefined') {
       var scripts = document.getElementsByTagName('script')
@@ -262,8 +274,9 @@ module.exports = {
       params[key] = keyvalue.join('=')
     }
     return { protocol: protocol, path: path, queryString: queryString, queryStringParsed: params, hash: hash }
-  }
+  },
 
+  isPlatformSupported: isPlatformSupported
 }
 
 function isObject (value) {
