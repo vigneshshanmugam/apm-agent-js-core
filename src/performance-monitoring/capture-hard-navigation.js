@@ -88,17 +88,20 @@ module.exports = function captureHardNavigation (transaction) {
     transaction._adjustStartToEarliestSpan()
     transaction._adjustEndToLatestSpan()
 
-    var metrics = {
-      timeToComplete: transaction._rootSpan._end
+    var marks = {
+      agent: {
+        timeToComplete: transaction._rootSpan._end
+      },
+      navigationTiming: {}
     }
     var navigationStart = window.performance.timing.navigationStart
     navigationTimingKeys.forEach(function (timingKey) {
       var m = timings[timingKey]
       if (m) {
-        metrics[timingKey] = m - navigationStart
+        marks.navigationTiming[timingKey] = m - navigationStart
       }
     })
-    transaction.addMetrics(metrics)
+    transaction.addMarks(marks)
   }
   return 0
 }

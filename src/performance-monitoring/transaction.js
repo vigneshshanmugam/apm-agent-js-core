@@ -17,9 +17,10 @@ var Transaction = function (name, type, options, logger) {
   }
 
   this.contextInfo = {
-    _debug: {},
-    _metrics: {}
+    _debug: {}
   }
+
+  this.marks = {}
   if (this._options.sendVerboseDebugInfo) {
     this.contextInfo._debug.log = []
     this.debugLog('Transaction', name, type)
@@ -62,8 +63,8 @@ Transaction.prototype.setDebugData = function setDebugData (key, value) {
   this.contextInfo._debug[key] = value
 }
 
-Transaction.prototype.addMetrics = function (obj) {
-  this.contextInfo._metrics = utils.merge(this.contextInfo._metrics, obj)
+Transaction.prototype.addMarks = function (obj) {
+  this.marks = utils.merge(this.marks, obj)
 }
 
 Transaction.prototype.redefine = function (name, type, options) {

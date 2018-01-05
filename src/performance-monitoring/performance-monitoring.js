@@ -101,6 +101,7 @@ class PerformanceMonitoring {
         duration: transaction.duration(),
         spans: spans,
         context: transaction.contextInfo,
+        marks: transaction.marks,
         unknownName: transaction.unknownName
       }
     })
