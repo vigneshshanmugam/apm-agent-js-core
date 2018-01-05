@@ -6,7 +6,7 @@ function Config () {
   this.defaults = {
     serviceName: '',
     serviceVersion: '',
-    agentName: 'apm-js',
+    agentName: 'js-base',
     agentVersion: '%%agent-version%%',
     serverUrl: 'http://localhost:8200',
     serverUrlPrefix: '/v1/client-side',
