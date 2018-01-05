@@ -1,3 +1,18 @@
+<a name="0.1.3"></a>
+## [0.1.3](https://github.com/elastic/apm-agent-js-core/compare/v0.1.2...v0.1.3) (2018-01-05)
+
+
+### Bug Fixes
+
+* remove in_app field from stacktraces ([610cc6e](https://github.com/elastic/apm-agent-js-core/commit/610cc6e))
+
+
+### Features
+
+* add serviceVersion configuration ([c468338](https://github.com/elastic/apm-agent-js-core/commit/c468338))
+
+
+
 <a name="0.1.2"></a>
 ## [0.1.2](https://github.com/jahtalab/apm-agent-js-core/compare/v0.1.1...v0.1.2) (2017-12-20)
 
