@@ -93,6 +93,8 @@ function buildE2eBundles (basePath, callback) {
         console.log('Error:', error)
       })
       cb(jsonStats.errors)
+    } else {
+      cb()
     }
   })
 }
