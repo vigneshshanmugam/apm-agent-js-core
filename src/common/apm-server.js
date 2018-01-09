@@ -11,6 +11,9 @@ class ApmServer {
       agent: {
         name: cfg.get('agentName'),
         version: cfg.get('agentVersion')
+      },
+      language: {
+        name: 'javascript'
       }
     }
     return serviceObject
