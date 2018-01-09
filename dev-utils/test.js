@@ -75,7 +75,14 @@ function buildE2eBundles (basePath, callback) {
   })
   var configs = fileList.map(f => {
     return require(f)
-  })
+  }).reduce((acc, cfg) => {
+    if (cfg.length) {
+      return acc.concat(cfg)
+    } else {
+      acc.push(cfg)
+      return acc
+    }
+  }, [])
 
   console.log('Config Files: \n', fileList.join('\n'))
   webpack(configs, (err, stats) => {
@@ -174,5 +181,6 @@ module.exports = {
   runKarma: runKarma,
   buildE2eBundles: buildE2eBundles,
   startSelenium: startSelenium,
-  runE2eTests: runE2eTests
+  runE2eTests: runE2eTests,
+  dirWalkSync: walkSync
 }
