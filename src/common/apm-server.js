@@ -1,6 +1,10 @@
 class ApmServer {
-  constructor (configService) {
+  constructor (configService, loggingService) {
     this._configService = configService
+    this._loggingService = loggingService
+    this.logMessages = {
+      invalidConfig: { message: 'Configuration is invalid!', level: 'warn' }
+    }
   }
 
   createServiceObject () {
@@ -61,29 +65,47 @@ class ApmServer {
     })
   }
 
+  warnOnce (logObject) {
+    if (logObject.level === 'warn') {
+      logObject.level = 'debug'
+      this._loggingService.warn(logObject.message)
+    } else {
+      this._loggingService.debug(logObject.message)
+    }
+  }
+
   sendErrors (errors) {
-    if (errors && errors.length > 0) {
-      var payload = {
-        service: this.createServiceObject(),
-        errors: errors
+    if (this._configService.isValid()) {
+      if (errors && errors.length > 0) {
+        var payload = {
+          service: this.createServiceObject(),
+          errors: errors
+        }
+        payload = this._configService.applyFilters(payload)
+        var endPoint = this._configService.getEndpointUrl('errors')
+        return this._postJson(endPoint, payload)
       }
-      payload = this._configService.applyFilters(payload)
-      var endPoint = this._configService.getEndpointUrl('errors')
-      return this._postJson(endPoint, payload)
+    } else {
+      this.warnOnce(this.logMessages.invalidConfig)
     }
   }
 
   sendTransactions (transactions) {
-    if (transactions && transactions.length > 0) {
-      var payload = {
-        service: this.createServiceObject(),
-        transactions: transactions
+    if (this._configService.isValid()) {
+      if (transactions && transactions.length > 0) {
+        var payload = {
+          service: this.createServiceObject(),
+          transactions: transactions
+        }
+        payload = this._configService.applyFilters(payload)
+        var endPoint = this._configService.getEndpointUrl('transactions')
+        return this._postJson(endPoint, payload)
       }
-      payload = this._configService.applyFilters(payload)
-      var endPoint = this._configService.getEndpointUrl('transactions')
-      return this._postJson(endPoint, payload)
+    } else {
+      this.warnOnce(this.logMessages.invalidConfig)
     }
   }
+
 }
 
 module.exports = ApmServer

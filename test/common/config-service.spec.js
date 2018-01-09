@@ -82,6 +82,7 @@ describe('ConfigService', function () {
     result = configService.applyFilters('hamid-test')
     expect(result).toBeUndefined()
   })
+
   it('should set userContext and customContext', function () {
     configService.setCustomContext({test: 'test'})
     var customContext = configService.get('context.custom')
@@ -98,5 +99,22 @@ describe('ConfigService', function () {
     configService.setUserContext({test: 'test', username: {}})
     userContext = configService.get('context.user')
     expect(userContext).toEqual({})
+  })
+
+  it('should check config validity', function () {
+    var result = configService.isValid()
+    expect(result).toBe(false)
+
+    configService.setConfig({serviceName: 'serviceName'})
+    result = configService.isValid()
+    expect(result).toBe(true)
+
+    configService.setConfig({serverUrl: undefined})
+    result = configService.isValid()
+    expect(result).toBe(false)
+
+    configService.setConfig({serverUrl: 'test'})
+    result = configService.isValid()
+    expect(result).toBe(true)
   })
 })

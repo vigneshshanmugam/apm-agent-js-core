@@ -18,10 +18,6 @@ class ServiceFactory {
       return configService
     })
 
-    this.registerServiceCreator('ApmServer', function () {
-      return new ApmServer(serviceFactory.getService('ConfigService'))
-    })
-
     function setLogLevel (loggingService, configService) {
       if (configService.get('debug') === true && configService.config.logLevel !== 'trace') {
         loggingService.setLevel('debug', false)
@@ -37,6 +33,9 @@ class ServiceFactory {
     })
 
     this.registerServiceInstance('LoggingService', Logger)
+    this.registerServiceCreator('ApmServer', function () {
+      return new ApmServer(serviceFactory.getService('ConfigService'), serviceFactory.getService('LoggingService'))
+    })
     this.registerServiceInstance('PatchUtils', patchUtils)
     this.registerServiceInstance('Utils', utils)
   }

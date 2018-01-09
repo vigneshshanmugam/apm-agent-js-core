@@ -132,9 +132,9 @@ Config.prototype.subscribeToChange = function (fn) {
 }
 
 Config.prototype.isValid = function () {
-  var requiredKeys = ['serviceName']
+  var requiredKeys = ['serviceName', 'serverUrl']
   var values = utils.arrayMap(requiredKeys, utils.functionBind(function (key) {
-    return (this.config[key] === null) || (this.config[key] === undefined)
+    return (this.config[key] === null) || (this.config[key] === undefined) || (this.config[key] === '')
   }, this))
 
   return utils.arrayIndexOf(values, true) === -1
