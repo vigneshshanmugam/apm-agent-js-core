@@ -1,3 +1,14 @@
+<a name="0.1.7"></a>
+## [0.1.7](https://github.com/elastic/apm-agent-js-core/compare/v0.1.6...v0.1.7) (2018-01-10)
+
+
+### Bug Fixes
+
+* add language name to the payload ([ac39335](https://github.com/elastic/apm-agent-js-core/commit/ac39335))
+* check config validity before sending the payload ([1486fd6](https://github.com/elastic/apm-agent-js-core/commit/1486fd6))
+
+
+
 <a name="0.1.6"></a>
 ## [0.1.6](https://github.com/elastic/apm-agent-js-core/compare/v0.1.5...v0.1.6) (2018-01-09)
 
