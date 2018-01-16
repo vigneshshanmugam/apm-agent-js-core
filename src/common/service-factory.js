@@ -8,15 +8,33 @@ class ServiceFactory {
   constructor () {
     this._serviceCreators = {}
     this._serviceInstances = {}
+    this.initialized = false
   }
-  init () {
+
+  registerCoreServices () {
     var serviceFactory = this
 
     this.registerServiceCreator('ConfigService', function () {
       var configService = new ConfigService()
-      configService.init()
       return configService
     })
+
+    this.registerServiceInstance('LoggingService', Logger)
+    this.registerServiceCreator('ApmServer', function () {
+      return new ApmServer(serviceFactory.getService('ConfigService'), serviceFactory.getService('LoggingService'))
+    })
+    this.registerServiceInstance('PatchUtils', patchUtils)
+    this.registerServiceInstance('Utils', utils)
+  }
+  init () {
+    if (this.initialized) {
+      return
+    }
+    this.initialized = true
+    var serviceFactory = this
+
+    var configService = serviceFactory.getService('ConfigService')
+    configService.init()
 
     function setLogLevel (loggingService, configService) {
       if (configService.get('debug') === true && configService.config.logLevel !== 'trace') {
@@ -26,18 +44,10 @@ class ServiceFactory {
       }
     }
 
-    var configService = serviceFactory.getService('ConfigService')
     setLogLevel(Logger, configService)
     configService.subscribeToChange(function (newConfig) {
       setLogLevel(Logger, configService)
     })
-
-    this.registerServiceInstance('LoggingService', Logger)
-    this.registerServiceCreator('ApmServer', function () {
-      return new ApmServer(serviceFactory.getService('ConfigService'), serviceFactory.getService('LoggingService'))
-    })
-    this.registerServiceInstance('PatchUtils', patchUtils)
-    this.registerServiceInstance('Utils', utils)
   }
 
   registerServiceCreator (name, creator) {

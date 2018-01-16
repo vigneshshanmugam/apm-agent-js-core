@@ -5,6 +5,7 @@ describe('ServiceFactory', function () {
   var logger
   beforeEach(function () {
     var serviceFactory = new ServiceFactory()
+    serviceFactory.registerCoreServices()
     serviceFactory.init()
     configService = serviceFactory.getService('ConfigService')
 

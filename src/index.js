@@ -8,9 +8,9 @@ var utils = require('./common/utils')
 module.exports = {
   createServiceFactory: function () {
     var serviceFactory = new ServiceFactory()
-    serviceFactory.init()
-    ErrorLogging.initServiceFactory(serviceFactory)
-    PerformanceMonitoring.initServiceFactory(serviceFactory)
+    serviceFactory.registerCoreServices()
+    ErrorLogging.registerServices(serviceFactory)
+    PerformanceMonitoring.registerServices(serviceFactory)
     return serviceFactory
   },
   ServiceFactory: ServiceFactory,
