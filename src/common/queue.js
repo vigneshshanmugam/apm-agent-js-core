@@ -9,11 +9,11 @@ class Queue {
   }
   _setTimer () {
     this.timeoutId = setTimeout(() => {
-      this._flush()
+      this.flush()
     }, this.flushInterval)
   }
 
-  _flush () {
+  flush () {
     this.onFlush(this.items)
     this._clear()
   }
@@ -29,7 +29,7 @@ class Queue {
   add (item) {
     this.items.push(item)
     if (this.queueLimit !== -1 && this.items.length >= this.queueLimit) {
-      this._flush()
+      this.flush()
     } else {
       if (typeof this.timeoutId === 'undefined') {
         this._setTimer()
