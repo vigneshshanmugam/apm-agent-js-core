@@ -46,7 +46,7 @@ describe('ErrorLogging', function () {
       error.anObject = obj
       error.aFunction = function noop () {}
       error.null = null
-      errorLogging.logError(error)
+      errorLogging.logErrorEvent({error: error}, true)
         .then(function () {
           expect(apmServer.sendErrors).toHaveBeenCalled()
           var errors = apmServer.sendErrors.calls.argsFor(0)[0]
@@ -92,7 +92,7 @@ describe('ErrorLogging', function () {
 
     var errorEvent = createErrorEvent(testErrorMessage)
 
-    errorLogging.logErrorEvent(errorEvent)
+    errorLogging.logErrorEvent(errorEvent, true)
       .then(function () {
         expect(apmServer.sendErrors).toHaveBeenCalled()
         var errors = apmServer.sendErrors.calls.argsFor(0)[0]
@@ -111,11 +111,11 @@ describe('ErrorLogging', function () {
   it('should install onerror and accept ErrorEvents', function (done) {
     var count = 0
     spyOn(apmServer, 'sendErrors').and.callFake(function (errors) {
-      expect(errors.length).toBe(1)
+      expect(errors.length).toBe(6)
       var error = errors[0]
       expect(error.exception.message).toContain(testErrorMessage)
 
-      count++
+      count = count + errors.length
       if (count === 6) {
         done()
       }
@@ -142,12 +142,32 @@ describe('ErrorLogging', function () {
 
   it('should handle edge cases', function (done) {
     var resultPromises = []
-    resultPromises.push(errorLogging.logErrorEvent())
-    resultPromises.push(errorLogging.logErrorEvent({}))
-    resultPromises.push(errorLogging.logErrorEvent(undefined))
+    resultPromises.push(errorLogging.logErrorEvent(), true)
+    resultPromises.push(errorLogging.logErrorEvent({}), true)
+    resultPromises.push(errorLogging.logErrorEvent(undefined), true)
 
     Promise.all(resultPromises).then(function (result) {
       done()
+    }, (reason) => {
+      fail('failed: ' + reason)
     })
+  })
+
+  it('should add error to queue', function () {
+    configService.setConfig({
+      serviceName: 'serviceName'
+    })
+    expect(configService.isValid()).toBe(true)
+    spyOn(apmServer, 'sendErrors')
+    try {
+      throw new Error('unittest error')
+    } catch (error) {
+      errorLogging.logErrorEvent({error: error})
+      errorLogging.logErrorEvent({error: error})
+      errorLogging.logError(error)
+      errorLogging.logError('test error')
+      expect(apmServer.sendErrors).not.toHaveBeenCalled()
+      expect(apmServer.errorQueue.items.length).toBe(4)
+    }
   })
 })

@@ -67,7 +67,7 @@ class ErrorLogging {
     return errorObject
   }
 
-  logErrorEvent (errorEvent) {
+  logErrorEvent (errorEvent, sendImmediately) {
     if (typeof errorEvent === 'undefined') {
       return
     }
@@ -75,7 +75,11 @@ class ErrorLogging {
     if (typeof errorObject.exception.message === 'undefined') {
       return
     }
-    return this._apmServer.sendErrors([errorObject])
+    if (sendImmediately) {
+      return this._apmServer.sendErrors([errorObject])
+    } else {
+      return this._apmServer.addError(errorObject)
+    }
   }
 
   registerGlobalEventListener () {
