@@ -27,7 +27,6 @@ class ApmServer {
 
     this.initErrorQueue()
     this.initTransactionQueue()
-    // this.initThrottledMakeRequest()
   }
 
   createServiceObject () {
@@ -46,24 +45,7 @@ class ApmServer {
     return serviceObject
   }
 
-  // initThrottledMakeRequest () {
-  //   var apmServer = this
-  //   var throttlingRequestLimit = apmServer._configService.get('throttlingRequestLimit')
-  //   var throttlingInterval = apmServer._configService.get('throttlingInterval')
-  //   this._throttledMakeRequest = throttle(apmServer._makeHttpRequest.bind(apmServer),
-  //     function (method, url) {
-  //       apmServer._loggingService.warn('ElasticAPM: Dropped request to ' + url + ' due to throttling!')
-  //     }, {
-  //       limit: throttlingRequestLimit,
-  //       interval: throttlingInterval
-  //     })
-  // }
-
   _postJson (endPoint, payload) {
-    // if (!this._throttledMakeRequest) {
-    //   this.initThrottledMakeRequest()
-    // }
-
     return this._makeHttpRequest('POST',
       endPoint,
       JSON.stringify(payload),
@@ -170,7 +152,6 @@ class ApmServer {
     if (!this.errorQueue) {
       this.initErrorQueue()
     }
-    // this.errorQueue.add(error)
     this.throttleAddError(error)
   }
 
@@ -178,7 +159,6 @@ class ApmServer {
     if (!this.transactionQueue) {
       this.initTransactionQueue()
     }
-    // this.transactionQueue.add(transaction)
     this.throttleAddTransaction(transaction)
   }
 
