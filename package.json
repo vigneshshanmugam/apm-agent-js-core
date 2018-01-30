@@ -39,6 +39,7 @@
     "browserify": "^13.0.1",
     "browserify-istanbul": "^2.0.0",
     "elastic-apm-js-zone": "0.8.19-tskdt",
+    "es6-promise": "^4.2.4",
     "event-stream": "^3.3.1",
     "gulp": "^3.9.1",
     "gulp-awspublish": "^3.0.1",

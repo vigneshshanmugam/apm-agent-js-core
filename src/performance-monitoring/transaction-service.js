@@ -4,84 +4,35 @@ var Subscription = require('../common/subscription')
 
 var captureHardNavigation = require('./capture-hard-navigation')
 
-function TransactionService (zoneService, logger, config) {
+function TransactionService (logger, config) {
   this._config = config
   if (typeof config === 'undefined') {
     logger.debug('TransactionService: config is not provided')
   }
   this._logger = logger
-  this._zoneService = zoneService
-
   this.nextAutoTaskId = 1
 
   this.taskMap = {}
   this.metrics = {}
 
   this.initialPageLoadName = undefined
+  this.currentTransaction = undefined
 
   this._subscription = new Subscription()
 
-  var transactionService = this
   this._alreadyCapturedPageLoad = false
+}
 
-  function onBeforeInvokeTask (task) {
-    if (task.source === 'XMLHttpRequest.send' && task.span && !task.span.ended) {
-      task.span.end()
-    }
-    transactionService.logInTransaction('Executing', task.taskId)
-  }
-  zoneService.spec.onBeforeInvokeTask = onBeforeInvokeTask
+TransactionService.prototype.shouldCreateTransaction = function () {
+  return this._config.isActive()
+}
 
-  var self = this
+TransactionService.prototype.getZoneTransaction = function () {
+  return this.currentTransaction
+}
 
-  function onScheduleTask (task) {
-    if (task.source === 'XMLHttpRequest.send') {
-      var url = task['XHR']['url']
-      var spanSignature = task['XHR']['method'] + ' '
-      if (transactionService._config.get('includeXHRQueryString')) {
-        spanSignature = spanSignature + url
-      } else {
-        var parsed = utils.parseUrl(url)
-        spanSignature = spanSignature + parsed.path
-      }
-
-      var span = transactionService.startSpan(spanSignature, 'ext.HttpRequest', {'enableStackFrames': false})
-      task.span = span
-    } else if (task.type === 'interaction') {
-      if (typeof self.interactionStarted === 'function') {
-        self.interactionStarted(task)
-      }
-    }
-    transactionService.addTask(task.taskId)
-  }
-  zoneService.spec.onScheduleTask = onScheduleTask
-
-  function onInvokeTask (task) {
-    if (task.source === 'XMLHttpRequest.send' && task.span && !task.span.ended) {
-      task.span.end()
-      transactionService.logInTransaction('xhr late ending')
-      transactionService.setDebugDataOnTransaction('xhrLateEnding', true)
-    }
-    transactionService.removeTask(task.taskId)
-    transactionService.detectFinish()
-  }
-  zoneService.spec.onInvokeTask = onInvokeTask
-
-  function onCancelTask (task) {
-    transactionService.removeTask(task.taskId)
-    transactionService.detectFinish()
-  }
-  zoneService.spec.onCancelTask = onCancelTask
-  function onInvokeEnd (task) {
-    logger.trace('onInvokeEnd', 'source:', task.source, 'type:', task.type)
-    transactionService.detectFinish()
-  }
-  zoneService.spec.onInvokeEnd = onInvokeEnd
-
-  function onInvokeStart (task) {
-    logger.trace('onInvokeStart', 'source:', task.source, 'type:', task.type)
-  }
-  zoneService.spec.onInvokeStart = onInvokeStart
+TransactionService.prototype.setZoneTransaction = function (value) {
+  this.currentTransaction = value
 }
 
 TransactionService.prototype.createTransaction = function (name, type, options) {
@@ -89,13 +40,12 @@ TransactionService.prototype.createTransaction = function (name, type, options) 
   if (utils.isUndefined(perfOptions)) {
     perfOptions = this._config.config
   }
-  if (!this._config.isActive() || !this._zoneService.isApmZone()) {
+  if (!this.shouldCreateTransaction()) {
     return
   }
 
   var tr = new Transaction(name, type, perfOptions, this._logger)
-  tr.setDebugData('zone', this._zoneService.getCurrentZone().name)
-  this._zoneService.set('transaction', tr)
+  this.setZoneTransaction(tr)
   if (perfOptions.checkBrowserResponsiveness) {
     this.startCounter(tr)
   }
@@ -107,10 +57,10 @@ TransactionService.prototype.createZoneTransaction = function () {
 }
 
 TransactionService.prototype.getCurrentTransaction = function () {
-  if (!this._config.isActive() || !this._zoneService.isApmZone()) {
+  if (!this.shouldCreateTransaction()) {
     return
   }
-  var tr = this._zoneService.get('transaction')
+  var tr = this.getZoneTransaction()
   if (!utils.isUndefined(tr) && !tr.ended) {
     return tr
   }
@@ -124,7 +74,7 @@ TransactionService.prototype.startCounter = function (transaction) {
     this._logger.debug('browserResponsivenessInterval is undefined!')
     return
   }
-  this._zoneService.runOuter(function () {
+  this.runOuter(function () {
     var id = setInterval(function () {
       if (transaction.ended) {
         window.clearInterval(id)
@@ -140,7 +90,7 @@ TransactionService.prototype.sendPageLoadMetrics = function (name) {
   var perfOptions = this._config.config
   var tr
 
-  tr = this._zoneService.getFromApmZone('transaction')
+  tr = this.getZoneTransaction()
 
   var trName = name || this.initialPageLoadName
   var unknownName = false
@@ -219,7 +169,7 @@ TransactionService.prototype.startTransaction = function (name, type) {
 }
 
 TransactionService.prototype.applyAsync = function (fn, applyThis, applyArgs) {
-  return this._zoneService.runOuter(function () {
+  return this.runOuter(function () {
     return Promise.resolve()
       .then(function () {
         return fn.apply(applyThis, applyArgs)
@@ -280,31 +230,35 @@ TransactionService.prototype.addTask = function (taskId) {
   return taskId
 }
 TransactionService.prototype.removeTask = function (taskId) {
-  var tr = this._zoneService.get('transaction')
+  var tr = this.getZoneTransaction()
   if (!utils.isUndefined(tr) && !tr.ended) {
     tr.removeTask(taskId)
     this._logger.debug('TransactionService.removeTask', taskId)
   }
 }
 TransactionService.prototype.logInTransaction = function () {
-  var tr = this._zoneService.get('transaction')
+  var tr = this.getZoneTransaction()
   if (!utils.isUndefined(tr) && !tr.ended) {
     tr.debugLog.apply(tr, arguments)
   }
 }
 TransactionService.prototype.setDebugDataOnTransaction = function setDebugDataOnTransaction (key, value) {
-  var tr = this._zoneService.get('transaction')
+  var tr = this.getZoneTransaction()
   if (!utils.isUndefined(tr) && !tr.ended) {
     tr.setDebugData(key, value)
   }
 }
 
 TransactionService.prototype.detectFinish = function () {
-  var tr = this._zoneService.get('transaction')
+  var tr = this.getZoneTransaction()
   if (!utils.isUndefined(tr) && !tr.ended) {
     tr.detectFinish()
     this._logger.debug('TransactionService.detectFinish')
   }
+}
+
+TransactionService.prototype.runOuter = function (fn, applyThis, applyArgs) {
+  return fn.apply(applyThis, applyArgs)
 }
 
 module.exports = TransactionService

@@ -4,7 +4,7 @@ var patchCommon = require('../../src/common/patching/patch-common')
 
 var logger = require('loglevel')
 
-describe('ZoneService', function () {
+xdescribe('ZoneService', function () {
   var zoneService
   var originalTimeout
 

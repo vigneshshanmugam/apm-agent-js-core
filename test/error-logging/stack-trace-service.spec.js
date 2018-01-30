@@ -6,12 +6,15 @@ describe('StackTraceService', function () {
     var serviceFactory = createServiceFactory()
     var configService = serviceFactory.getService('ConfigService')
     var stackTraceService = new StackTraceService(configService)
+    function generateError () {
+      throw new Error('test error')
+    }
     setTimeout(function () {
       try {
-        throw new Error('test error')
+        generateError()
       } catch(error) {
         var stackTraces = stackTraceService.createStackTraces({error})
-        expect(stackTraces.length).toBeGreaterThan(4)
+        expect(stackTraces.length).toBeGreaterThan(1)
         done()
       }
     }, 1)

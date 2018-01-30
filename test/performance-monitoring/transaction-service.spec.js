@@ -1,6 +1,4 @@
-import { debug } from 'util'
-
-var TransactionService = require('../../src/performance-monitoring/transaction-service')
+var ZoneTransactionService = require('../../src/performance-monitoring/zone-transaction-service')
 var Transaction = require('../../src/performance-monitoring/transaction')
 var Span = require('../../src/performance-monitoring/span')
 
@@ -22,7 +20,7 @@ describe('TransactionService', function () {
 
     config = new Config()
     config.init()
-    transactionService = new TransactionService(zoneServiceMock, logger, config)
+    transactionService = new ZoneTransactionService(zoneServiceMock, logger, config)
   })
 
   it('should not start span when there is no current transaction', function () {
@@ -33,24 +31,24 @@ describe('TransactionService', function () {
   it('should call startSpan on current Transaction', function () {
     var tr = new Transaction('transaction', 'transaction')
     spyOn(tr, 'startSpan').and.callThrough()
-    zoneServiceMock.zone.transaction = tr
+    transactionService.setZoneTransaction(tr)
     transactionService.startSpan('test-span', 'test-span')
-    expect(zoneServiceMock.zone.transaction.startSpan).toHaveBeenCalledWith('test-span', 'test-span', undefined)
+    expect(transactionService.getZoneTransaction().startSpan).toHaveBeenCalledWith('test-span', 'test-span', undefined)
   })
 
   it('should not start span when performance monitoring is disabled', function () {
     config.set('active', false)
-    transactionService = new TransactionService(zoneServiceMock, logger, config)
+    transactionService = new ZoneTransactionService(zoneServiceMock, logger, config)
     var tr = new Transaction('transaction', 'transaction')
     spyOn(tr, 'startSpan').and.callThrough()
-    zoneServiceMock.zone.transaction = tr
+    transactionService.setZoneTransaction(tr)
     transactionService.startSpan('test-span', 'test-span')
-    expect(zoneServiceMock.zone.transaction.startSpan).not.toHaveBeenCalled()
+    expect(transactionService.getZoneTransaction().startSpan).not.toHaveBeenCalled()
   })
 
   it('should not start transaction when performance monitoring is disabled', function () {
     config.set('active', false)
-    transactionService = new TransactionService(zoneServiceMock, logger, config)
+    transactionService = new ZoneTransactionService(zoneServiceMock, logger, config)
 
     var result = transactionService.startTransaction('transaction', 'transaction')
 
@@ -61,7 +59,7 @@ describe('TransactionService', function () {
     zoneServiceMock.isApmZone = function () {
       return false
     }
-    transactionService = new TransactionService(zoneServiceMock, logger, config)
+    transactionService = new ZoneTransactionService(zoneServiceMock, logger, config)
 
     var result = transactionService.startTransaction('transaction', 'transaction')
 
@@ -71,7 +69,7 @@ describe('TransactionService', function () {
   it('should start transaction', function () {
     config.set('active', true)
     config.set('browserResponsivenessInterval', true)
-    transactionService = new TransactionService(zoneServiceMock, logger, config)
+    transactionService = new ZoneTransactionService(zoneServiceMock, logger, config)
 
     var result = transactionService.startTransaction('transaction1', 'transaction')
     expect(result).toBeDefined()
@@ -81,10 +79,10 @@ describe('TransactionService', function () {
 
   it('should create a zone transaction on the first span', function () {
     config.set('active', true)
-    transactionService = new TransactionService(zoneServiceMock, logger, config)
+    transactionService = new ZoneTransactionService(zoneServiceMock, logger, config)
 
     var span = transactionService.startSpan('testSpan', 'testtype')
-    var trans = zoneServiceMock.get('transaction')
+    var trans = transactionService.getZoneTransaction()
     expect(trans.name).toBe('ZoneTransaction')
     transactionService.startTransaction('transaction', 'transaction')
     expect(trans.name).toBe('transaction')
@@ -92,14 +90,14 @@ describe('TransactionService', function () {
 
   it('should not create transaction if performance is not enabled', function () {
     config.set('active', false)
-    transactionService = new TransactionService(zoneServiceMock, logger, config)
+    transactionService = new ZoneTransactionService(zoneServiceMock, logger, config)
     var result = transactionService.createTransaction('test', 'test', config.get('performance'))
     expect(result).toBeUndefined()
   })
 
   it('should not start interactions by default', function () {
     config.set('active', true)
-    transactionService = new TransactionService(zoneServiceMock, logger, config)
+    transactionService = new ZoneTransactionService(zoneServiceMock, logger, config)
 
     var trans = transactionService.startTransaction('interaction', 'interaction')
     expect(trans).toBeUndefined()
@@ -107,7 +105,7 @@ describe('TransactionService', function () {
 
   it('should call startSpan on current Transaction', function () {
     var tr = new Transaction('transaction', 'transaction')
-    zoneServiceMock.zone.transaction = tr
+    transactionService.setZoneTransaction(tr)
     expect(tr._scheduledTasks).toEqual({})
     zoneServiceMock.spec.onScheduleTask({source: 'setTimeout',taskId: 'setTimeout1'})
     zoneServiceMock.spec.onScheduleTask({source: 'XMLHttpRequest.send',taskId: 'XMLHttpRequest.send1',XHR: {method: 'GET',url: 'url'}})
@@ -123,7 +121,7 @@ describe('TransactionService', function () {
   it('should remove XHR query string by default', function () {
     expect(config.get('includeXHRQueryString')).toBe(false)
     var tr = new Transaction('transaction', 'transaction')
-    zoneServiceMock.zone.transaction = tr
+    transactionService.setZoneTransaction(tr)
     spyOn(transactionService, 'startSpan').and.callThrough()
 
     zoneServiceMock.spec.onScheduleTask({source: 'XMLHttpRequest.send',taskId: 'XMLHttpRequest.send1',XHR: {method: 'GET',url: 'http://test.com/path?key=value'}})
@@ -134,7 +132,7 @@ describe('TransactionService', function () {
     config.set('includeXHRQueryString', true)
     expect(config.get('includeXHRQueryString')).toBe(true)
     var tr = new Transaction('transaction', 'transaction')
-    zoneServiceMock.zone.transaction = tr
+    transactionService.setZoneTransaction(tr)
     spyOn(transactionService, 'startSpan').and.callThrough()
 
     zoneServiceMock.spec.onScheduleTask({source: 'XMLHttpRequest.send',taskId: 'XMLHttpRequest.send1',XHR: {method: 'GET',url: 'http://test.com/path?key=value'}})
@@ -143,7 +141,7 @@ describe('TransactionService', function () {
 
   it('should call detectFinish onInvokeEnd', function () {
     config.set('active', true)
-    transactionService = new TransactionService(zoneServiceMock, logger, config)
+    transactionService = new ZoneTransactionService(zoneServiceMock, logger, config)
 
     var trans = transactionService.startTransaction('transaction', 'transaction')
     spyOn(trans, 'detectFinish')
@@ -154,7 +152,7 @@ describe('TransactionService', function () {
 
   it('should end the span if onInvokeTask is called first', function () {
     var tr = new Transaction('transaction', 'transaction')
-    zoneServiceMock.zone.transaction = tr
+    transactionService.setZoneTransaction(tr)
     var task = {source: 'XMLHttpRequest.send',taskId: 'XMLHttpRequest.send1',XHR: {method: 'GET',url: 'http://test.com/path?key=value'}}
     zoneServiceMock.spec.onScheduleTask(task)
     expect(task.span).toBeDefined()
@@ -167,7 +165,7 @@ describe('TransactionService', function () {
     // todo: can't test hard navigation metrics since karma runs tests inside an iframe
     config.set('active', true)
     config.set('capturePageLoad', true)
-    transactionService = new TransactionService(zoneServiceMock, logger, config)
+    transactionService = new ZoneTransactionService(zoneServiceMock, logger, config)
 
     var tr1 = transactionService.startTransaction('transaction1', 'transaction')
     var tr1DoneFn = tr1.doneCallback
@@ -197,24 +195,26 @@ describe('TransactionService', function () {
   it('should sendPageLoadMetrics', function (done) {
     config.set('active', true)
     config.set('capturePageLoad', true)
-    transactionService = new TransactionService(zoneServiceMock, logger, config)
+
+    transactionService = new ZoneTransactionService(zoneServiceMock, logger, config)
 
     transactionService.subscribe(function () {
       expect(tr.isHardNavigation).toBe(true)
       done()
     })
     var tr = transactionService.sendPageLoadMetrics('test')
-    var zoneTr = new Transaction('ZoneTransaction', 'zone-transaction')
-    zoneServiceMock.set('transaction', zoneTr)
 
-    transactionService = new TransactionService(zoneServiceMock, logger, config)
+    transactionService = new ZoneTransactionService(zoneServiceMock, logger, config)
+    var zoneTr = new Transaction('ZoneTransaction', 'zone-transaction')
+    transactionService.setZoneTransaction(zoneTr)
+
     var pageLoadTr = transactionService.sendPageLoadMetrics('new tr')
 
     expect(pageLoadTr).toBe(zoneTr)
   })
 
   it('should consider initial page load name or use location.pathname', function () {
-    transactionService = new TransactionService(zoneServiceMock, logger, config)
+    transactionService = new ZoneTransactionService(zoneServiceMock, logger, config)
     var tr
 
     tr = transactionService.sendPageLoadMetrics()
@@ -231,7 +231,7 @@ describe('TransactionService', function () {
   xit('should not add duplicate resource spans', function (done) {
     config.set('active', true)
     config.set('capturePageLoad', true)
-    transactionService = new TransactionService(zoneServiceMock, logger, config)
+    transactionService = new ZoneTransactionService(zoneServiceMock, logger, config)
 
     var tr = transactionService.startTransaction('transaction', 'transaction')
     tr.isHardNavigation = true
@@ -270,11 +270,11 @@ describe('TransactionService', function () {
       expect(type).toBe('resource')
       return resourceEntries
     }
-    
+
     config.set('active', true)
     config.set('capturePageLoad', true)
 
-    var transactionService = new TransactionService(zoneServiceMock, logger, config)
+    var transactionService = new ZoneTransactionService(zoneServiceMock, logger, config)
     transactionService.subscribe(function () {
       expect(tr.isHardNavigation).toBe(true)
       window.performance.getEntriesByType = _getEntriesByType
@@ -282,17 +282,15 @@ describe('TransactionService', function () {
     })
 
     var zoneTr = new Transaction('ZoneTransaction', 'zone-transaction')
-    zoneServiceMock.set('transaction', zoneTr)
+    transactionService.setZoneTransaction(zoneTr)
     var span = zoneTr.startSpan('GET http://example.com', 'ext.HttpRequest')
     span.end()
     var tr = transactionService.sendPageLoadMetrics('resource-test')
-
-    
   })
 
   it('should ignore transactions that match the list', function () {
     config.set('ignoreTransactions', ['transaction1', /transaction2/])
-    transactionService = new TransactionService(zoneServiceMock, logger, config)
+    transactionService = new ZoneTransactionService(zoneServiceMock, logger, config)
 
     expect(transactionService.shouldIgnoreTransaction('dont-ignore')).toBeFalsy()
     expect(transactionService.shouldIgnoreTransaction('transaction1')).toBeTruthy()

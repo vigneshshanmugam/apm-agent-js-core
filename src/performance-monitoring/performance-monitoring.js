@@ -9,7 +9,9 @@ class PerformanceMonitoring {
   }
 
   init () {
-    this._zoneService.initialize(window.Zone.current)
+    if (this._zoneService) {
+      this._zoneService.initialize(window.Zone.current)
+    }
     var performanceMonitoring = this
     this._transactionService.subscribe(function (tr) {
       var payload = performanceMonitoring.createTransactionPayload(tr)

@@ -182,7 +182,7 @@ describe('PerformanceMonitoring', function () {
         ' duration:', 3000, ' browserResponsivenessCounter:', 3, 'interval:', 500)
   })
 
-  it('should initialize', function (done) {
+  xit('should initialize', function (done) {
     var _fork = window.Zone.current.fork
     var zoneService = serviceFactory.getService('ZoneService')
     performanceMonitoring.init()
