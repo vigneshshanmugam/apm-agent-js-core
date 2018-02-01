@@ -22,11 +22,19 @@ describe('ApmServer', function () {
   var apmServer
   var configService
   var loggingService
+  var originalTimeout
   beforeEach(function () {
+    originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 50000
+
     serviceFactory = createServiceFactory()
     configService = serviceFactory.getService('ConfigService')
     loggingService = serviceFactory.getService('LoggingService')
     apmServer = serviceFactory.getService('ApmServer')
+  })
+
+  afterEach(function () {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout
   })
 
   it('should not send transctions when the list is empty', function () {
@@ -170,7 +178,8 @@ describe('ApmServer', function () {
       serverUrl: 'http://localhost:54321',
       serviceName: 'test-service'
     })
-    apmServer.addError([{test: 'test'}])
+    expect(configService.isValid()).toBe(true)
+    apmServer.addError({test: 'test'})
 
     expect(loggingService.debug).not.toHaveBeenCalled()
     apmServer.errorQueue.flush()
@@ -197,7 +206,8 @@ describe('ApmServer', function () {
       serverUrl: 'http://localhost:54321',
       serviceName: 'test-service'
     })
-    apmServer.addTransaction([{test: 'test'}])
+    expect(configService.isValid()).toBe(true)
+    apmServer.addTransaction({test: 'test'})
 
     expect(loggingService.debug).not.toHaveBeenCalled()
     apmServer.transactionQueue.flush()
