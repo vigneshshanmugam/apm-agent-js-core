@@ -1,6 +1,6 @@
-var xhrPatch = require('../../../src/common/patches/xhr-patch')
+var xhrPatch = require('../../src/common/patching/xhr-patch')
 
-var patchUtils = require('../../../src/common/patching/patch-utils')
+var patchUtils = require('../../src/common/patching/patch-utils')
 var urlSympbol = patchUtils.apmSymbol('url')
 var methodSymbol = patchUtils.apmSymbol('method')
 
