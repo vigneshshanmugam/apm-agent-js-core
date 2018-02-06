@@ -1,3 +1,25 @@
+<a name="0.2.0"></a>
+# [0.2.0](https://github.com/elastic/apm-agent-js-core/compare/v0.1.8...v0.2.0) (2018-02-06)
+
+
+### BREAKING CHANGES
+
+* ServiceFactory now requires init to be called
+
+
+### Bug Fixes
+
+* minor improvements to queue and throttle ([e2aae2c](https://github.com/elastic/apm-agent-js-core/commit/e2aae2c))
+* remove transaction.unknownName ([b760c87](https://github.com/elastic/apm-agent-js-core/commit/b760c87))
+
+
+### Features
+
+* add Queue and throttle ([f987f41](https://github.com/elastic/apm-agent-js-core/commit/f987f41))
+* throttle adding to both errorQueue and transactionQueue ([f1590f5](https://github.com/elastic/apm-agent-js-core/commit/f1590f5))
+
+
+
 <a name="0.1.8"></a>
 ## [0.1.8](https://github.com/elastic/apm-agent-js-core/compare/v0.1.7...v0.1.8) (2018-01-10)
 
