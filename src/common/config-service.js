@@ -39,6 +39,8 @@ function Config () {
 
     hasRouterLibrary: false,
 
+    serverStringLimit: 1024,
+
     context: {},
     platform: {}
   }

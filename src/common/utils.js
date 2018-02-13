@@ -15,6 +15,20 @@ function isPlatformSupported () {
     isCORSSupported()
 }
 
+function sanitizeString (value, limit, required, placeholder) {
+  if (typeof value === 'number') {
+    value = String(value)
+  }
+  if (required && !value) {
+    value = placeholder || 'NA'
+  }
+  if (value) {
+    return String(value).substr(0, limit)
+  } else {
+    return value
+  }
+}
+
 module.exports = {
   getViewPortInfo: function getViewPort () {
     var e = document.documentElement
@@ -276,7 +290,9 @@ module.exports = {
     return { protocol: protocol, path: path, queryString: queryString, queryStringParsed: params, hash: hash }
   },
 
-  isPlatformSupported: isPlatformSupported
+  isPlatformSupported: isPlatformSupported,
+
+  sanitizeString: sanitizeString
 }
 
 function isObject (value) {

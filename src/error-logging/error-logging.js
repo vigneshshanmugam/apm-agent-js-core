@@ -46,6 +46,7 @@ class ErrorLogging {
     }
 
     var configContext = this._configService.get('context')
+    var stringLimit = this._configService.get('serverStringLimit')
     var errorContext
     if (errorEvent.error) {
       errorContext = this._getErrorProperties(errorEvent.error)
@@ -56,11 +57,11 @@ class ErrorLogging {
     var errorObject = {
       id: uuidv4(),
       timestamp: new Date().toISOString(),
-      culprit: culprit,
+      culprit: utils.sanitizeString(culprit),
       exception: {
-        message: message,
+        message: utils.sanitizeString(message, undefined, true),
         stacktrace: frames,
-        type: errorType
+        type: utils.sanitizeString(errorType, stringLimit, false)
       },
       context: context
     }

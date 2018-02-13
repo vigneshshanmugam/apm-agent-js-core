@@ -1,5 +1,6 @@
 var Queue = require('./queue')
 var throttle = require('./throttle')
+var utils = require('./utils')
 
 class ApmServer {
   constructor (configService, loggingService) {
@@ -31,9 +32,11 @@ class ApmServer {
 
   createServiceObject () {
     var cfg = this._configService
+    var stringLimit = cfg.get('serverStringLimit')
+
     var serviceObject = {
-      name: cfg.get('serviceName'),
-      version: cfg.get('serviceVersion'),
+      name: utils.sanitizeString(cfg.get('serviceName'), stringLimit, true),
+      version: utils.sanitizeString(cfg.get('serviceVersion'), stringLimit, false),
       agent: {
         name: cfg.get('agentName'),
         version: cfg.get('agentVersion')

@@ -82,4 +82,20 @@ describe('lib/utils', function () {
       expect(result).toEqual(jasmine.objectContaining({path: '',queryString: 'param=value',queryStringParsed: {param: 'value'}}))
     })
   })
+
+  describe('sanitizeString', function () {
+    it('should sanitize', function () {
+      expect(utils.sanitizeString()).toBe(undefined)
+      expect(utils.sanitizeString(null, 10)).toBe(null)
+      expect(utils.sanitizeString(null, 10, true)).toBe('NA')
+      expect(utils.sanitizeString(undefined, 10, true)).toBe('NA')
+      expect(utils.sanitizeString(undefined, 5, true, 'no string')).toBe('no st')
+      expect(utils.sanitizeString('justlong', 5, true, 'no string')).toBe('justl')
+      expect(utils.sanitizeString('justlong', undefined, true, 'no string')).toBe('justlong')
+      expect(utils.sanitizeString('just', 5, true, 'no string')).toBe('just')
+      expect(utils.sanitizeString({what: 'This is an object'}, 5, true, 'no string')).toBe('[obje')
+      expect(utils.sanitizeString(0, 5, true, 'no string')).toBe('0')
+      expect(utils.sanitizeString(1, 5, true, 'no string')).toBe('1')
+    })
+  })
 })
