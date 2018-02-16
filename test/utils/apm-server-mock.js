@@ -36,11 +36,13 @@ class ApmServerMock {
         var call = {args: args,mocked: false}
         if (mockFn) {
           call.mocked = true
+          call.returnValue = mockFn.apply(service, arguments)
           captureCall(methodName, call)
-          return mockFn.apply(service, arguments)
+          return call.returnValue
         } else {
+          call.returnValue = _orig.apply(service, arguments)
           captureCall(methodName, call)
-          return _orig.apply(service, arguments)
+          return call.returnValue
         }
       }
     }
