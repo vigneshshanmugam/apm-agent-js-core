@@ -1,3 +1,18 @@
+<a name="0.2.2"></a>
+## [0.2.2](https://github.com/elastic/apm-agent-js-core/compare/v0.2.1...v0.2.2) (2018-02-16)
+
+
+### Bug Fixes
+
+* set descriptive names for navigation timing spans ([d270c78](https://github.com/elastic/apm-agent-js-core/commit/d270c78))
+
+
+### Features
+
+* enforce server string limit ([09ca8c6](https://github.com/elastic/apm-agent-js-core/commit/09ca8c6))
+
+
+
 <a name="0.2.1"></a>
 ## [0.2.1](https://github.com/elastic/apm-agent-js-core/compare/v0.2.0...v0.2.1) (2018-02-07)
 
