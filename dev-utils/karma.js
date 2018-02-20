@@ -6,7 +6,7 @@ var baseLaunchers = {
     browserName: 'chrome',
     version: '62'
   },
-  'SL_CHROME': {
+  'SL_CHROME46': {
     base: 'SauceLabs',
     browserName: 'chrome',
     version: '46'
