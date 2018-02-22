@@ -170,4 +170,24 @@ describe('ErrorLogging', function () {
       expect(apmServer.errorQueue.items.length).toBe(4)
     }
   })
+
+  it('should check isActive', function () {
+    configService.setConfig({
+      active: false
+    })
+    expect(configService.isActive()).toBe(false)
+    spyOn(apmServer, 'sendErrors')
+    spyOn(apmServer, 'addError')
+    try {
+      throw new Error('unittest error')
+    } catch (error) {
+      errorLogging.logErrorEvent({error: error})
+      errorLogging.logErrorEvent({error: error})
+      errorLogging.logError(error)
+      errorLogging.logError('test error')
+      expect(apmServer.sendErrors).not.toHaveBeenCalled()
+      expect(apmServer.addError).not.toHaveBeenCalled()
+      expect(apmServer.errorQueue).toBe(undefined)
+    }
+  })
 })

@@ -69,17 +69,19 @@ class ErrorLogging {
   }
 
   logErrorEvent (errorEvent, sendImmediately) {
-    if (typeof errorEvent === 'undefined') {
-      return
-    }
-    var errorObject = this.createErrorDataModel(errorEvent)
-    if (typeof errorObject.exception.message === 'undefined') {
-      return
-    }
-    if (sendImmediately) {
-      return this._apmServer.sendErrors([errorObject])
-    } else {
-      return this._apmServer.addError(errorObject)
+    if (this._configService.isActive()) {
+      if (typeof errorEvent === 'undefined') {
+        return
+      }
+      var errorObject = this.createErrorDataModel(errorEvent)
+      if (typeof errorObject.exception.message === 'undefined') {
+        return
+      }
+      if (sendImmediately) {
+        return this._apmServer.sendErrors([errorObject])
+      } else {
+        return this._apmServer.addError(errorObject)
+      }
     }
   }
 

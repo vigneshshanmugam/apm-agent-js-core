@@ -266,4 +266,20 @@ describe('ApmServer', function () {
       done()
     }, 300)
   })
+
+  it('should check isActive', function () {
+    configService.setConfig({
+      active: false
+    })
+    expect(configService.isActive()).toBe(false)
+
+    expect(apmServer.transactionQueue).toBeUndefined()
+    expect(apmServer.errorQueue).toBeUndefined()
+
+    apmServer.addTransaction({test: 'test'})
+    apmServer.addError({test: 'test'})
+
+    expect(apmServer.transactionQueue).toBeUndefined()
+    expect(apmServer.errorQueue).toBeUndefined()
+  })
 })

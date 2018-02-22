@@ -152,17 +152,21 @@ class ApmServer {
       })
   }
   addError (error) {
-    if (!this.errorQueue) {
-      this.initErrorQueue()
+    if (this._configService.isActive()) {
+      if (!this.errorQueue) {
+        this.initErrorQueue()
+      }
+      this.throttleAddError(error)
     }
-    this.throttleAddError(error)
   }
 
   addTransaction (transaction) {
-    if (!this.transactionQueue) {
-      this.initTransactionQueue()
+    if (this._configService.isActive()) {
+      if (!this.transactionQueue) {
+        this.initTransactionQueue()
+      }
+      this.throttleAddTransaction(transaction)
     }
-    this.throttleAddTransaction(transaction)
   }
 
   warnOnce (logObject) {
@@ -175,7 +179,7 @@ class ApmServer {
   }
 
   sendErrors (errors) {
-    if (this._configService.isValid()) {
+    if (this._configService.isValid() && this._configService.isActive()) {
       if (errors && errors.length > 0) {
         var payload = {
           service: this.createServiceObject(),
@@ -191,7 +195,7 @@ class ApmServer {
   }
 
   sendTransactions (transactions) {
-    if (this._configService.isValid()) {
+    if (this._configService.isValid() && this._configService.isActive()) {
       if (transactions && transactions.length > 0) {
         var payload = {
           service: this.createServiceObject(),
