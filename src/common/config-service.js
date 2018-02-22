@@ -107,14 +107,17 @@ Config.prototype.set = function (key, value) {
 
 Config.prototype.setUserContext = function (userContext) {
   var context = {}
-  if (typeof userContext.id === 'string' || typeof userContext.id === 'number') {
+  if (typeof userContext.id === 'number') {
     context.id = userContext.id
   }
+  if (typeof userContext.id === 'string') {
+    context.id = utils.sanitizeString(userContext.id, this.get('serverStringLimit'))
+  }
   if (typeof userContext.username === 'string') {
-    context.username = userContext.username
+    context.username = utils.sanitizeString(userContext.username, this.get('serverStringLimit'))
   }
   if (typeof userContext.email === 'string') {
-    context.email = userContext.email
+    context.email = utils.sanitizeString(userContext.email, this.get('serverStringLimit'))
   }
   this.set('context.user', context)
 }
