@@ -117,4 +117,20 @@ describe('ConfigService', function () {
     result = configService.isValid()
     expect(result).toBe(true)
   })
+
+  it('should setTag', function () {
+    configService.setTag('', 'test')
+    configService.setTag('test', 'test')
+    configService.setTag('test.key', 'test value')
+    configService.setTag('newKey', '')
+    var tags = configService.get('context.tags')
+    expect(tags).toEqual({test: 'test','test_key': 'test value','newKey': ''})
+  })
+
+  it('should setTags', function () {
+    var date = new Date()
+    configService.setTags({test: 'test', no: 1, 'test.test': 'test', obj: {just: 'object'},date: date})
+    var tags = configService.get('context.tags')
+    expect(tags).toEqual({test: 'test', no: '1', 'test_test': 'test',obj: '[object Object]',date: String(date)})
+  })
 })

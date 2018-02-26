@@ -123,7 +123,26 @@ Config.prototype.setUserContext = function (userContext) {
 }
 
 Config.prototype.setCustomContext = function (customContext) {
-  this.set('context.custom', customContext)
+  if (customContext && typeof customContext === 'object') {
+    this.set('context.custom', customContext)
+  }
+}
+
+Config.prototype.setTag = function (key, value) {
+  if (!key) return false
+  if (!this.config.context.tags) {
+    this.config.context.tags = {}
+  }
+  var skey = key.replace(/[.*]/g, '_')
+  this.config.context.tags[skey] = utils.sanitizeString(value, this.get('serverStringLimit'))
+}
+
+Config.prototype.setTags = function (tags) {
+  var configService = this
+  var keys = Object.keys(tags)
+  keys.forEach(function (k) {
+    configService.setTag(k, tags[k])
+  })
 }
 
 Config.prototype.getAgentName = function () {
