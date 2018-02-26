@@ -158,7 +158,7 @@ describe('ApmServer', function () {
   })
 
   it('should report http errors for queued errors', function (done) {
-    spyOn(loggingService, 'debug').and.callThrough()
+    spyOn(loggingService, 'warn').and.callThrough()
     var apmServer = new ApmServer(configService, loggingService)
     var _sendErrors = apmServer.sendErrors
     apmServer.sendErrors = function () {
@@ -167,7 +167,7 @@ describe('ApmServer', function () {
         fail('Request should have failed!')
       }, function () {
         setTimeout(() => {
-          expect(loggingService.debug)
+          expect(loggingService.warn)
             .toHaveBeenCalledWith('Failed sending errors!', jasmine.objectContaining({}))
           done()
         })
@@ -181,12 +181,12 @@ describe('ApmServer', function () {
     expect(configService.isValid()).toBe(true)
     apmServer.addError({test: 'test'})
 
-    expect(loggingService.debug).not.toHaveBeenCalled()
+    expect(loggingService.warn).not.toHaveBeenCalled()
     apmServer.errorQueue.flush()
   })
 
   it('should report http errors for queued transactions', function (done) {
-    spyOn(loggingService, 'debug').and.callThrough()
+    spyOn(loggingService, 'warn').and.callThrough()
     var apmServer = new ApmServer(configService, loggingService)
     var _sendTransactions = apmServer.sendTransactions
     apmServer.sendTransactions = function () {
@@ -195,7 +195,7 @@ describe('ApmServer', function () {
         fail('Request should have failed!')
       }, function () {
         setTimeout(() => {
-          expect(loggingService.debug)
+          expect(loggingService.warn)
             .toHaveBeenCalledWith('Failed sending transactions!', jasmine.objectContaining({}))
           done()
         })
@@ -209,7 +209,7 @@ describe('ApmServer', function () {
     expect(configService.isValid()).toBe(true)
     apmServer.addTransaction({test: 'test'})
 
-    expect(loggingService.debug).not.toHaveBeenCalled()
+    expect(loggingService.warn).not.toHaveBeenCalled()
     apmServer.transactionQueue.flush()
   })
 
@@ -222,13 +222,13 @@ describe('ApmServer', function () {
     })
     expect(configService.isValid()).toBe(true)
     spyOn(apmServer, 'sendErrors')
-    spyOn(loggingService, 'debug').and.callThrough()
+    spyOn(loggingService, 'warn').and.callThrough()
 
     var errors = generateErrors(6)
     errors.forEach(apmServer.addError.bind(apmServer))
     expect(apmServer.errorQueue.items.length).toBe(5)
     expect(apmServer.sendErrors).not.toHaveBeenCalled()
-    expect(loggingService.debug).toHaveBeenCalledWith('ElasticAPM: Dropped error due to throttling!')
+    expect(loggingService.warn).toHaveBeenCalledWith('Dropped error due to throttling!')
 
     setTimeout(() => {
       expect(apmServer.errorQueue.items.length).toBe(0)
@@ -249,13 +249,13 @@ describe('ApmServer', function () {
     })
     expect(configService.isValid()).toBe(true)
     spyOn(apmServer, 'sendTransactions')
-    spyOn(loggingService, 'debug').and.callThrough()
+    spyOn(loggingService, 'warn').and.callThrough()
 
     var transactions = generateTransaction(6)
     transactions.forEach(apmServer.addTransaction.bind(apmServer))
     expect(apmServer.transactionQueue.items.length).toBe(5)
     expect(apmServer.sendTransactions).not.toHaveBeenCalled()
-    expect(loggingService.debug).toHaveBeenCalledWith('ElasticAPM: Dropped transaction due to throttling!')
+    expect(loggingService.warn).toHaveBeenCalledWith('Dropped transaction due to throttling!')
 
     setTimeout(() => {
       expect(apmServer.transactionQueue.items.length).toBe(0)

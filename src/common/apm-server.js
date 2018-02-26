@@ -109,7 +109,7 @@ class ApmServer {
       var p = apmServer.sendErrors(errors)
       if (p) {
         p.then(undefined, function (reason) {
-          apmServer._loggingService.debug('Failed sending errors!', reason)
+          apmServer._loggingService.warn('Failed sending errors!', reason)
         })
       }
     })
@@ -119,7 +119,7 @@ class ApmServer {
 
     this.throttleAddError = throttle(this.errorQueue.add.bind(this.errorQueue),
       function (method, url) {
-        apmServer._loggingService.debug('ElasticAPM: Dropped error due to throttling!')
+        apmServer._loggingService.warn('Dropped error due to throttling!')
       }, {
         limit: limit,
         interval: interval
@@ -135,7 +135,7 @@ class ApmServer {
       var p = apmServer.sendTransactions(transactions)
       if (p) {
         p.then(undefined, function (reason) {
-          apmServer._loggingService.debug('Failed sending transactions!', reason)
+          apmServer._loggingService.warn('Failed sending transactions!', reason)
         })
       }
     })
@@ -145,7 +145,7 @@ class ApmServer {
 
     this.throttleAddTransaction = throttle(this.transactionQueue.add.bind(this.transactionQueue),
       function () {
-        apmServer._loggingService.debug('ElasticAPM: Dropped transaction due to throttling!')
+        apmServer._loggingService.warn('Dropped transaction due to throttling!')
       }, {
         limit: limit,
         interval: interval
