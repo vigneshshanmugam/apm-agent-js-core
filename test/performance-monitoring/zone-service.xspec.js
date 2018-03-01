@@ -2,7 +2,9 @@ var ZoneService = require('../../src/performance-monitoring/zone-service')
 var ServiceFactory = require('../../src/common/service-factory')
 var patchCommon = require('../../src/common/patching/patch-common')
 
-var logger = require('loglevel')
+var LoggingService = require('../../src/common/logging-service')
+
+var logger = new LoggingService()
 
 xdescribe('ZoneService', function () {
   var zoneService

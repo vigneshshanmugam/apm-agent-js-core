@@ -3,7 +3,7 @@ var Transaction = require('../../src/performance-monitoring/transaction')
 var Span = require('../../src/performance-monitoring/span')
 
 var ZoneServiceMock = require('./zoneServiceMock.js')
-var logger = Object.create(require('loglevel'))
+var LoggingService = require('../../src/common/logging-service')
 
 var Config = require('../../src/common/config-service')
 var resourceEntries = require('./resource-entries.js')
@@ -12,10 +12,12 @@ describe('ZoneTransactionService', function () {
   var transactionService
   var zoneServiceMock
   var config
+  var logger
   beforeEach(function () {
     zoneServiceMock = new ZoneServiceMock()
 
     spyOn(zoneServiceMock, 'get').and.callThrough()
+    logger = new LoggingService()
     spyOn(logger, 'debug')
 
     config = new Config()

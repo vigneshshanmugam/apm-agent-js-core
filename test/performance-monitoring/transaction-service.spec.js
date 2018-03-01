@@ -2,15 +2,17 @@ var TransactionService = require('../../src/performance-monitoring/transaction-s
 var Transaction = require('../../src/performance-monitoring/transaction')
 var Span = require('../../src/performance-monitoring/span')
 
-var logger = Object.create(require('loglevel'))
-
 var Config = require('../../src/common/config-service')
+var LoggingService = require('../../src/common/logging-service')
+
 var resourceEntries = require('./resource-entries.js')
 
 describe('TransactionService', function () {
   var transactionService
   var config
+  var logger
   beforeEach(function () {
+    logger = new LoggingService()
     spyOn(logger, 'debug')
 
     config = new Config()
