@@ -1,6 +1,6 @@
 var ApmServer = require('./apm-server')
 var ConfigService = require('./config-service')
-var Logger = require('loglevel')
+var LoggingService = require('./logging-service')
 
 var patchUtils = require('./patching/patch-utils')
 var utils = require('./utils')
@@ -19,7 +19,9 @@ class ServiceFactory {
       return configService
     })
 
-    this.registerServiceInstance('LoggingService', Logger)
+    this.registerServiceCreator('LoggingService', function () {
+      return new LoggingService()
+    })
     this.registerServiceCreator('ApmServer', function () {
       return new ApmServer(serviceFactory.getService('ConfigService'), serviceFactory.getService('LoggingService'))
     })
@@ -35,6 +37,7 @@ class ServiceFactory {
 
     var configService = serviceFactory.getService('ConfigService')
     configService.init()
+    var loggingService = serviceFactory.getService('LoggingService')
 
     function setLogLevel (loggingService, configService) {
       if (configService.get('debug') === true && configService.config.logLevel !== 'trace') {
@@ -44,9 +47,9 @@ class ServiceFactory {
       }
     }
 
-    setLogLevel(Logger, configService)
+    setLogLevel(loggingService, configService)
     configService.subscribeToChange(function (newConfig) {
-      setLogLevel(Logger, configService)
+      setLogLevel(loggingService, configService)
     })
 
     var apmServer = serviceFactory.getService('ApmServer')
