@@ -1,3 +1,22 @@
+<a name="0.3.0"></a>
+# [0.3.0](https://github.com/elastic/apm-agent-js-core/compare/v0.2.2...v0.3.0) (2018-03-06)
+
+
+### Bug Fixes
+
+* apply serverStringLimit to user context ([b24b038](https://github.com/elastic/apm-agent-js-core/commit/b24b038))
+* minor improvements in navigation timing spans ([d1008d5](https://github.com/elastic/apm-agent-js-core/commit/d1008d5))
+* review log levels and update logLevel lib ([b68db82](https://github.com/elastic/apm-agent-js-core/commit/b68db82))
+
+
+### Features
+
+* add LoggingService ([6f190ac](https://github.com/elastic/apm-agent-js-core/commit/6f190ac))
+* add setTags to ConfigService ([5c65967](https://github.com/elastic/apm-agent-js-core/commit/5c65967))
+* check isActive before adding items to the queue ([b372b35](https://github.com/elastic/apm-agent-js-core/commit/b372b35))
+
+
+
 <a name="0.2.2"></a>
 ## [0.2.2](https://github.com/elastic/apm-agent-js-core/compare/v0.2.1...v0.2.2) (2018-02-16)
 
