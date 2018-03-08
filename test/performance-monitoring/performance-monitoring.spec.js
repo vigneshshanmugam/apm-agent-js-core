@@ -204,4 +204,18 @@ describe('PerformanceMonitoring', function () {
       }, 10)
     })
   })
+
+  it('should create correct payload', function () {
+    var tr = new Transaction('transaction1', 'transaction1type')
+    var span = tr.startSpan('span1', 'span1type')
+    span.end()
+    var payload = performanceMonitoring.createTransactionPayload(tr)
+    expect(payload.name).toBe('transaction1')
+    expect(payload.type).toBe('transaction1type')
+    expect(payload.spans.length).toBe(1)
+    expect(payload.spans[0].name).toBe('span1')
+    expect(payload.spans[0].type).toBe('span1type')
+    expect(payload.spans[0].start).toBe(span._start - tr._rootSpan._start)
+    expect(payload.spans[0].duration).toBe(span._end - span._start)
+  })
 })

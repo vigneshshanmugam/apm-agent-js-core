@@ -62,12 +62,13 @@ class PerformanceMonitoring {
   createTransactionDataModel (transaction) {
     var configContext = this._configService.get('context')
     var stringLimit = this._configService.get('serverStringLimit')
+    var transactionStart = transaction._rootSpan._start
 
     var spans = transaction.spans.map(function (span) {
       return {
         name: utils.sanitizeString(span.signature, stringLimit, true),
         type: utils.sanitizeString(span.type, stringLimit, true),
-        start: span._start,
+        start: span._start - transactionStart,
         duration: span.duration()
       }
     })

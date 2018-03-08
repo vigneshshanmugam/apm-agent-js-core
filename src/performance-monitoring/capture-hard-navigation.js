@@ -25,6 +25,7 @@ module.exports = function captureHardNavigation (transaction) {
     var baseTime = window.performance.timing.fetchStart
     var timings = window.performance.timing
 
+    // must be zero otherwise the calculated relative _start time would be wrong
     transaction._rootSpan._start = 0
     transaction.type = 'page-load'
     for (var i = 0; i < eventPairs.length; i++) {
