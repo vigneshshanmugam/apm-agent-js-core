@@ -92,7 +92,7 @@ var baseConfig = {
     },
     devtool: 'inline-source-map'
   },
-  browserNoActivityTimeout: 60000,
+  browserNoActivityTimeout: 120000,
   customLaunchers: baseLaunchers,
   browsers: [],
   captureTimeout: 120000, // on saucelabs it takes some time to capture browser
