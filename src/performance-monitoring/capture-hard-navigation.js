@@ -1,4 +1,5 @@
 var Span = require('./span')
+var utils = require('../common/utils')
 
 var eventPairs = [
   ['domainLookupStart', 'domainLookupEnd', 'Domain lookup'],
@@ -75,7 +76,8 @@ module.exports = function captureHardNavigation (transaction) {
             kind += '.' + entry.initiatorType
           }
 
-          span = new Span(entry.name, kind)
+          var parsedUrl = utils.parseUrl(entry.name)
+          span = new Span(parsedUrl.path || entry.name, kind)
           span._start = entry.startTime
           span.ended = true
           span.end()
