@@ -70,7 +70,6 @@ describe('LoggingService', function () {
   })
 
   it('should set prefix for logs', function () {
-    debugger;
     spyOn(console, 'info')
     loggingService = new LoggingService({
       prefix: 'APM: '

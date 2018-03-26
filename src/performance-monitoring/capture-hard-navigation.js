@@ -78,6 +78,13 @@ module.exports = function captureHardNavigation (transaction) {
 
           var parsedUrl = utils.parseUrl(entry.name)
           span = new Span(parsedUrl.path || entry.name, kind)
+          span.setContext({
+            http: {
+              url: {
+                raw: entry.name
+              }
+            }
+          })
           span._start = entry.startTime
           span.ended = true
           span.end()

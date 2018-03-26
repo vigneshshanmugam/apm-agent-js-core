@@ -29,6 +29,24 @@ function sanitizeString (value, limit, required, placeholder) {
   }
 }
 
+function sanitizeObjectStrings (obj, limit, required, placeholder) {
+  if (!obj) return obj
+  if (typeof obj === 'string') {
+    return sanitizeString(obj, limit, required, placeholder)
+  }
+  var keys = Object.keys(obj)
+  keys.forEach(function (k) {
+    var value = obj[k]
+    if (typeof value === 'string') {
+      value = sanitizeString(obj[k], limit, required, placeholder)
+    } else if (typeof value === 'object') {
+      value = sanitizeObjectStrings(value, limit, required, placeholder)
+    }
+    obj[k] = value
+  })
+  return obj
+}
+
 module.exports = {
   getViewPortInfo: function getViewPort () {
     var e = document.documentElement
@@ -292,7 +310,8 @@ module.exports = {
 
   isPlatformSupported: isPlatformSupported,
 
-  sanitizeString: sanitizeString
+  sanitizeString: sanitizeString,
+  sanitizeObjectStrings: sanitizeObjectStrings
 }
 
 function isObject (value) {

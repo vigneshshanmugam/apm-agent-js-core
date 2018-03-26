@@ -65,11 +65,16 @@ class PerformanceMonitoring {
     var transactionStart = transaction._rootSpan._start
 
     var spans = transaction.spans.map(function (span) {
+      var context
+      if (span.context) {
+        context = utils.sanitizeObjectStrings(span.context, stringLimit)
+      }
       return {
         name: utils.sanitizeString(span.signature, stringLimit, true),
         type: utils.sanitizeString(span.type, stringLimit, true),
         start: span._start - transactionStart,
-        duration: span.duration()
+        duration: span.duration(),
+        context: context
       }
     })
 

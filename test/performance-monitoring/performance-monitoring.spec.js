@@ -3,6 +3,8 @@ var Transaction = require('../../src/performance-monitoring/transaction')
 var Span = require('../../src/performance-monitoring/span')
 var apmTestConfig = require('../apm-test-config')()
 
+var resourceEntries = require('./resource-entries.js')
+
 describe('PerformanceMonitoring', function () {
   var serviceFactory
   var apmServer
@@ -217,5 +219,32 @@ describe('PerformanceMonitoring', function () {
     expect(payload.spans[0].type).toBe('span1type')
     expect(payload.spans[0].start).toBe(span._start - tr._rootSpan._start)
     expect(payload.spans[0].duration).toBe(span._end - span._start)
+  })
+
+  it('should sendPageLoadMetrics', function (done) {
+    var _getEntriesByType = window.performance.getEntriesByType
+
+    window.performance.getEntriesByType = function (type) {
+      expect(type).toBe('resource')
+      debugger
+      return resourceEntries
+    }
+
+    var transactionService = serviceFactory.getService('TransactionService')
+
+    transactionService.subscribe(function (tr) {
+      debugger
+      expect(tr.isHardNavigation).toBe(true)
+      var payload = performanceMonitoring.convertTransactionsToServerModel([tr])
+      var promise = apmServer.sendTransactions(payload)
+      expect(promise).toBeDefined()
+      promise.then(function () {
+        window.performance.getEntriesByType = _getEntriesByType
+        done()
+      }, function (reason) {
+        fail('Failed sending transactions to the server, reason: ' + reason)
+      })
+    })
+    var tr = transactionService.sendPageLoadMetrics('resource-test')
   })
 })

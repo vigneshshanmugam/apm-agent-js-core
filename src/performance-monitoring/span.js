@@ -11,7 +11,7 @@ function Span (signature, type, options) {
   this.type = type
   this.ended = false
   this._end = null
-
+  this.context = null
   // Start timers
   this._start = window.performance.now()
 }
@@ -31,6 +31,11 @@ Span.prototype.duration = function () {
   var diff = this._end - this._start
 
   return parseFloat(diff)
+}
+
+Span.prototype.setContext = function (context) {
+  if (!context) return
+  this.context = utils.merge(this.context || {}, context)
 }
 
 module.exports = Span

@@ -97,5 +97,29 @@ describe('lib/utils', function () {
       expect(utils.sanitizeString(0, 5, true, 'no string')).toBe('0')
       expect(utils.sanitizeString(1, 5, true, 'no string')).toBe('1')
     })
+
+    it('should sanitize objects', function () {
+      var result = utils.sanitizeObjectStrings({
+        string: 'string',
+        null: null,
+        undefined: undefined,
+        number: 1,
+        object: {
+          string: 'string'
+        }
+      }, 3)
+
+      expect(result).toEqual({
+        string: 'str',
+        null: null,
+        undefined: undefined,
+        number: 1,
+        object: {
+          string: 'str'
+        }
+      })
+
+      expect(utils.sanitizeObjectStrings('test', 3)).toBe('tes')
+    })
   })
 })
