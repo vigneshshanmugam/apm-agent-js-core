@@ -16,13 +16,10 @@ var Transaction = function (name, type, options, logger) {
     this._options = {}
   }
 
-  this.contextInfo = {
-    _debug: {}
-  }
+  this.contextInfo = {}
 
   this.marks = {}
   if (this._options.sendVerboseDebugInfo) {
-    this.contextInfo._debug.log = []
     this.debugLog('Transaction', name, type)
   }
 
@@ -47,6 +44,12 @@ var Transaction = function (name, type, options, logger) {
 
 Transaction.prototype.debugLog = function () {
   if (this._options.sendVerboseDebugInfo) {
+    if (!this.contextInfo._debug) {
+      this.contextInfo._debug = {log: []}
+    }
+    if (!this.contextInfo._debug.log) {
+      this.contextInfo._debug.log = []
+    }
     var messages = (arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments))
     messages.unshift(Date.now().toString())
     var textMessage = messages.join(' - ')
@@ -60,6 +63,9 @@ Transaction.prototype.addContextInfo = function (obj) {
 }
 
 Transaction.prototype.setDebugData = function setDebugData (key, value) {
+  if (!this.contextInfo._debug) {
+    this.contextInfo._debug = {}
+  }
   this.contextInfo._debug[key] = value
 }
 

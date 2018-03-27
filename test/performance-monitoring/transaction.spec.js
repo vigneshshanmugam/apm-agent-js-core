@@ -140,9 +140,9 @@ describe('transaction.Transaction', function () {
     expect(tr.contextInfo._debug.log.length).toBeGreaterThan(0)
   })
 
-  it('should not create log on contextInfo._debug if sendVerboseDebugInfo is not true', function () {
+  it('should not create contextInfo._debug if sendVerboseDebugInfo is not true', function () {
     var tr = new Transaction('/', 'transaction')
-    expect(tr.contextInfo._debug.log).toBeUndefined()
+    expect(tr.contextInfo._debug).toBeUndefined()
   })
 
   it('should redefine transaction', function () {

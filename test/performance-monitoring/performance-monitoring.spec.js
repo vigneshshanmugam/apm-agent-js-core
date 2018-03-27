@@ -226,14 +226,12 @@ describe('PerformanceMonitoring', function () {
 
     window.performance.getEntriesByType = function (type) {
       expect(type).toBe('resource')
-      debugger
       return resourceEntries
     }
 
     var transactionService = serviceFactory.getService('TransactionService')
 
     transactionService.subscribe(function (tr) {
-      debugger
       expect(tr.isHardNavigation).toBe(true)
       var payload = performanceMonitoring.convertTransactionsToServerModel([tr])
       var promise = apmServer.sendTransactions(payload)
