@@ -48,9 +48,11 @@ var baseLaunchers = {
   },
   'SL_IOS9': {
     base: 'SauceLabs',
-    browserName: 'iphone',
-    platform: 'OS X 10.10',
-    version: '9.1'
+    deviceName: 'iPhone Simulator',
+    deviceOrientation: 'portrait',
+    platformVersion: '9.3',
+    platformName: 'iOS',
+    browserName: 'Safari'
   },
   'SL_IOS8': {
     base: 'SauceLabs',
