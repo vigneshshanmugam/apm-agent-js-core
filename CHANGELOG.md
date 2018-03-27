@@ -1,3 +1,19 @@
+<a name="0.4.0"></a>
+# [0.4.0](https://github.com/elastic/apm-agent-js-core/compare/v0.3.1...v0.4.0) (2018-03-27)
+
+
+### Bug Fixes
+
+* remove _debug from transaction context ([d2fc1b9](https://github.com/elastic/apm-agent-js-core/commit/d2fc1b9))
+* remove query string from resource entries ([7507a5c](https://github.com/elastic/apm-agent-js-core/commit/7507a5c))
+
+
+### Features
+
+* add http.raw.url to span context ([45aaa5b](https://github.com/elastic/apm-agent-js-core/commit/45aaa5b))
+
+
+
 <a name="0.3.1"></a>
 ## [0.3.1](https://github.com/elastic/apm-agent-js-core/compare/v0.3.0...v0.3.1) (2018-03-08)
 
