@@ -186,8 +186,12 @@ class ApmServer {
           errors: errors
         }
         payload = this._configService.applyFilters(payload)
-        var endPoint = this._configService.getEndpointUrl('errors')
-        return this._postJson(endPoint, payload)
+        if (payload) {
+          var endPoint = this._configService.getEndpointUrl('errors')
+          return this._postJson(endPoint, payload)
+        } else {
+          this._loggingService.warn('Dropped payload due to filtering!')
+        }
       }
     } else {
       this.warnOnce(this.logMessages.invalidConfig)
@@ -202,8 +206,12 @@ class ApmServer {
           transactions: transactions
         }
         payload = this._configService.applyFilters(payload)
-        var endPoint = this._configService.getEndpointUrl('transactions')
-        return this._postJson(endPoint, payload)
+        if (payload) {
+          var endPoint = this._configService.getEndpointUrl('transactions')
+          return this._postJson(endPoint, payload)
+        } else {
+          this._loggingService.warn('Dropped payload due to filtering!')
+        }
       }
     } else {
       this.warnOnce(this.logMessages.invalidConfig)

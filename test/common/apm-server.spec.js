@@ -282,4 +282,20 @@ describe('ApmServer', function () {
     expect(apmServer.transactionQueue).toBeUndefined()
     expect(apmServer.errorQueue).toBeUndefined()
   })
+
+  it('should ignore undefined payload', function () {
+    configService.setConfig({
+      serviceName: 'serviceName'
+    })
+    configService.addFilter(function (payload) {
+      return
+    })
+    spyOn(apmServer, '_postJson')
+    var result = apmServer.sendErrors([{test: 'test'}])
+    expect(result).toBeUndefined()
+    expect(apmServer._postJson).not.toHaveBeenCalled()
+    result = apmServer.sendTransactions([{test: 'test'}])
+    expect(result).toBeUndefined()
+    expect(apmServer._postJson).not.toHaveBeenCalled()
+  })
 })
