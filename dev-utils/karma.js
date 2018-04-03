@@ -53,12 +53,6 @@ var baseLaunchers = {
     platformVersion: '9.3',
     platformName: 'iOS',
     browserName: 'Safari'
-  },
-  'SL_IOS8': {
-    base: 'SauceLabs',
-    browserName: 'iphone',
-    platform: 'OS X 10.10',
-    version: '8.4'
   }
 }
 
