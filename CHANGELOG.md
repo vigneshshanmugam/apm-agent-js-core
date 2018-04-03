@@ -1,3 +1,13 @@
+<a name="0.4.1"></a>
+## [0.4.1](https://github.com/elastic/apm-agent-js-core/compare/v0.4.0...v0.4.1) (2018-04-03)
+
+
+### Bug Fixes
+
+* **apm-server:** ignore falsy payload after filtering ([0bef5b6](https://github.com/elastic/apm-agent-js-core/commit/0bef5b6))
+
+
+
 <a name="0.4.0"></a>
 # [0.4.0](https://github.com/elastic/apm-agent-js-core/compare/v0.3.1...v0.4.0) (2018-03-27)
 
