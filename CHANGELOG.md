@@ -1,3 +1,13 @@
+<a name="0.4.3"></a>
+## [0.4.3](https://github.com/elastic/apm-agent-js-core/compare/v0.4.2...v0.4.3) (2018-04-10)
+
+
+### Bug Fixes
+
+* **error-logging:** parsing error stack fails if error object is string ([6365b15](https://github.com/elastic/apm-agent-js-core/commit/6365b15))
+
+
+
 <a name="0.4.2"></a>
 ## [0.4.2](https://github.com/elastic/apm-agent-js-core/compare/v0.4.1...v0.4.2) (2018-04-03)
 
