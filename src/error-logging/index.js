@@ -6,7 +6,8 @@ module.exports = {
     serviceFactory.registerServiceCreator('ErrorLogging', function () {
       var apmService = serviceFactory.getService('ApmServer')
       var configService = serviceFactory.getService('ConfigService')
-      return new ErrorLogging(apmService, configService)
+      var loggingService = serviceFactory.getService('LoggingService')
+      return new ErrorLogging(apmService, configService, loggingService)
     })
   }
 }

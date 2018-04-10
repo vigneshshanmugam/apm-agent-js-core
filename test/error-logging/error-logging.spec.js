@@ -110,13 +110,14 @@ describe('ErrorLogging', function () {
 
   it('should install onerror and accept ErrorEvents', function (done) {
     var count = 0
+    var numberOfErrors = 7
     spyOn(apmServer, 'sendErrors').and.callFake(function (errors) {
-      expect(errors.length).toBe(6)
+      expect(errors.length).toBe(numberOfErrors)
       var error = errors[0]
       expect(error.exception.message).toContain(testErrorMessage)
 
       count = count + errors.length
-      if (count === 6) {
+      if (count === numberOfErrors) {
         done()
       }
     })
@@ -134,6 +135,7 @@ describe('ErrorLogging', function () {
     }
 
     apmOnError(testErrorMessage, 'filename', 1, 2, undefined)
+    apmOnError(testErrorMessage, 'filename', 1, 2, testErrorMessage) // throw "test";
     apmOnError(testErrorMessage, undefined, undefined, undefined, undefined)
     apmOnError('Test:' + testErrorMessage, 'filename', 1, 2, undefined)
     apmOnError('Script error.' + testErrorMessage, undefined, undefined, undefined, undefined)

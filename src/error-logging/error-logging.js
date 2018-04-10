@@ -4,10 +4,11 @@ var StackTraceService = require('./stack-trace-service')
 var utils = require('../common/utils')
 
 class ErrorLogging {
-  constructor (apmServer, configService) {
+  constructor (apmServer, configService, loggingService) {
     this._apmServer = apmServer
     this._configService = configService
-    this._stackTraceService = new StackTraceService(configService)
+    this._loggingService = loggingService
+    this._stackTraceService = new StackTraceService(configService, loggingService)
   }
 
   // errorEvent = {message, filename, lineno, colno, error}
@@ -48,7 +49,7 @@ class ErrorLogging {
     var configContext = this._configService.get('context')
     var stringLimit = this._configService.get('serverStringLimit')
     var errorContext
-    if (errorEvent.error) {
+    if (errorEvent.error && typeof errorEvent.error === 'object') {
       errorContext = this._getErrorProperties(errorEvent.error)
     }
     var browserMetadata = this._getBrowserSpecificMetadata()

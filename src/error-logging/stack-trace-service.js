@@ -1,8 +1,9 @@
 var errorStackParser = require('error-stack-parser')
 
 class StackTraceService {
-  constructor (configService) {
+  constructor (configService, loggingService) {
     this._configService = configService
+    this._loggingService = loggingService
   }
   createStackTraces (errorEvent) {
     var stackTraceService = this
@@ -10,7 +11,11 @@ class StackTraceService {
 
     var stackTraces
     if (error) {
-      stackTraces = errorStackParser.parse(error)
+      try {
+        stackTraces = errorStackParser.parse(error)
+      } catch (e) {
+        this._loggingService.debug('Parsing error stack failed!', e)
+      }
     }
 
     if (!stackTraces || stackTraces.length === 0) {
