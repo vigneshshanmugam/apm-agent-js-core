@@ -10,10 +10,8 @@ class TransactionService {
       logger.debug('TransactionService: config is not provided')
     }
     this._logger = logger
-    this.nextAutoTaskId = 1
 
-    this.taskMap = {}
-    this.metrics = {}
+    this.marks = {}
 
     this.initialPageLoadName = undefined
     this.currentTransaction = undefined
@@ -116,7 +114,7 @@ class TransactionService {
     var self = this
     var capturePageLoad = self._config.get('capturePageLoad')
     if (capturePageLoad && !self._alreadyCapturedPageLoad && tr.isHardNavigation) {
-      tr.addMarks(self.metrics)
+      tr.addMarks(self.marks)
       captureHardNavigation(tr)
       self._alreadyCapturedPageLoad = true
       return true
@@ -207,9 +205,6 @@ class TransactionService {
   addTask (taskId) {
     var tr = this.getOrCreateCurrentTransaction()
     if (tr) {
-      if (typeof taskId === 'undefined') {
-        taskId = 'autoId' + this.nextAutoTaskId++
-      }
       tr.addTask(taskId)
       this._logger.debug('TransactionService.addTask', taskId)
     }

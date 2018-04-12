@@ -6,7 +6,6 @@ class Transaction {
   constructor (name, type, options, logger) {
     this.id = uuidv4()
     this.timestamp = new Date().toISOString()
-    this.metadata = {}
     this.name = name
     this.type = type
     this.ended = false
@@ -29,16 +28,13 @@ class Transaction {
 
     this._scheduledTasks = {}
 
-    this.events = {}
-
     this.doneCallback = function noop () {}
 
     this._rootSpan = new Span('transaction', 'transaction', {enableStackFrames: false})
 
-    this._startStamp = new Date()
-
     this.duration = this._rootSpan.duration.bind(this._rootSpan)
-    this.nextId = 0
+    this.nextSpanId = 0
+    this.nextAutoTaskId = 0
 
     this.isHardNavigation = false
   }
@@ -100,8 +96,8 @@ class Transaction {
     }
 
     var span = new Span(signature, type, opts)
-    span.id = this.nextId
-    this.nextId++
+    span.id = this.nextSpanId
+    this.nextSpanId++
     this._activeSpans[span.id] = span
 
     return span
@@ -138,6 +134,9 @@ class Transaction {
 
   addTask (taskId) {
     // todo: should not accept more tasks if the transaction is alreadyFinished]
+    if (typeof taskId === 'undefined') {
+      taskId = 'autoId' + this.nextAutoTaskId++
+    }
     this.debugLog('addTask', taskId)
     this._scheduledTasks[taskId] = taskId
   }
