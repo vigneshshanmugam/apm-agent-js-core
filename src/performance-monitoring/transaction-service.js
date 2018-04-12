@@ -2,7 +2,7 @@ var Transaction = require('./transaction')
 var utils = require('../common/utils')
 var Subscription = require('../common/subscription')
 
-var captureHardNavigation = require('./capture-hard-navigation')
+var captureHardNavigation = require('./capture-hard-navigation').captureHardNavigation
 
 function TransactionService (logger, config) {
   this._config = config

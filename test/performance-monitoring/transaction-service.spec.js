@@ -144,6 +144,8 @@ describe('TransactionService', function () {
 
     transactionService.subscribe(function () {
       expect(tr.isHardNavigation).toBe(true)
+      expect(tr.marks.agent).toBeDefined()
+      expect(tr.marks.navigationTiming).toBeDefined()
       done()
     })
     var tr = transactionService.sendPageLoadMetrics('test')
