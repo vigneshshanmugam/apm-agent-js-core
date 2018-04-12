@@ -22,13 +22,24 @@ class TransactionService {
 
     this._alreadyCapturedPageLoad = false
   }
+
   shouldCreateTransaction () {
     return this._config.isActive()
   }
-  getZoneTransaction () {
+  getOrCreateCurrentTransaction () {
+    if (!this.shouldCreateTransaction()) {
+      return
+    }
+    var tr = this.getCurrentTransaction()
+    if (!utils.isUndefined(tr) && !tr.ended) {
+      return tr
+    }
+    return this.createZoneTransaction()
+  }
+  getCurrentTransaction () {
     return this.currentTransaction
   }
-  setZoneTransaction (value) {
+  setCurrentTransaction (value) {
     this.currentTransaction = value
   }
   createTransaction (name, type, options) {
@@ -41,7 +52,7 @@ class TransactionService {
     }
 
     var tr = new Transaction(name, type, perfOptions, this._logger)
-    this.setZoneTransaction(tr)
+    this.setCurrentTransaction(tr)
     if (perfOptions.checkBrowserResponsiveness) {
       this.startCounter(tr)
     }
@@ -50,16 +61,7 @@ class TransactionService {
   createZoneTransaction () {
     return this.createTransaction('ZoneTransaction', 'transaction')
   }
-  getCurrentTransaction () {
-    if (!this.shouldCreateTransaction()) {
-      return
-    }
-    var tr = this.getZoneTransaction()
-    if (!utils.isUndefined(tr) && !tr.ended) {
-      return tr
-    }
-    return this.createZoneTransaction()
-  }
+
   startCounter (transaction) {
     transaction.browserResponsivenessCounter = 0
     var interval = this._config.get('browserResponsivenessInterval')
@@ -82,7 +84,7 @@ class TransactionService {
     var perfOptions = this._config.config
     var tr
 
-    tr = this.getZoneTransaction()
+    tr = this.getCurrentTransaction()
 
     var trName = name || this.initialPageLoadName
     var unknownName = false
@@ -128,7 +130,7 @@ class TransactionService {
     }
 
     // this will create a zone transaction if possible
-    var tr = this.getCurrentTransaction()
+    var tr = this.getOrCreateCurrentTransaction()
 
     if (tr) {
       if (tr.name !== 'ZoneTransaction') {
@@ -183,7 +185,7 @@ class TransactionService {
     return false
   }
   startSpan (signature, type, options) {
-    var trans = this.getCurrentTransaction()
+    var trans = this.getOrCreateCurrentTransaction()
 
     if (trans) {
       this._logger.debug('TransactionService.startSpan', signature, type)
@@ -203,7 +205,7 @@ class TransactionService {
     return this._subscription.subscribe(fn)
   }
   addTask (taskId) {
-    var tr = this.getCurrentTransaction()
+    var tr = this.getOrCreateCurrentTransaction()
     if (tr) {
       if (typeof taskId === 'undefined') {
         taskId = 'autoId' + this.nextAutoTaskId++
@@ -214,26 +216,26 @@ class TransactionService {
     return taskId
   }
   removeTask (taskId) {
-    var tr = this.getZoneTransaction()
+    var tr = this.getCurrentTransaction()
     if (!utils.isUndefined(tr) && !tr.ended) {
       tr.removeTask(taskId)
       this._logger.debug('TransactionService.removeTask', taskId)
     }
   }
   logInTransaction () {
-    var tr = this.getZoneTransaction()
+    var tr = this.getCurrentTransaction()
     if (!utils.isUndefined(tr) && !tr.ended) {
       tr.debugLog.apply(tr, arguments)
     }
   }
   setDebugDataOnTransaction (key, value) {
-    var tr = this.getZoneTransaction()
+    var tr = this.getCurrentTransaction()
     if (!utils.isUndefined(tr) && !tr.ended) {
       tr.setDebugData(key, value)
     }
   }
   detectFinish () {
-    var tr = this.getZoneTransaction()
+    var tr = this.getCurrentTransaction()
     if (!utils.isUndefined(tr) && !tr.ended) {
       tr.detectFinish()
       this._logger.debug('TransactionService.detectFinish')
