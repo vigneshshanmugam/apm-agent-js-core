@@ -105,8 +105,7 @@ class Transaction {
 
   isFinished () {
     var scheduledTasks = Object.keys(this._scheduledTasks)
-    this.debugLog('isFinished scheduledTasks', scheduledTasks)
-    return (scheduledTasks.length === 0)
+    return scheduledTasks.length === 0
   }
 
   detectFinish () {
@@ -127,9 +126,9 @@ class Transaction {
     })
     this._rootSpan.end()
 
-    if (this.isFinished() === true) {
-      this._finish()
-    }
+    this._adjustStartToEarliestSpan()
+    this._adjustEndToLatestSpan()
+    this.doneCallback(this)
   }
 
   addTask (taskId) {
@@ -145,28 +144,18 @@ class Transaction {
     this.debugLog('removeTask', taskId)
     this.setDebugData('lastRemovedTask', taskId)
     delete this._scheduledTasks[taskId]
+    this.detectFinish()
   }
 
   addEndedSpans (existingSpans) {
     this.spans = this.spans.concat(existingSpans)
   }
+
   _onSpanEnd (span) {
     this.spans.push(span)
     span._scheduledTasks = Object.keys(this._scheduledTasks)
     // Remove span from _activeSpans
     delete this._activeSpans[span.id]
-  }
-
-  _finish () {
-    if (this._alreadFinished === true) {
-      return
-    }
-
-    this._alreadFinished = true
-
-    this._adjustStartToEarliestSpan()
-    this._adjustEndToLatestSpan()
-    this.doneCallback(this)
   }
 
   _adjustEndToLatestSpan () {
