@@ -120,9 +120,15 @@ class TransactionService {
       return true
     }
   }
+
   startTransaction (name, type) {
     var self = this
     var perfOptions = this._config.config
+
+    if (!type) {
+      type = 'custom'
+    }
+
     if (type === 'interaction' && !perfOptions.captureInteractions) {
       return
     }
@@ -157,6 +163,7 @@ class TransactionService {
     }
     return tr
   }
+
   applyAsync (fn, applyThis, applyArgs) {
     return this.runOuter(function () {
       return Promise.resolve()
@@ -182,12 +189,12 @@ class TransactionService {
     }
     return false
   }
-  startSpan (signature, type, options) {
+  startSpan (signature, type) {
     var trans = this.getOrCreateCurrentTransaction()
 
     if (trans) {
       this._logger.debug('TransactionService.startSpan', signature, type)
-      var span = trans.startSpan(signature, type, options)
+      var span = trans.startSpan(signature, type)
       return span
     }
   }
