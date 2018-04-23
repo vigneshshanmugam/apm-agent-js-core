@@ -1,3 +1,18 @@
+<a name="0.5.0"></a>
+# [0.5.0](https://github.com/elastic/apm-agent-js-core/compare/v0.4.3...v0.5.0) (2018-04-23)
+
+
+### Bug Fixes
+
+* default custom for transaction type ([997c747](https://github.com/elastic/apm-agent-js-core/commit/997c747))
+
+
+### Features
+
+* ability to add navigation timing marks to any transaction ([e8c934c](https://github.com/elastic/apm-agent-js-core/commit/e8c934c))
+
+
+
 <a name="0.4.3"></a>
 ## [0.4.3](https://github.com/elastic/apm-agent-js-core/compare/v0.4.2...v0.4.3) (2018-04-10)
 
