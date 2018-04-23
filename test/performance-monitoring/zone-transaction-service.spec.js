@@ -35,7 +35,7 @@ describe('ZoneTransactionService', function () {
     spyOn(tr, 'startSpan').and.callThrough()
     transactionService.setCurrentTransaction(tr)
     transactionService.startSpan('test-span', 'test-span')
-    expect(transactionService.getCurrentTransaction().startSpan).toHaveBeenCalledWith('test-span', 'test-span', undefined)
+    expect(transactionService.getCurrentTransaction().startSpan).toHaveBeenCalledWith('test-span', 'test-span')
   })
 
   it('should not start span when performance monitoring is disabled', function () {
@@ -127,7 +127,7 @@ describe('ZoneTransactionService', function () {
     spyOn(transactionService, 'startSpan').and.callThrough()
 
     zoneServiceMock.spec.onScheduleTask({source: 'XMLHttpRequest.send',taskId: 'XMLHttpRequest.send1',XHR: {method: 'GET',url: 'http://test.com/path?key=value'}})
-    expect(transactionService.startSpan).toHaveBeenCalledWith('GET http://test.com/path', 'ext.HttpRequest', jasmine.objectContaining({ enableStackFrames: false }))
+    expect(transactionService.startSpan).toHaveBeenCalledWith('GET http://test.com/path', 'ext.HttpRequest')
   })
 
   it('should check includeXHRQueryString config', function () {
@@ -138,7 +138,7 @@ describe('ZoneTransactionService', function () {
     spyOn(transactionService, 'startSpan').and.callThrough()
 
     zoneServiceMock.spec.onScheduleTask({source: 'XMLHttpRequest.send',taskId: 'XMLHttpRequest.send1',XHR: {method: 'GET',url: 'http://test.com/path?key=value'}})
-    expect(transactionService.startSpan).toHaveBeenCalledWith('GET http://test.com/path?key=value', 'ext.HttpRequest', jasmine.objectContaining({ enableStackFrames: false }))
+    expect(transactionService.startSpan).toHaveBeenCalledWith('GET http://test.com/path?key=value', 'ext.HttpRequest')
   })
 
   it('should call detectFinish onInvokeEnd', function () {

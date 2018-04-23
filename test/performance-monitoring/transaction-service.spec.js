@@ -30,7 +30,7 @@ describe('TransactionService', function () {
     spyOn(tr, 'startSpan').and.callThrough()
     transactionService.setCurrentTransaction(tr)
     transactionService.startSpan('test-span', 'test-span')
-    expect(transactionService.getCurrentTransaction().startSpan).toHaveBeenCalledWith('test-span', 'test-span', undefined)
+    expect(transactionService.getCurrentTransaction().startSpan).toHaveBeenCalledWith('test-span', 'test-span')
   })
 
   it('should not start span when performance monitoring is disabled', function () {
@@ -203,7 +203,7 @@ describe('TransactionService', function () {
 
           var xhrTask = {source: 'XMLHttpRequest.send', XHR: {url: testUrl,method: 'GET'}}
           var spanSignature = xhrTask.XHR.method + ' ' + testUrl
-          var span = transactionService.startSpan(spanSignature, 'ext.HttpRequest', {'enableStackFrames': false})
+          var span = transactionService.startSpan(spanSignature, 'ext.HttpRequest')
           span.end()
         })
       }

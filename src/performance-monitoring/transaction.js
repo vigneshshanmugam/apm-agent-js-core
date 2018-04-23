@@ -30,7 +30,7 @@ class Transaction {
 
     this.doneCallback = function noop () {}
 
-    this._rootSpan = new Span('transaction', 'transaction', {enableStackFrames: false})
+    this._rootSpan = new Span('transaction', 'transaction')
 
     this.duration = this._rootSpan.duration.bind(this._rootSpan)
     this.nextSpanId = 0
@@ -89,7 +89,6 @@ class Transaction {
     var transaction = this
     this.debugLog('startSpan', signature, type)
     var opts = typeof options === 'undefined' ? {} : options
-    opts.enableStackFrames = this._options.enableStackFrames === true && opts.enableStackFrames !== false
 
     opts.onSpanEnd = function (trc) {
       transaction._onSpanEnd(trc)
