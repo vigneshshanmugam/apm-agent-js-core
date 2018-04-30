@@ -36,7 +36,7 @@ function Config () {
     queueLimit: -1,
     flushInterval: 500,
 
-    hasRouterLibrary: false,
+    sendPageLoadTransaction: true,
 
     serverStringLimit: 1024,
 
