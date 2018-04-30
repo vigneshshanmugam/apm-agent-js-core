@@ -128,7 +128,7 @@ function startSelenium (callback, manualStop) {
   var selenium = require('selenium-standalone')
   var drivers = {
     chrome: {
-      version: '2.34',
+      version: '2.38',
       arch: process.arch,
       baseURL: 'https://chromedriver.storage.googleapis.com'
     },
