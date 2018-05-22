@@ -42,7 +42,7 @@ PACKAGE_VERSION=`node -e "console.log(require('./package.json').version);"`
 TAG_NAME="v$PACKAGE_VERSION"
 
 {
-    conventional-changelog -p angular -i CHANGELOG.md -s
+    npm run changelog
 } || {
     read -r -p "Could not generate changelog. Please write it manually and press ENTER." TRASH
 }
