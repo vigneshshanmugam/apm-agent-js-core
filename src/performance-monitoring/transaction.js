@@ -69,7 +69,12 @@ class Transaction {
   addNavigationTimingMarks () {
     var marks = utils.getNavigationTimingMarks()
     if (marks) {
-      this.addMarks({navigationTiming: marks})
+      var agent = {
+        timeToFirstByte: marks.responseStart,
+        domInteractive: marks.domInteractive,
+        domComplete: marks.domComplete
+      }
+      this.addMarks({navigationTiming: marks, agent: agent})
     }
   }
 

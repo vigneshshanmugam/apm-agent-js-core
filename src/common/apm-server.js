@@ -17,7 +17,6 @@ class ApmServer {
     this.throttleAddTransaction = undefined
 
     this.initialized = false
-    this._throttledMakeRequest
   }
 
   init () {

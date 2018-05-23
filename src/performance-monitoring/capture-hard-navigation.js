@@ -96,13 +96,7 @@ function captureHardNavigation (transaction) {
     transaction._adjustStartToEarliestSpan()
     transaction._adjustEndToLatestSpan()
 
-    var marks = {
-      agent: {
-        timeToComplete: transaction._rootSpan._end
-      }
-    }
     transaction.addNavigationTimingMarks()
-    transaction.addMarks(marks)
   }
   return 0
 }
