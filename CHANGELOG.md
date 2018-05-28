@@ -1,3 +1,14 @@
+<a name="0.6.1"></a>
+## [0.6.1](https://github.com/elastic/apm-agent-js-core/compare/v0.6.0...v0.6.1) (2018-05-28)
+
+
+### Features
+
+* add transaction.mark ([3de6b10](https://github.com/elastic/apm-agent-js-core/commit/3de6b10))
+* improve agent marks ([97ea337](https://github.com/elastic/apm-agent-js-core/commit/97ea337))
+
+
+
 <a name="0.6.0"></a>
 # [0.6.0](https://github.com/elastic/apm-agent-js-core/compare/v0.5.1...v0.6.0) (2018-05-22)
 
