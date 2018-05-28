@@ -127,4 +127,12 @@ describe('transaction.Transaction', function () {
     tr.removeTask('task1')
     expect(tr._scheduledTasks).toEqual({})
   })
+
+  it('should mark events',function () {
+    var transaction = new Transaction('transaction', 'transaction')
+    transaction.mark('new.mark')
+    transaction.mark('mark')
+    expect(typeof transaction.marks.custom.new_mark).toBe('number')
+    expect(typeof transaction.marks.custom.mark).toBe('number')
+  })
 })

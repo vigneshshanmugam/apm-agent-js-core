@@ -82,6 +82,14 @@ class Transaction {
     this.marks = utils.merge(this.marks || {}, obj)
   }
 
+  mark (key) {
+    var skey = key.replace(/[.*]/g, '_')
+    var now = window.performance.now() - this._rootSpan._start
+    var custom = {}
+    custom[skey] = now
+    this.addMarks({ custom: custom })
+  }
+
   redefine (name, type, options) {
     this.debugLog('redefine', name, type)
     this.name = name
