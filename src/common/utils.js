@@ -48,18 +48,18 @@ function sanitizeObjectStrings (obj, limit, required, placeholder) {
 }
 
 var navigationTimingKeys = [
-  'navigationStart', 'unloadEventStart', 'unloadEventEnd', 'redirectStart', 'redirectEnd', 'fetchStart', 'domainLookupStart', 'domainLookupEnd', 'connectStart',
+  'fetchStart', 'domainLookupStart', 'domainLookupEnd', 'connectStart',
   'connectEnd', 'secureConnectionStart', 'requestStart', 'responseStart', 'responseEnd', 'domLoading', 'domInteractive', 'domContentLoadedEventStart', 'domContentLoadedEventEnd', 'domComplete', 'loadEventStart', 'loadEventEnd']
 
 function getNavigationTimingMarks () {
   if (window.performance && window.performance.timing) {
     var timing = window.performance.timing
     var marks = {}
-    var navigationStart = timing.navigationStart
+    var fetchStart = timing.fetchStart
     navigationTimingKeys.forEach(function (timingKey) {
       var m = timing[timingKey]
       if (m) {
-        marks[timingKey] = m - navigationStart
+        marks[timingKey] = m - fetchStart
       }
     })
     return marks
