@@ -5,7 +5,7 @@ const uuidv4 = require('uuid/v4')
 class Transaction {
   constructor (name, type, options, logger) {
     this.id = uuidv4()
-    this.timestamp = new Date().toISOString()
+    this.timestamp = undefined
     this.name = name
     this.type = type
     this.ended = false

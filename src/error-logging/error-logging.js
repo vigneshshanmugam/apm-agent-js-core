@@ -57,7 +57,6 @@ class ErrorLogging {
 
     var errorObject = {
       id: uuidv4(),
-      timestamp: new Date().toISOString(),
       culprit: utils.sanitizeString(culprit),
       exception: {
         message: utils.sanitizeString(message, undefined, true),
