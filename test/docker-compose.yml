@@ -56,3 +56,25 @@ services:
       test: ["CMD", "curl", "--write-out", "'HTTP %{http_code}'", "--silent", "--output", "/dev/null", "http://apm-server:8200/healthcheck"]
       retries: 10
       interval: 10s
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION:-6.2.2}
+    environment:
+      SERVER_NAME: kibana.example.org
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+    ports:
+      - "127.0.0.1:${KIBANA_PORT:-5601}:5601"
+    logging:
+      driver: 'json-file'
+      options:
+          max-size: '2m'
+          max-file: '5'
+    healthcheck:
+      test: ["CMD", "curl", "--write-out", "'HTTP %{http_code}'", "--silent", "--output", "/dev/null", "http://kibana:5601/"]
+      retries: 10
+      interval: 10s
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    labels:
+      - "co.elatic.apm.stack-version=${STACK_VERSION:-6.2.2}"
