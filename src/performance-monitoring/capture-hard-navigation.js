@@ -70,9 +70,7 @@ function createResourceTimingSpans (entries, filterUrls) {
         var span = new Span(parsedUrl.path || entry.name, kind)
         span.setContext({
           http: {
-            url: {
-              raw: entry.name
-            }
+            url: entry.name
           }
         })
         span._start = start
