@@ -1,7 +1,9 @@
 var karmaUtils = require('./dev-utils/karma.js')
+var testUtils = require('./dev-utils/test.js')
 
 module.exports = function (config) {
   config.set(karmaUtils.baseConfig)
+  var env = testUtils.getTestEnvironmentVariables()
   var customConfig = {
     globalConfigs: {
       useMocks: false,
@@ -13,17 +15,14 @@ module.exports = function (config) {
         agentVersion: '0.0.1'
       }
     },
-    testConfig: {
-      sauceLabs: process.env.MODE && process.env.MODE.startsWith('saucelabs'),
-      branch: process.env.TRAVIS_BRANCH,
-      mode: process.env.MODE
-    }
+    testConfig: env
   }
 
-  if (customConfig.testConfig.sauceLabs) {
-    customConfig.globalConfigs.useMocks = true
+  if (env.isTravis) {
+    customConfig.globalConfigs.agentConfig.serverUrl = 'http://localhost:8001'
   }
-  console.log('customConfig:', customConfig)
+
+  console.log('customConfig:', JSON.stringify(customConfig, undefined, 2))
   config.set(customConfig)
   config.files.unshift('test/utils/polyfill.js')
   // config.files.unshift('node_modules/elastic-apm-js-zone/dist/zone.js')
