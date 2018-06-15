@@ -18,8 +18,8 @@ module.exports = function (config) {
     testConfig: env
   }
 
-  if (env.isTravis) {
-    customConfig.globalConfigs.agentConfig.serverUrl = 'http://localhost:8001'
+  if (env.serverUrl) {
+    customConfig.globalConfigs.agentConfig.serverUrl = env.serverUrl
   }
 
   console.log('customConfig:', JSON.stringify(customConfig, undefined, 2))

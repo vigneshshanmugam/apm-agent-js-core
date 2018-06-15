@@ -27,7 +27,8 @@ function getTestEnvironmentVariables () {
     branch: process.env.TRAVIS_BRANCH,
     mode: process.env.MODE,
     sauceLabs: process.env.MODE && process.env.MODE.startsWith('saucelabs'),
-    isTravis: process.env.TRAVIS
+    isTravis: process.env.TRAVIS,
+    serverUrl: process.env.APM_SERVER_URL
   }
   if (envVars.sauceLabs) {
     envVars.sauceLabs = {
