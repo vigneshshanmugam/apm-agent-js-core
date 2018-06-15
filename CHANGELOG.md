@@ -1,3 +1,18 @@
+<a name="0.7.0"></a>
+# [0.7.0](https://github.com/elastic/apm-agent-js-core/compare/v0.6.2...v0.7.0) (2018-06-15)
+
+
+### BREAKING CHANGES
+
+* remove timestamp on error and transaction payload
+
+
+### Bug Fixes
+
+* update span.context.http.url structure ([40d6bb2](https://github.com/elastic/apm-agent-js-core/commit/40d6bb2))
+
+
+
 <a name="0.6.2"></a>
 ## [0.6.2](https://github.com/elastic/apm-agent-js-core/compare/v0.6.1...v0.6.2) (2018-06-12)
 
