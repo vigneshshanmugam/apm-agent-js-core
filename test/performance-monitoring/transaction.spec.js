@@ -97,7 +97,7 @@ describe('transaction.Transaction', function () {
   it('should store contextInfo.url.location', function () {
     var tr = new Transaction('/', 'transaction')
     tr.detectFinish()
-    var location = tr.contextInfo.url.location
+    var location = tr.contextInfo.page.url
     expect(location).toBe(window.location.href)
   })
 

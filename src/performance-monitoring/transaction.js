@@ -131,11 +131,8 @@ class Transaction {
     this.debugLog('end')
     this.ended = true
 
-    this.addContextInfo({
-      url: {
-        location: window.location.href
-      }
-    })
+    var metadata = utils.getPageMetadata()
+    this.addContextInfo(metadata)
     this._rootSpan.end()
 
     this._adjustStartToEarliestSpan()

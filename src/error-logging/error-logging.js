@@ -52,7 +52,7 @@ class ErrorLogging {
     if (errorEvent.error && typeof errorEvent.error === 'object') {
       errorContext = this._getErrorProperties(errorEvent.error)
     }
-    var browserMetadata = this._getBrowserSpecificMetadata()
+    var browserMetadata = utils.getPageMetadata()
     var context = utils.merge({}, browserMetadata, configContext, errorContext)
 
     var errorObject = {
@@ -131,28 +131,6 @@ class ErrorLogging {
       properties[key] = val
     })
     return properties
-  }
-
-  _getBrowserSpecificMetadata () {
-    var viewportInfo = utils.getViewPortInfo()
-    var metadata = {
-      'environment': {
-        'browserWidth': viewportInfo.width,
-        'browserHeight': viewportInfo.height,
-        'screenWidth': window.screen.width,
-        'screenHeight': window.screen.height,
-        'language': navigator.language,
-        'userAgent': navigator.userAgent,
-        'platform': navigator.platform
-      },
-      'page': {
-        'referer': document.referrer,
-        'host': document.domain,
-        'location': window.location.href
-      }
-    }
-
-    return metadata
   }
 
 }
