@@ -1,3 +1,13 @@
+<a name="0.7.1"></a>
+## [0.7.1](https://github.com/elastic/apm-agent-js-core/compare/v0.7.0...v0.7.1) (2018-06-22)
+
+
+### Bug Fixes
+
+* consolidate Transaction and Error contexts ([f34aabd](https://github.com/elastic/apm-agent-js-core/commit/f34aabd))
+
+
+
 <a name="0.7.0"></a>
 # [0.7.0](https://github.com/elastic/apm-agent-js-core/compare/v0.6.2...v0.7.0) (2018-06-15)
 
