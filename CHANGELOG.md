@@ -1,3 +1,25 @@
+<a name="0.8.0"></a>
+# [0.8.0](https://github.com/elastic/apm-agent-js-core/compare/v0.7.1...v0.8.0) (2018-07-02)
+
+
+### BREAKING CHANGES
+
+* remove patch-common
+
+
+### Bug Fixes
+
+* minor fixes in Span and Transaction ([718cc19](https://github.com/elastic/apm-agent-js-core/commit/718cc19))
+* simplify patchMethod ([204f1c0](https://github.com/elastic/apm-agent-js-core/commit/204f1c0))
+
+
+### Features
+
+* add xhr-patch ([f61be32](https://github.com/elastic/apm-agent-js-core/commit/f61be32))
+* support timing sync xhr ([9005b7f](https://github.com/elastic/apm-agent-js-core/commit/9005b7f))
+
+
+
 <a name="0.7.1"></a>
 ## [0.7.1](https://github.com/elastic/apm-agent-js-core/compare/v0.7.0...v0.7.1) (2018-06-22)
 
