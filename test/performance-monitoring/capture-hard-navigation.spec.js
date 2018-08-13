@@ -1,5 +1,6 @@
 
 var navigationTiming = require('../../src/performance-monitoring/capture-hard-navigation')
+var Transaction = require('../../src/performance-monitoring/transaction')
 
 var resourceEntries = require('./resource-entries.js')
 
@@ -220,6 +221,14 @@ describe('navigationTiming', function () {
     it('should createResourceTimingSpans', function () {
         var spans = navigationTiming.createResourceTimingSpans(resourceEntries, [])
         expect(spans.map(mapSpan)).toEqual(spanSnapshot)
+    })
+
+    it('should captureHardNavigation', function () {
+        var tr = new Transaction('test', 'test')
+        tr.isHardNavigation = true
+        tr.end()
+        navigationTiming.captureHardNavigation(tr)
+        expect(tr.spans.length).toBeGreaterThan(2)
     })
 })
 

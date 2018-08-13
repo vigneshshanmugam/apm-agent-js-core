@@ -159,6 +159,10 @@ describe('PerformanceMonitoring', function () {
     var span = tr.startSpan('test span', 'test span thype')
     span.end()
     tr.detectFinish()
+    expect(tr._rootSpan._end).toBeDefined()
+    if (tr._rootSpan._end === tr._rootSpan._start) {
+      tr._rootSpan._end = tr._rootSpan._end + 100
+    }
     var result = performanceMonitoring.sendTransactions([tr])
     expect(result).toBeDefined()
   })
@@ -172,6 +176,8 @@ describe('PerformanceMonitoring', function () {
     spyOn(logger, 'debug').and.callThrough()
     expect(logger.debug).not.toHaveBeenCalled()
     var tr = new Transaction('transaction', 'transaction')
+    var span = tr.startSpan('test span', 'test span type')
+    span.end()
     tr.end()
     tr._rootSpan._start = 1
 
@@ -211,6 +217,13 @@ describe('PerformanceMonitoring', function () {
     var tr = new Transaction('transaction1', 'transaction1type')
     var span = tr.startSpan('span1', 'span1type')
     span.end()
+    tr.detectFinish()
+
+    expect(tr._rootSpan._end).toBeDefined()
+    if (tr._rootSpan._end === tr._rootSpan._start) {
+      tr._rootSpan._end = tr._rootSpan._end + 100
+    }
+
     var payload = performanceMonitoring.createTransactionPayload(tr)
     expect(payload.name).toBe('transaction1')
     expect(payload.type).toBe('transaction1type')
@@ -244,5 +257,30 @@ describe('PerformanceMonitoring', function () {
       })
     })
     var tr = transactionService.sendPageLoadMetrics('resource-test')
+  })
+
+  it('should filter out empty transactions', function () {
+    var tr = new Transaction('test', 'test')
+    var result = performanceMonitoring.filterTransaction(tr)
+    expect(tr.spans.length).toBe(0)
+    expect(tr.duration()).toBe(null)
+    expect(result).toBe(false)
+    var span = tr.startSpan('span1', 'span1type')
+    span.end()
+
+    expect(tr.spans.length).toBe(1)
+    expect(tr.duration()).toBe(null)
+    result = performanceMonitoring.filterTransaction(tr)
+    expect(result).toBe(false)
+
+
+    tr.end()
+    if (tr._rootSpan._end && tr._rootSpan._end === tr._rootSpan._start) {
+      tr._rootSpan._end += 100
+    }
+    expect(tr.duration()).toBeGreaterThan(0)
+    result = performanceMonitoring.filterTransaction(tr)
+    expect(result).toBe(true)
+
   })
 })

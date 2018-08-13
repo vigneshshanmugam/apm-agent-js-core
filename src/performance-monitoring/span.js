@@ -10,8 +10,8 @@ class Span {
     this.signature = signature
     this.type = type
     this.ended = false
-    this._end = null
-    this.context = null
+    this._end = undefined
+    this.context = undefined
     // Start timers
     this._start = window.performance.now()
   }
@@ -27,7 +27,7 @@ class Span {
   }
 
   duration () {
-    if (utils.isUndefined(this.ended) || utils.isUndefined(this._start)) {
+    if (utils.isUndefined(this._end) || utils.isUndefined(this._start)) {
       return null
     }
 
