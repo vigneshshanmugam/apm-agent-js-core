@@ -1,3 +1,13 @@
+<a name="0.8.1"></a>
+## [0.8.1](https://github.com/elastic/apm-agent-js-core/compare/v0.8.0...v0.8.1) (2018-08-14)
+
+
+### Bug Fixes
+
+* filter out transactions with zero spans ([2311a53](https://github.com/elastic/apm-agent-js-core/commit/2311a53))
+
+
+
 <a name="0.8.0"></a>
 # [0.8.0](https://github.com/elastic/apm-agent-js-core/compare/v0.7.1...v0.8.0) (2018-07-02)
 

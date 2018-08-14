@@ -1,6 +1,6 @@
 {
   "name": "elastic-apm-js-core",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Elastic apm core",
   "license": "MIT",
   "main": "src/index.js",
