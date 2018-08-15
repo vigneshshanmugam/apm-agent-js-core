@@ -58,7 +58,7 @@ function getNavigationTimingMarks () {
     var fetchStart = timing.fetchStart
     navigationTimingKeys.forEach(function (timingKey) {
       var m = timing[timingKey]
-      if (m) {
+      if (m && m >= fetchStart) {
         marks[timingKey] = m - fetchStart
       }
     })
