@@ -283,4 +283,20 @@ describe('PerformanceMonitoring', function () {
     expect(result).toBe(true)
 
   })
+
+  it('should filter the transactions with duration above threshold', function () {
+    var threshold = configService.get('transactionDurationThreshold')
+    var tr = new Transaction('/test/outlier', 'page-load-slow', configService.config, logger)
+    var span1 = new Span('span 1', 'test-span')
+    span1.end()
+    tr.spans.push(span1)
+    tr.end()
+    tr._rootSpan._end += 60001
+    expect(tr.duration()).toBeGreaterThanOrEqual(threshold)
+    var payload = performanceMonitoring.createTransactionPayload(tr)
+    expect(payload).toBeUndefined()
+    var promise = apmServer.sendTransactions(payload)
+    expect(promise).toBeUndefined()
+  })
+
 })

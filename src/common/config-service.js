@@ -32,6 +32,7 @@ function Config () {
     errorThrottleInterval: 30000,
     transactionThrottleLimit: 20,
     transactionThrottleInterval: 30000,
+    transactionDurationThreshold: 60000,
 
     queueLimit: -1,
     flushInterval: 500,

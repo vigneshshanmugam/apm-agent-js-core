@@ -30,8 +30,9 @@ class PerformanceMonitoring {
 
   filterTransaction (tr) {
     var performanceMonitoring = this
+    var transactionDurationThreshold = this._configService.get('transactionDurationThreshold')
     var duration = tr.duration()
-    if (!duration || !tr.spans.length) {
+    if (!duration || duration > transactionDurationThreshold || !tr.spans.length) {
       return false
     }
 
