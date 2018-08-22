@@ -9,7 +9,7 @@ function Config () {
     agentName: 'js-base',
     agentVersion: '%%agent-version%%',
     serverUrl: 'http://localhost:8200',
-    serverUrlPrefix: '/v1/client-side',
+    serverUrlPrefix: '/v1/rum',
     active: true,
     isInstalled: false,
     debug: false,
