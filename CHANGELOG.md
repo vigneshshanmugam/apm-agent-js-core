@@ -1,3 +1,12 @@
+<a name="1.0.0"></a>
+# [1.0.0](https://github.com/elastic/apm-agent-js-core/compare/v0.8.2...v1.0.0) (2018-08-23)
+
+
+### BREAKING CHANGES
+
+* use /v1/rum endpoint (APM Server v6.4+)
+
+
 <a name="0.8.2"></a>
 ## [0.8.2](https://github.com/elastic/apm-agent-js-core/compare/v0.8.1...v0.8.2) (2018-08-17)
 
