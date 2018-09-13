@@ -108,7 +108,10 @@ class PerformanceMonitoring {
       duration: transaction.duration(),
       spans: spans,
       context: context,
-      marks: transaction.marks
+      marks: transaction.marks,
+      span_count: {
+        started: spans.length
+      }
     }
   }
 
