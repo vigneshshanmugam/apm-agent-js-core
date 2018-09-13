@@ -1,6 +1,8 @@
 var utils = require('../common/utils')
+const uuidv4 = require('uuid/v4')
 class Span {
   constructor (signature, type, options) {
+    this.id = uuidv4()
     var opts = options || {}
     if (typeof opts.onSpanEnd === 'function') {
       this.onSpanEnd = opts.onSpanEnd

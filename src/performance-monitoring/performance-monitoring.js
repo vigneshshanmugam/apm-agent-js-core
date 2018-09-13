@@ -90,6 +90,7 @@ class PerformanceMonitoring {
         context = utils.sanitizeObjectStrings(span.context, stringLimit)
       }
       return {
+        id: span.id,
         name: utils.sanitizeString(span.signature, stringLimit, true),
         type: utils.sanitizeString(span.type, stringLimit, true),
         start: span._start - transactionStart,

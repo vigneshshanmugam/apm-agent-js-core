@@ -1,18 +1,33 @@
 var ApmServer = require('../../src/common/apm-server')
 var Transaction = require('../../src/performance-monitoring/transaction')
+// var performanceMonitoring = require('../../src/performance-monitoring/performance-monitoring')
 var createServiceFactory = require('..').createServiceFactory
 
-function generateTransaction (count) {
+function generateTransaction(count) {
   var result = []
-  for (var i = 0;i < count;i++) {
-    result.push(new Transaction('transaction #' + i, 'transaction', {}))
+  for (var i = 0; i < count; i++) {
+    var tr = new Transaction('transaction #' + i, 'transaction', {})
+    tr.id = 'transaction-id-' + i
+    var span1 = tr.startSpan('name', 'type')
+    span1.end()
+    span1.id = 'span-id-' + i + '-1'
+    tr.end()
+    tr.contextInfo.page.referer = 'referer'
+    tr.contextInfo.page.url = 'url'
+    tr._rootSpan._start = 10
+    tr._rootSpan._end = 1000
+
+    span1._start = 20
+    span1._end = 30
+
+    result.push(tr)
   }
   return result
 }
 
-function generateErrors (count) {
+function generateErrors(count) {
   var result = []
-  for (var i = 0;i < count;i++) {
+  for (var i = 0; i < count; i++) {
     result.push(new Error('error #' + i))
   }
   return result
@@ -23,6 +38,7 @@ describe('ApmServer', function () {
   var configService
   var loggingService
   var originalTimeout
+  var performanceMonitoring
   beforeEach(function () {
     originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL
     jasmine.DEFAULT_TIMEOUT_INTERVAL = 50000
@@ -31,6 +47,7 @@ describe('ApmServer', function () {
     configService = serviceFactory.getService('ConfigService')
     loggingService = serviceFactory.getService('LoggingService')
     apmServer = serviceFactory.getService('ApmServer')
+    performanceMonitoring = serviceFactory.getService('PerformanceMonitoring')
   })
 
   afterEach(function () {
@@ -50,7 +67,7 @@ describe('ApmServer', function () {
       serverUrl: 'http://localhost:54321',
       serviceName: 'test-service'
     })
-    var result = apmServer.sendTransactions([{test: 'test'}])
+    var result = apmServer.sendTransactions([{ test: 'test' }])
     expect(result).toBeDefined()
     result.then(function () {
       fail('Request should have failed!')
@@ -66,22 +83,22 @@ describe('ApmServer', function () {
     spyOn(loggingService, 'debug')
     expect(configService.isValid()).toBe(false)
 
-    var result = apmServer.sendTransactions([{test: 'test'}])
+    var result = apmServer.sendTransactions([{ test: 'test' }])
     expect(result).toBeUndefined()
     expect(apmServer._postJson).not.toHaveBeenCalled()
     expect(loggingService.warn).toHaveBeenCalled()
     expect(loggingService.debug).not.toHaveBeenCalled()
 
     loggingService.warn.calls.reset()
-    var result = apmServer.sendErrors([{test: 'test'}])
+    var result = apmServer.sendErrors([{ test: 'test' }])
     expect(result).toBeUndefined()
     expect(apmServer._postJson).not.toHaveBeenCalled()
     expect(loggingService.warn).not.toHaveBeenCalled()
     expect(loggingService.debug).toHaveBeenCalled()
 
-    configService.setConfig({serviceName: 'serviceName'})
+    configService.setConfig({ serviceName: 'serviceName' })
     expect(configService.isValid()).toBe(true)
-    apmServer.sendTransactions([{test: 'test'}])
+    apmServer.sendTransactions([{ test: 'test' }])
     expect(apmServer._postJson).toHaveBeenCalled()
     expect(loggingService.warn).not.toHaveBeenCalled()
   })
@@ -119,7 +136,7 @@ describe('ApmServer', function () {
   })
 
   it('should init queue if not initialized before', function (done) {
-    configService.setConfig({flushInterval: 200})
+    configService.setConfig({ flushInterval: 200 })
     spyOn(apmServer, 'sendErrors')
     spyOn(apmServer, 'sendTransactions')
 
@@ -179,7 +196,7 @@ describe('ApmServer', function () {
       serviceName: 'test-service'
     })
     expect(configService.isValid()).toBe(true)
-    apmServer.addError({test: 'test'})
+    apmServer.addError({ test: 'test' })
 
     expect(loggingService.warn).not.toHaveBeenCalled()
     apmServer.errorQueue.flush()
@@ -207,7 +224,7 @@ describe('ApmServer', function () {
       serviceName: 'test-service'
     })
     expect(configService.isValid()).toBe(true)
-    apmServer.addTransaction({test: 'test'})
+    apmServer.addTransaction({ test: 'test' })
 
     expect(loggingService.warn).not.toHaveBeenCalled()
     apmServer.transactionQueue.flush()
@@ -276,8 +293,8 @@ describe('ApmServer', function () {
     expect(apmServer.transactionQueue).toBeUndefined()
     expect(apmServer.errorQueue).toBeUndefined()
 
-    apmServer.addTransaction({test: 'test'})
-    apmServer.addError({test: 'test'})
+    apmServer.addTransaction({ test: 'test' })
+    apmServer.addError({ test: 'test' })
 
     expect(apmServer.transactionQueue).toBeUndefined()
     expect(apmServer.errorQueue).toBeUndefined()
@@ -291,11 +308,24 @@ describe('ApmServer', function () {
       return
     })
     spyOn(apmServer, '_postJson')
-    var result = apmServer.sendErrors([{test: 'test'}])
+    var result = apmServer.sendErrors([{ test: 'test' }])
     expect(result).toBeUndefined()
     expect(apmServer._postJson).not.toHaveBeenCalled()
-    result = apmServer.sendTransactions([{test: 'test'}])
+    result = apmServer.sendTransactions([{ test: 'test' }])
     expect(result).toBeUndefined()
     expect(apmServer._postJson).not.toHaveBeenCalled()
+  })
+
+  it('should ndjson transactions', function () {
+    var trs = generateTransaction(3)
+    trs = performanceMonitoring.convertTransactionsToServerModel(trs)
+    var result = apmServer.ndjsonTransactions(trs)
+    var expected = [
+      '{"transaction":{"id":"transaction-id-0","name":"transaction #0","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"trace_id":"none"}}\n{"span":{"id":"span-id-0-1","name":"name","type":"type","start":10,"duration":10,"transaction_id":"transaction-id-0","trace_id":"none"}}\n'
+      , '{"transaction":{"id":"transaction-id-1","name":"transaction #1","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"trace_id":"none"}}\n{"span":{"id":"span-id-1-1","name":"name","type":"type","start":10,"duration":10,"transaction_id":"transaction-id-1","trace_id":"none"}}\n'
+      , '{"transaction":{"id":"transaction-id-2","name":"transaction #2","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"trace_id":"none"}}\n{"span":{"id":"span-id-2-1","name":"name","type":"type","start":10,"duration":10,"transaction_id":"transaction-id-2","trace_id":"none"}}\n'
+    ]
+    console.log(result.join(','))
+    expect(result).toEqual(expected)
   })
 })

@@ -1,6 +1,7 @@
 var Queue = require('./queue')
 var throttle = require('./throttle')
 var utils = require('./utils')
+var NDJSON = require('./ndjson')
 
 class ApmServer {
   constructor (configService, loggingService) {
@@ -17,6 +18,7 @@ class ApmServer {
     this.throttleAddTransaction = undefined
 
     this.initialized = false
+    this.ndjsonSpan = {}
   }
 
   init () {
@@ -48,8 +50,8 @@ class ApmServer {
   }
 
   _postJson (endPoint, payload) {
-    return this._makeHttpRequest('POST', endPoint, JSON.stringify(payload), {
-      'Content-Type': 'application/json'
+    return this._makeHttpRequest('POST', endPoint, payload, {
+      'Content-Type': 'application/x-ndjson'
     })
   }
 
@@ -155,6 +157,7 @@ class ApmServer {
       }
     )
   }
+
   addError (error) {
     if (this._configService.isActive()) {
       if (!this.errorQueue) {
@@ -182,6 +185,12 @@ class ApmServer {
     }
   }
 
+  ndjsonErrors (errors) {
+    return errors.map(function (error) {
+      return NDJSON.stringify({ error: error })
+    })
+  }
+
   sendErrors (errors) {
     if (this._configService.isValid() && this._configService.isActive()) {
       if (errors && errors.length > 0) {
@@ -189,10 +198,14 @@ class ApmServer {
           service: this.createServiceObject(),
           errors: errors
         }
+
         payload = this._configService.applyFilters(payload)
         if (payload) {
           var endPoint = this._configService.getEndpointUrl('errors')
-          return this._postJson(endPoint, payload)
+          var ndjson = this.ndjsonErrors(payload.errors)
+          ndjson.unshift(NDJSON.stringify({ metadata: { service: payload.service } }))
+          var ndjsonPayload = ndjson.join('')
+          return this._postJson(endPoint, ndjsonPayload)
         } else {
           this._loggingService.warn('Dropped payload due to filtering!')
         }
@@ -200,6 +213,26 @@ class ApmServer {
     } else {
       this.warnOnce(this.logMessages.invalidConfig)
     }
+  }
+
+  ndjsonTransactions (transactions) {
+    var ndjsonSpan = this.ndjsonSpan
+    return transactions.map(function (tr) {
+      tr.trace_id = 'none'
+      var spans = ''
+      if (tr.spans) {
+        spans = tr.spans
+          .map(function (sp) {
+            sp.transaction_id = tr.id
+            sp.trace_id = tr.trace_id
+            ndjsonSpan.span = sp
+            return NDJSON.stringify(ndjsonSpan)
+          })
+          .join('')
+        delete tr.spans
+      }
+      return NDJSON.stringify({ transaction: tr }) + spans
+    })
   }
 
   sendTransactions (transactions) {
@@ -212,7 +245,10 @@ class ApmServer {
         payload = this._configService.applyFilters(payload)
         if (payload) {
           var endPoint = this._configService.getEndpointUrl('transactions')
-          return this._postJson(endPoint, payload)
+          var ndjson = this.ndjsonTransactions(payload.transactions)
+          ndjson.unshift(NDJSON.stringify({ metadata: { service: payload.service } }))
+          var ndjsonPayload = ndjson.join('')
+          return this._postJson(endPoint, ndjsonPayload)
         } else {
           this._loggingService.warn('Dropped payload due to filtering!')
         }

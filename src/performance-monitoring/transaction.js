@@ -33,7 +33,6 @@ class Transaction {
     this._rootSpan = new Span('transaction', 'transaction')
 
     this.duration = this._rootSpan.duration.bind(this._rootSpan)
-    this.nextSpanId = 0
     this.nextAutoTaskId = 0
 
     this.isHardNavigation = false
@@ -108,8 +107,6 @@ class Transaction {
     }
 
     var span = new Span(signature, type, opts)
-    span.id = this.nextSpanId
-    this.nextSpanId++
     this._activeSpans[span.id] = span
 
     return span

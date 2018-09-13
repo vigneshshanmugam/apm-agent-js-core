@@ -9,7 +9,7 @@ function Config () {
     agentName: 'js-base',
     agentVersion: '%%agent-version%%',
     serverUrl: 'http://localhost:8200',
-    serverUrlPrefix: '/v1/rum',
+    serverUrlPrefix: '/intake/v2/rum/events',
     active: true,
     isInstalled: false,
     debug: false,
@@ -86,7 +86,7 @@ Config.prototype.get = function (key) {
 }
 
 Config.prototype.getEndpointUrl = function getEndpointUrl (endpoint) {
-  var url = this.get('serverUrl') + this.get('serverUrlPrefix') + '/' + endpoint
+  var url = this.get('serverUrl') + this.get('serverUrlPrefix')
   return url
 }
 
