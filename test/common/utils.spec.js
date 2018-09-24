@@ -130,4 +130,19 @@ describe('lib/utils', function () {
     expect(marks.domComplete).toBeGreaterThanOrEqual(0)
     expect(marks.loadEventEnd).toBeGreaterThanOrEqual(0)
   })
+  it('should generate random ids', function () {
+    debugger
+    var result = utils.bytesToHex(utils.rng())
+    expect(result.length).toBe(32)
+
+    result = utils.generateRandomId()
+    expect(result.length).toBe(32)
+    result = utils.generateRandomId(16)
+    expect(result.length).toBe(16)
+
+
+    var array = [252, 192, 107, 62, 0, 43, 190, 201, 129, 49, 251, 159, 243, 81, 153, 192]
+    result = utils.bytesToHex(array)
+    expect(result).toBe('fcc06b3e002bbec98131fb9ff35199c0')
+  })
 })

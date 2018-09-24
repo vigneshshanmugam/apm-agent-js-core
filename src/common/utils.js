@@ -4,6 +4,40 @@ function isCORSSupported () {
   var xhr = new window.XMLHttpRequest()
   return 'withCredentials' in xhr
 }
+var rng = require('uuid/lib/rng-browser')
+var byteToHex = []
+for (var i = 0; i < 256; ++i) {
+  byteToHex[i] = (i + 0x100).toString(16).substr(1)
+}
+
+function bytesToHex (buf, offset) {
+  var i = offset || 0
+  var bth = byteToHex
+  // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
+  return [
+    bth[buf[i++]],
+    bth[buf[i++]],
+    bth[buf[i++]],
+    bth[buf[i++]],
+    bth[buf[i++]],
+    bth[buf[i++]],
+    bth[buf[i++]],
+    bth[buf[i++]],
+    bth[buf[i++]],
+    bth[buf[i++]],
+    bth[buf[i++]],
+    bth[buf[i++]],
+    bth[buf[i++]],
+    bth[buf[i++]],
+    bth[buf[i++]],
+    bth[buf[i++]]
+  ].join('')
+}
+
+function generateRandomId (length) {
+  var id = bytesToHex(rng())
+  return id.substr(0, length)
+}
 
 function isPlatformSupported () {
   return (
@@ -293,14 +327,6 @@ module.exports = {
     }
   },
 
-  generateUuid: function () {
-    function _p8 (s) {
-      var p = (Math.random().toString(16) + '000000000').substr(2, 8)
-      return s ? '-' + p.substr(0, 4) + '-' + p.substr(4, 4) : p
-    }
-    return _p8() + _p8(true) + _p8(true) + _p8()
-  },
-
   parseUrl: function parseUrl (url) {
     // source: angular.js/$LocationProvider
     var PATH_MATCH = /^([^?#]*)(\?([^#]*))?(#(.*))?$/
@@ -338,7 +364,10 @@ module.exports = {
 
   sanitizeString: sanitizeString,
   sanitizeObjectStrings: sanitizeObjectStrings,
-  getNavigationTimingMarks: getNavigationTimingMarks
+  getNavigationTimingMarks: getNavigationTimingMarks,
+  bytesToHex: bytesToHex,
+  rng: rng,
+  generateRandomId: generateRandomId
 }
 
 function isObject (value) {
