@@ -8,6 +8,7 @@ function generateTransaction(count) {
   for (var i = 0; i < count; i++) {
     var tr = new Transaction('transaction #' + i, 'transaction', {})
     tr.id = 'transaction-id-' + i
+    tr.traceId = 'trace-id-' + i
     var span1 = tr.startSpan('name', 'type')
     span1.end()
     span1.id = 'span-id-' + i + '-1'
@@ -321,7 +322,8 @@ describe('ApmServer', function () {
     trs = performanceMonitoring.convertTransactionsToServerModel(trs)
     var result = apmServer.ndjsonTransactions(trs)
     var expected = [
-      '{"transaction":{"id":"transaction-id-0","name":"transaction #0","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"trace_id":"none"}}\n{"span":{"id":"span-id-0-1","name":"name","type":"type","start":10,"duration":10,"transaction_id":"transaction-id-0","trace_id":"none"}}\n', '{"transaction":{"id":"transaction-id-1","name":"transaction #1","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"trace_id":"none"}}\n{"span":{"id":"span-id-1-1","name":"name","type":"type","start":10,"duration":10,"transaction_id":"transaction-id-1","trace_id":"none"}}\n', '{"transaction":{"id":"transaction-id-2","name":"transaction #2","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1},"trace_id":"none"}}\n{"span":{"id":"span-id-2-1","name":"name","type":"type","start":10,"duration":10,"transaction_id":"transaction-id-2","trace_id":"none"}}\n'
+      '{"transaction":{"id":"transaction-id-0","trace_id":"trace-id-0","name":"transaction #0","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1}}}\n{"span":{"id":"span-id-0-1","transaction_id":"transaction-id-0","trace_id":"trace-id-0","name":"name","type":"type","start":10,"duration":10}}\n','{"transaction":{"id":"transaction-id-1","trace_id":"trace-id-1","name":"transaction #1","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1}}}\n{"span":{"id":"span-id-1-1","transaction_id":"transaction-id-1","trace_id":"trace-id-1","name":"name","type":"type","start":10,"duration":10}}\n','{"transaction":{"id":"transaction-id-2","trace_id":"trace-id-2","name":"transaction #2","type":"transaction","duration":990,"context":{"page":{"referer":"referer","url":"url"}},"span_count":{"started":1}}}\n{"span":{"id":"span-id-2-1","transaction_id":"transaction-id-2","trace_id":"trace-id-2","name":"name","type":"type","start":10,"duration":10}}\n'
+
     ]
 
     // var snapshot = result.map(function (r) {

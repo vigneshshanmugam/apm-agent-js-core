@@ -91,6 +91,8 @@ class PerformanceMonitoring {
       }
       return {
         id: span.id,
+        transaction_id: transaction.id,
+        trace_id: transaction.traceId,
         name: utils.sanitizeString(span.signature, stringLimit, true),
         type: utils.sanitizeString(span.type, stringLimit, true),
         start: span._start - transactionStart,
@@ -102,6 +104,7 @@ class PerformanceMonitoring {
     var context = utils.merge({}, configContext, transaction.contextInfo)
     return {
       id: transaction.id,
+      trace_id: transaction.traceId,
       timestamp: transaction.timestamp,
       name: utils.sanitizeString(transaction.name, stringLimit, false),
       type: utils.sanitizeString(transaction.type, stringLimit, true),

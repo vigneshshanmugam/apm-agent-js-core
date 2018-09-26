@@ -1,4 +1,3 @@
-const uuidv4 = require('uuid/v4')
 var StackTraceService = require('./stack-trace-service')
 
 var utils = require('../common/utils')
@@ -56,7 +55,7 @@ class ErrorLogging {
     var context = utils.merge({}, browserMetadata, configContext, errorContext)
 
     var errorObject = {
-      id: uuidv4(),
+      id: utils.generateRandomId(),
       culprit: utils.sanitizeString(culprit),
       exception: {
         message: utils.sanitizeString(message, undefined, true),

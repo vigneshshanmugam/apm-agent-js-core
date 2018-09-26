@@ -218,13 +218,10 @@ class ApmServer {
   ndjsonTransactions (transactions) {
     var ndjsonSpan = this.ndjsonSpan
     return transactions.map(function (tr) {
-      tr.trace_id = 'none'
       var spans = ''
       if (tr.spans) {
         spans = tr.spans
           .map(function (sp) {
-            sp.transaction_id = tr.id
-            sp.trace_id = tr.trace_id
             ndjsonSpan.span = sp
             return NDJSON.stringify(ndjsonSpan)
           })

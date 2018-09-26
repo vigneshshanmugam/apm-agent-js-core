@@ -1,10 +1,10 @@
 var Span = require('./span')
 var utils = require('../common/utils')
-const uuidv4 = require('uuid/v4')
 
 class Transaction {
   constructor (name, type, options, logger) {
-    this.id = uuidv4()
+    this.id = utils.generateRandomId(16)
+    this.traceId = utils.generateRandomId()
     this.timestamp = undefined
     this.name = name
     this.type = type
@@ -105,6 +105,7 @@ class Transaction {
     opts.onSpanEnd = function (trc) {
       transaction._onSpanEnd(trc)
     }
+    opts.traceId = this.traceId
 
     var span = new Span(signature, type, opts)
     this._activeSpans[span.id] = span
