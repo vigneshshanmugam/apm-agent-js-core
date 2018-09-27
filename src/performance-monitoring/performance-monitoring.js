@@ -92,6 +92,7 @@ class PerformanceMonitoring {
       return {
         id: span.id,
         transaction_id: transaction.id,
+        parent_id: span.parentId || transaction.id,
         trace_id: transaction.traceId,
         name: utils.sanitizeString(span.signature, stringLimit, true),
         type: utils.sanitizeString(span.type, stringLimit, true),
