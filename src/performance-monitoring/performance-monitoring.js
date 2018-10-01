@@ -22,27 +22,29 @@ class PerformanceMonitoring {
       }
     })
 
-    this.subscribeToXhrPatch()
+    var patchSubFn = this.getXhrPatchSubFn(this._configService, this._transactionService)
+    this.cancelPatchSub = patchingSub.subscribe(patchSubFn)
   }
 
-  subscribeToXhrPatch () {
+  getXhrPatchSubFn () {
     var configService = this._configService
     var transactionService = this._transactionService
-    this.cancelPatchSub = patchingSub.subscribe(function (event, task) {
+    return function (event, task) {
       if (event === 'schedule' && task.source === 'XMLHttpRequest.send' && task.data) {
         var spanName = task.data.method + ' ' + task.data.url
         var span = transactionService.startSpan(spanName, 'ext.HttpRequest')
         if (span) {
           var isDtEnabled = configService.get('distributedTracing')
-          if (isDtEnabled && utils.isSameOrigin(task.data.url, window.location.href)) {
+          var target = task.data.target
+          if (isDtEnabled && utils.isSameOrigin(task.data.url, window.location.href) && target) {
             var headerName = configService.get('distributedTracingHeaderName')
             var headerValueCallback = configService.get('distributedTracingHeaderValueCallback')
             if (typeof headerValueCallback !== 'function') {
               headerValueCallback = utils.getDtHeaderValue
             }
-            var target = task.data.target
+
             var headerValue = headerValueCallback(span)
-            if (target && headerName && headerValue) {
+            if (headerName && headerValue) {
               target.setRequestHeader(headerName, headerValue)
             }
           }
@@ -59,7 +61,7 @@ class PerformanceMonitoring {
         task.data.span.setContext({ http: { status_code: task.data.target.status } })
         task.data.span.end()
       }
-    })
+    }
   }
 
   setTransactionContextInfo (transaction) {

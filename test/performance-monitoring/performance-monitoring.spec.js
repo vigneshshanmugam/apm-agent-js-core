@@ -4,6 +4,7 @@ var Span = require('../../src/performance-monitoring/span')
 var apmTestConfig = require('../apm-test-config')()
 
 var resourceEntries = require('./resource-entries.js')
+var utils = require('../../src/common/utils')
 
 describe('PerformanceMonitoring', function () {
   var serviceFactory
@@ -299,4 +300,32 @@ describe('PerformanceMonitoring', function () {
     expect(promise).toBeUndefined()
   })
 
+  it('should correctly use xhr patch', function (done) {
+    var fn = performanceMonitoring.getXhrPatchSubFn()
+    expect(typeof fn).toBe('function')
+    var req = new window.XMLHttpRequest()
+    req.open('GET', '/', true)
+    spyOn(req, 'setRequestHeader').and.callThrough()
+    var task = {
+      source: 'XMLHttpRequest.send',
+      data: {
+        target: req
+      }
+    }
+    req.addEventListener('readystatechange', function () {
+      if (req.readyState === req.DONE) {
+        fn('invoke', task)
+        expect(task.data.span.ended).toBeTruthy()
+        done()
+      }
+    })
+    fn('schedule', task)
+    req.send()
+    expect(task.data.span).toBeDefined()
+    expect(task.data.span.ended).toBeFalsy()
+    var headerName = configService.get('distributedTracingHeaderName')
+    var headerValue = utils.getDtHeaderValue(task.data.span)
+    expect(req.setRequestHeader).toHaveBeenCalledWith(headerName, headerValue)
+
+  })
 })
