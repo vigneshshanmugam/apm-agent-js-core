@@ -34,6 +34,56 @@ function bytesToHex (buf, offset) {
   ].join('')
 }
 
+function parseUrl (url) {
+  // source: angular.js/$LocationProvider
+  var PATH_MATCH = /^([^?#]*)(\?([^#]*))?(#(.*))?$/
+  var match = PATH_MATCH.exec(url)
+  var path = match[1] || ''
+  var queryString = match[3] || ''
+  var hash = match[5] ? '#' + match[5] : ''
+
+  var protocol = ''
+  if (url.indexOf('://') > -1) {
+    protocol = url.split('://')[0] + ':'
+  }
+
+  var params = {}
+  var queries = queryString.split('&')
+  for (var i = 0, l = queries.length; i < l; i++) {
+    var query = queries[i]
+    if (query === '' || typeof query === 'undefined' || query === null) {
+      continue
+    }
+    var keyvalue = queries[i].split('=')
+    var key = keyvalue.shift()
+    params[key] = keyvalue.join('=')
+  }
+  return {
+    protocol: protocol,
+    path: path,
+    queryString: queryString,
+    queryStringParsed: params,
+    hash: hash
+  }
+}
+
+var dtVersion = '00'
+// 00000011 ->  '03' -> recorded and requested
+var dtFlags = '03'
+function getDtHeaderValue (span) {
+  if (span && span.traceId && span.id) {
+    return dtVersion + '-' + span.traceId + '-' + span.id + '-' + dtFlags
+  }
+}
+
+var URL = require('url-parse')
+
+function isSameOrigin (source, target) {
+  var src = new URL(source)
+  var tar = new URL(target)
+  return src.origin === tar.origin
+}
+
 function generateRandomId (length) {
   var id = bytesToHex(rng())
   return id.substr(0, length)
@@ -327,38 +377,7 @@ module.exports = {
     }
   },
 
-  parseUrl: function parseUrl (url) {
-    // source: angular.js/$LocationProvider
-    var PATH_MATCH = /^([^?#]*)(\?([^#]*))?(#(.*))?$/
-    var match = PATH_MATCH.exec(url)
-    var path = match[1] || ''
-    var queryString = match[3] || ''
-    var hash = match[5] ? '#' + match[5] : ''
-
-    var protocol = ''
-    if (url.indexOf('://') > -1) {
-      protocol = url.split('://')[0] + ':'
-    }
-
-    var params = {}
-    var queries = queryString.split('&')
-    for (var i = 0, l = queries.length; i < l; i++) {
-      var query = queries[i]
-      if (query === '' || typeof query === 'undefined' || query === null) {
-        continue
-      }
-      var keyvalue = queries[i].split('=')
-      var key = keyvalue.shift()
-      params[key] = keyvalue.join('=')
-    }
-    return {
-      protocol: protocol,
-      path: path,
-      queryString: queryString,
-      queryStringParsed: params,
-      hash: hash
-    }
-  },
+  parseUrl: parseUrl,
 
   isPlatformSupported: isPlatformSupported,
 
@@ -367,7 +386,9 @@ module.exports = {
   getNavigationTimingMarks: getNavigationTimingMarks,
   bytesToHex: bytesToHex,
   rng: rng,
-  generateRandomId: generateRandomId
+  generateRandomId: generateRandomId,
+  isSameOrigin: isSameOrigin,
+  getDtHeaderValue: getDtHeaderValue
 }
 
 function isObject (value) {

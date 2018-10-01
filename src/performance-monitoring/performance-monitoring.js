@@ -1,4 +1,6 @@
 var utils = require('../common/utils')
+var patchingSub = require('../common/patching').subscription
+
 class PerformanceMonitoring {
   constructor (apmServer, configService, loggingService, zoneService, transactionService) {
     this._apmServer = apmServer
@@ -17,6 +19,45 @@ class PerformanceMonitoring {
       var payload = performanceMonitoring.createTransactionPayload(tr)
       if (payload) {
         performanceMonitoring._apmServer.addTransaction(payload)
+      }
+    })
+
+    this.subscribeToXhrPatch()
+  }
+
+  subscribeToXhrPatch () {
+    var configService = this._configService
+    var transactionService = this._transactionService
+    this.cancelPatchSub = patchingSub.subscribe(function (event, task) {
+      if (event === 'schedule' && task.source === 'XMLHttpRequest.send' && task.data) {
+        var spanName = task.data.method + ' ' + task.data.url
+        var span = transactionService.startSpan(spanName, 'ext.HttpRequest')
+        if (span) {
+          var isDtEnabled = configService.get('distributedTracing')
+          if (isDtEnabled && utils.isSameOrigin(task.data.url, window.location.href)) {
+            var headerName = configService.get('distributedTracingHeaderName')
+            var headerValueCallback = configService.get('distributedTracingHeaderValueCallback')
+            if (typeof headerValueCallback !== 'function') {
+              headerValueCallback = utils.getDtHeaderValue
+            }
+            var target = task.data.target
+            var headerValue = headerValueCallback(span)
+            if (target && headerName && headerValue) {
+              target.setRequestHeader(headerName, headerValue)
+            }
+          }
+          span.setContext({
+            http: {
+              method: task.data.method,
+              url: task.data.url,
+              sync: task.data.sync
+            }
+          })
+          task.data.span = span
+        }
+      } else if (event === 'invoke' && task.data && task.data.span) {
+        task.data.span.setContext({ http: { status_code: task.data.target.status } })
+        task.data.span.end()
       }
     })
   }
