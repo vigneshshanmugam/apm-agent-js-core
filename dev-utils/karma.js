@@ -46,6 +46,12 @@ var baseLaunchers = {
     platform: 'Linux',
     version: '4.4'
   },
+  'SL_ANDROID': {
+    base: 'SauceLabs',
+    browserName: 'android',
+    platform: 'Linux',
+    version: '5.0'
+  },
   'SL_IOS9': {
     base: 'SauceLabs',
     deviceName: 'iPhone Simulator',

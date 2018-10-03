@@ -1,5 +1,6 @@
 
 var testUtils = require('./test')
+var saucelabs = require('./saucelabs')
 
 function runUnitTests(launchSauceConnect) {
     var testConfig = testUtils.getTestEnvironmentVariables()
@@ -26,7 +27,13 @@ function runScript(scripts, scriptName, scriptArgs) {
 }
 
 var scripts = {
-    runUnitTests: runUnitTests
+    runUnitTests: runUnitTests,
+    launchSauceConnect: function launchSauceConnect() {
+        var env = testUtils.getTestEnvironmentVariables()
+        saucelabs.launchSauceConnect(env.sauceLabs, function () {
+            console.log('Launched SauceConnect!')
+        })
+    }
 }
 
-runScript(scripts, process.argv[2], [].concat(process.argv).splice(0, 3))
+runScript(scripts, process.argv[2], ([].concat(process.argv)).slice(3))
