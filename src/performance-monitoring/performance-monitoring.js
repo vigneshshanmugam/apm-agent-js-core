@@ -75,7 +75,7 @@ class PerformanceMonitoring {
     var performanceMonitoring = this
     var transactionDurationThreshold = this._configService.get('transactionDurationThreshold')
     var duration = tr.duration()
-    if (!duration || duration > transactionDurationThreshold || !tr.spans.length) {
+    if (!duration || duration > transactionDurationThreshold || !tr.spans.length || !tr.sampled) {
       return false
     }
 
@@ -158,7 +158,8 @@ class PerformanceMonitoring {
       marks: transaction.marks,
       span_count: {
         started: spans.length
-      }
+      },
+      sampled: transaction.sampled
     }
   }
 

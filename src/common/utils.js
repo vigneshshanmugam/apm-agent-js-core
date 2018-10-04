@@ -69,10 +69,12 @@ function parseUrl (url) {
 
 var dtVersion = '00'
 // 00000011 ->  '03' -> recorded and requested
-var dtFlags = '03'
+var dtSampledFlags = '03'
+var dtUnSampledFlags = '00'
 function getDtHeaderValue (span) {
   if (span && span.traceId && span.id) {
-    return dtVersion + '-' + span.traceId + '-' + span.id + '-' + dtFlags
+    var flags = span.sampled ? dtSampledFlags : dtUnSampledFlags
+    return dtVersion + '-' + span.traceId + '-' + span.id + '-' + flags
   }
 }
 

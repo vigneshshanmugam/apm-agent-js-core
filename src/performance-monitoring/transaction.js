@@ -10,11 +10,8 @@ class Transaction {
     this.type = type
     this.ended = false
     this._isDone = false
-    this._options = options
     this._logger = logger
-    if (typeof options === 'undefined') {
-      this._options = {}
-    }
+    this._options = options || {}
 
     this.contextInfo = {}
 
@@ -27,7 +24,6 @@ class Transaction {
     this._activeSpans = {}
 
     this._scheduledTasks = {}
-
     this.doneCallback = function noop () {}
 
     this._rootSpan = new Span('transaction', 'transaction')
@@ -36,6 +32,8 @@ class Transaction {
     this.nextAutoTaskId = 0
 
     this.isHardNavigation = false
+
+    this.sampled = Math.random() <= this._options.transactionSampleRate
   }
 
   debugLog () {
@@ -106,6 +104,7 @@ class Transaction {
       transaction._onSpanEnd(trc)
     }
     opts.traceId = this.traceId
+    opts.sampled = this.sampled
 
     var span = new Span(signature, type, opts)
     this._activeSpans[span.id] = span

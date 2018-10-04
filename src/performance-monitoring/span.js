@@ -5,6 +5,7 @@ class Span {
     this.id = utils.generateRandomId(16)
     var opts = options || {}
     this.traceId = opts.traceId
+    this.sampled = opts.sampled
     if (typeof opts.onSpanEnd === 'function') {
       this.onSpanEnd = opts.onSpanEnd
     } else {

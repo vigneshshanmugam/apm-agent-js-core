@@ -201,7 +201,7 @@ describe('TransactionService', function () {
             fail()
           })
 
-          var xhrTask = {source: 'XMLHttpRequest.send', XHR: {url: testUrl,method: 'GET'}}
+          var xhrTask = { source: 'XMLHttpRequest.send', XHR: { url: testUrl, method: 'GET' } }
           var spanSignature = xhrTask.XHR.method + ' ' + testUrl
           var span = transactionService.startSpan(spanSignature, 'ext.HttpRequest')
           span.end()
@@ -244,5 +244,20 @@ describe('TransactionService', function () {
     expect(transactionService.shouldIgnoreTransaction('something-transaction2-something')).toBeTruthy()
 
     config.set('ignoreTransactions', [])
+  })
+
+  it('should apply sampling to transactions', function () {
+    var transactionSampleRate = config.get('transactionSampleRate')
+    expect(transactionSampleRate).toBe(1.0)
+    var tr = transactionService.startTransaction('test', 'test')
+    expect(tr.sampled).toBe(true)
+    var span = transactionService.startSpan('testspan', 'test')
+    expect(span.sampled).toBe(true)
+
+    config.set('transactionSampleRate', 0)
+    tr = transactionService.startTransaction('test', 'test')
+    expect(tr.sampled).toBe(false)
+    span = transactionService.startSpan('testspan', 'test')
+    expect(span.sampled).toBe(false)
   })
 })

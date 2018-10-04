@@ -45,6 +45,8 @@ function Config () {
     distributedTracingHeaderValueCallback: undefined,
     distributedTracingHeaderName: 'Elastic-Apm-Traceparent',
 
+    transactionSampleRate: 1.0,
+
     context: {},
     platform: {}
   }

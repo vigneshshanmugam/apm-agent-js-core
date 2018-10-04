@@ -156,7 +156,7 @@ describe('PerformanceMonitoring', function () {
   it('should sendTransactionInterval', function () {
     var transactionService = serviceFactory.getService('TransactionService')
     expect(configService.isValid()).toBe(true)
-    var tr = new Transaction('test transaction', 'transaction', {}, logger)
+    var tr = new Transaction('test transaction', 'transaction', { transactionSampleRate: 1 }, logger)
     var span = tr.startSpan('test span', 'test span thype')
     span.end()
     tr.detectFinish()
@@ -176,7 +176,7 @@ describe('PerformanceMonitoring', function () {
     })
     spyOn(logger, 'debug').and.callThrough()
     expect(logger.debug).not.toHaveBeenCalled()
-    var tr = new Transaction('transaction', 'transaction')
+    var tr = new Transaction('transaction', 'transaction', { transactionSampleRate: 1 })
     var span = tr.startSpan('test span', 'test span type')
     span.end()
     tr.end()
@@ -215,7 +215,7 @@ describe('PerformanceMonitoring', function () {
   })
 
   it('should create correct payload', function () {
-    var tr = new Transaction('transaction1', 'transaction1type')
+    var tr = new Transaction('transaction1', 'transaction1type', { transactionSampleRate: 1 })
     var span = tr.startSpan('span1', 'span1type')
     span.end()
     tr.detectFinish()
@@ -261,7 +261,7 @@ describe('PerformanceMonitoring', function () {
   })
 
   it('should filter out empty transactions', function () {
-    var tr = new Transaction('test', 'test')
+    var tr = new Transaction('test', 'test', { transactionSampleRate: 1 })
     var result = performanceMonitoring.filterTransaction(tr)
     expect(tr.spans.length).toBe(0)
     expect(tr.duration()).toBe(null)

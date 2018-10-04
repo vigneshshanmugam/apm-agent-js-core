@@ -1,4 +1,5 @@
 var utils = require('../../src/common/utils')
+var Span = require('../../src/performance-monitoring/span')
 
 describe('lib/utils', function () {
   it('should merge objects', function () {
@@ -150,5 +151,15 @@ describe('lib/utils', function () {
     expect(result).toBe(true)
     result = utils.isSameOrigin('http:test.com/test/new', window.location.href)
     expect(result).toBe(false)
+  })
+
+  it('should generate correct DT headers', function () {
+    var span = new Span('test', 'test', { sampled: true, traceId: 'traceId' })
+    span.id = 'spanId'
+    var headerValue = utils.getDtHeaderValue(span)
+    expect(headerValue).toBe('00-traceId-spanId-03')
+    span.sampled = false
+    headerValue = utils.getDtHeaderValue(span)
+    expect(headerValue).toBe('00-traceId-spanId-00')
   })
 })
