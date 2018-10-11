@@ -35,8 +35,12 @@ class PerformanceMonitoring {
         var span = transactionService.startSpan(spanName, 'ext.HttpRequest')
         if (span) {
           var isDtEnabled = configService.get('distributedTracing')
+          var origins = configService.get('distributedTracingOrigins')
+          var isSameOrigin =
+            utils.isSameOrigin(task.data.url, window.location.href) ||
+            utils.isSameOrigin(task.data.url, origins)
           var target = task.data.target
-          if (isDtEnabled && utils.isSameOrigin(task.data.url, window.location.href) && target) {
+          if (isDtEnabled && isSameOrigin && target) {
             var headerName = configService.get('distributedTracingHeaderName')
             var headerValueCallback = configService.get('distributedTracingHeaderValueCallback')
             if (typeof headerValueCallback !== 'function') {

@@ -42,8 +42,9 @@ function Config () {
     serverStringLimit: 1024,
 
     distributedTracing: true,
+    distributedTracingOrigins: [],
     distributedTracingHeaderValueCallback: undefined,
-    distributedTracingHeaderName: 'Elastic-Apm-Traceparent',
+    distributedTracingHeaderName: 'elastic-apm-traceparent',
 
     transactionSampleRate: 1.0,
 

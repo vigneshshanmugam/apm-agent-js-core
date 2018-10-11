@@ -81,9 +81,19 @@ function getDtHeaderValue (span) {
 var URL = require('url-parse')
 
 function isSameOrigin (source, target) {
-  var src = new URL(source)
-  var tar = new URL(target)
-  return src.origin === tar.origin
+  var isSame = false
+  if (typeof target === 'string') {
+    var src = new URL(source)
+    var tar = new URL(target)
+    isSame = src.origin === tar.origin
+  } else if (Array.isArray(target)) {
+    target.forEach(function (t) {
+      if (!isSame) {
+        isSame = isSameOrigin(source, t)
+      }
+    })
+  }
+  return isSame
 }
 
 function generateRandomId (length) {
