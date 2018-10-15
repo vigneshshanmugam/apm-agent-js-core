@@ -173,7 +173,7 @@ describe('lib/utils', function () {
     var span = new Span('test', 'test', { sampled: true, traceId: 'traceId' })
     span.id = 'spanId'
     var headerValue = utils.getDtHeaderValue(span)
-    expect(headerValue).toBe('00-traceId-spanId-03')
+    expect(headerValue).toBe('00-traceId-spanId-01')
     span.sampled = false
     headerValue = utils.getDtHeaderValue(span)
     expect(headerValue).toBe('00-traceId-spanId-00')
