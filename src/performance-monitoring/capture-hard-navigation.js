@@ -128,7 +128,7 @@ function captureHardNavigation (transaction) {
           return span.type.indexOf('ext.HttpRequest') > -1
         })
         .map(function (span) {
-          return span.signature.split(' ')[1]
+          return span.name.split(' ')[1]
         })
 
       createResourceTimingSpans(entries, ajaxUrls).forEach(function (span) {

@@ -1,7 +1,7 @@
 var utils = require('../common/utils')
 
 class Span {
-  constructor (signature, type, options) {
+  constructor (name, type, options) {
     this.id = utils.generateRandomId(16)
     var opts = options || {}
     this.traceId = opts.traceId
@@ -11,7 +11,7 @@ class Span {
     } else {
       this.onSpanEnd = function () {}
     }
-    this.signature = signature
+    this.name = name
     this.type = type
     this.ended = false
     this._end = undefined

@@ -141,7 +141,7 @@ class PerformanceMonitoring {
         transaction_id: transaction.id,
         parent_id: span.parentId || transaction.id,
         trace_id: transaction.traceId,
-        name: utils.sanitizeString(span.signature, stringLimit, true),
+        name: utils.sanitizeString(span.name, stringLimit, true),
         type: utils.sanitizeString(span.type, stringLimit, true),
         start: span._start - transactionStart,
         duration: span.duration(),
@@ -202,7 +202,7 @@ class PerformanceMonitoring {
 
         var isContinuouslySimilar =
           lastSpan.type === span.type &&
-          lastSpan.signature === span.signature &&
+          lastSpan.name === span.name &&
           span.duration() / transDuration < threshold &&
           (span._start - lastSpan._end) / transDuration < threshold
 
@@ -214,7 +214,7 @@ class PerformanceMonitoring {
         }
 
         if (lastCount > 1 && (!isContinuouslySimilar || isLastSpan)) {
-          lastSpan.signature = lastCount + 'x ' + lastSpan.signature
+          lastSpan.name = lastCount + 'x ' + lastSpan.name
           lastCount = 1
         }
 

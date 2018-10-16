@@ -94,10 +94,10 @@ class Transaction {
     this._options = options
   }
 
-  startSpan (signature, type, options) {
+  startSpan (name, type, options) {
     // todo: should not accept more spans if the transaction is alreadyFinished
     var transaction = this
-    this.debugLog('startSpan', signature, type)
+    this.debugLog('startSpan', name, type)
     var opts = typeof options === 'undefined' ? {} : options
 
     opts.onSpanEnd = function (trc) {
@@ -106,7 +106,7 @@ class Transaction {
     opts.traceId = this.traceId
     opts.sampled = this.sampled
 
-    var span = new Span(signature, type, opts)
+    var span = new Span(name, type, opts)
     this._activeSpans[span.id] = span
 
     return span

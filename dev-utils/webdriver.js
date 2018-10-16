@@ -92,11 +92,5 @@ module.exports = {
       }
     // done()
     }
-  },
-  expectTraceInGroups: function expectTraceInGroups (signature, count, groups) {
-    var filtered = groups.filter(function (g) {
-      return g.signature === signature
-    })
-    expect(filtered.length).toEqual(count, 'Expected ' + count + ' groups with signature == "' + signature + '" but got: ' + filtered.length)
   }
 }

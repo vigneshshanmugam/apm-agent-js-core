@@ -194,7 +194,7 @@ describe('TransactionService', function () {
 
           tr.donePromise.then(function () {
             var filtered = tr.spans.filter(function (span) {
-              return span.signature.indexOf(testUrl) > -1
+              return span.name.indexOf(testUrl) > -1
             })
             expect(filtered.length).toBe(1)
             console.log(filtered[0])
@@ -202,8 +202,8 @@ describe('TransactionService', function () {
           })
 
           var xhrTask = { source: 'XMLHttpRequest.send', XHR: { url: testUrl, method: 'GET' } }
-          var spanSignature = xhrTask.XHR.method + ' ' + testUrl
-          var span = transactionService.startSpan(spanSignature, 'ext.HttpRequest')
+          var spanName = xhrTask.XHR.method + ' ' + testUrl
+          var span = transactionService.startSpan(spanName, 'ext.HttpRequest')
           span.end()
         })
       }

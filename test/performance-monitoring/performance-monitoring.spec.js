@@ -40,15 +40,15 @@ describe('PerformanceMonitoring', function () {
 
   it('should group small continuously similar spans up until the last one', function () {
     var tr = new Transaction('transaction', 'transaction')
-    var span1 = tr.startSpan('signature', 'type')
+    var span1 = tr.startSpan('name', 'type')
     span1.end()
-    var span2 = tr.startSpan('signature', 'type')
+    var span2 = tr.startSpan('name', 'type')
     span2.end()
-    var span3 = tr.startSpan('another-signature', 'type')
+    var span3 = tr.startSpan('another-name', 'type')
     span3.end()
-    var span4 = tr.startSpan('signature', 'type')
+    var span4 = tr.startSpan('name', 'type')
     span4.end()
-    var span5 = tr.startSpan('signature', 'type')
+    var span5 = tr.startSpan('name', 'type')
     span5.end()
 
     tr.end()
@@ -77,22 +77,22 @@ describe('PerformanceMonitoring', function () {
     var grouped = performanceMonitoring.groupSmallContinuouslySimilarSpans(tr, 0.05)
 
     expect(grouped.length).toBe(3)
-    expect(grouped[0].signature).toBe('2x signature')
-    expect(grouped[1].signature).toBe('another-signature')
-    expect(grouped[2].signature).toBe('2x signature')
+    expect(grouped[0].name).toBe('2x name')
+    expect(grouped[1].name).toBe('another-name')
+    expect(grouped[2].name).toBe('2x name')
   })
 
   it('should group small continuously similar spans', function () {
     var tr = new Transaction('transaction', 'transaction')
-    var span1 = tr.startSpan('signature', 'type')
+    var span1 = tr.startSpan('name', 'type')
     span1.end()
-    var span2 = tr.startSpan('signature', 'type')
+    var span2 = tr.startSpan('name', 'type')
     span2.end()
-    var span3 = tr.startSpan('signature', 'type')
+    var span3 = tr.startSpan('name', 'type')
     span3.end()
-    var span4 = tr.startSpan('signature', 'type')
+    var span4 = tr.startSpan('name', 'type')
     span4.end()
-    var span5 = tr.startSpan('another-signature', 'type')
+    var span5 = tr.startSpan('another-name', 'type')
     span5.end()
 
     tr.end()
@@ -122,8 +122,8 @@ describe('PerformanceMonitoring', function () {
     var grouped = performanceMonitoring.groupSmallContinuouslySimilarSpans(tr, 0.05)
 
     expect(grouped.length).toBe(2)
-    expect(grouped[0].signature).toBe('4x signature')
-    expect(grouped[1].signature).toBe('another-signature')
+    expect(grouped[0].name).toBe('4x name')
+    expect(grouped[1].name).toBe('another-name')
   })
 
   it('should calculate browser responsiveness', function () {

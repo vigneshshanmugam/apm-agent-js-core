@@ -250,7 +250,7 @@ describe('ZoneTransactionService', function () {
 
           tr.donePromise.then(function () {
             var filtered = tr.spans.filter(function (span) {
-              return span.signature.indexOf(testUrl) > -1
+              return span.name.indexOf(testUrl) > -1
             })
             expect(filtered.length).toBe(1)
             console.log(filtered[0])

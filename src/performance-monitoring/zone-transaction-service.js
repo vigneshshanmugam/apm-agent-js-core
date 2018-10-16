@@ -19,15 +19,15 @@ class ZoneTransactionService extends TransactionService {
     function onScheduleTask (task) {
       if (task.source === 'XMLHttpRequest.send') {
         var url = task['XHR']['url']
-        var spanSignature = task['XHR']['method'] + ' '
+        var spanName = task['XHR']['method'] + ' '
         if (transactionService._config.get('includeXHRQueryString')) {
-          spanSignature = spanSignature + url
+          spanName = spanName + url
         } else {
           var parsed = utils.parseUrl(url)
-          spanSignature = spanSignature + parsed.path
+          spanName = spanName + parsed.path
         }
 
-        var span = transactionService.startSpan(spanSignature, 'ext.HttpRequest')
+        var span = transactionService.startSpan(spanName, 'ext.HttpRequest')
         task.span = span
       } else if (task.type === 'interaction') {
         if (typeof transactionService.interactionStarted === 'function') {

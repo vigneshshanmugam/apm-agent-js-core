@@ -191,12 +191,12 @@ class TransactionService {
     }
     return false
   }
-  startSpan (signature, type) {
+  startSpan (name, type) {
     var trans = this.getOrCreateCurrentTransaction()
 
     if (trans) {
-      this._logger.debug('TransactionService.startSpan', signature, type)
-      var span = trans.startSpan(signature, type)
+      this._logger.debug('TransactionService.startSpan', name, type)
+      var span = trans.startSpan(name, type)
       return span
     }
   }

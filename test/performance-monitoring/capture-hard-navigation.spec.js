@@ -6,7 +6,7 @@ var resourceEntries = require('./resource-entries.js')
 
 var spanSnapshot = require('./navigation-timing-span-snapshot').map(mapSpan)
 
-function mapSpan(s) { return { signature: s.signature, _end: s._end, _start: s._start } }
+function mapSpan(s) { return { name: s.name, _end: s._end, _start: s._start } }
 
 describe('navigationTiming', function () {
     it('should createNavigationTimingSpans', function () {
@@ -38,11 +38,11 @@ describe('navigationTiming', function () {
         var spans = navigationTiming.createNavigationTimingSpans(timings, timings.fetchStart)
         expect(spans.map(mapSpan))
             .toEqual([
-                { "signature": "Requesting the document, waiting for the first byte", "_end": 786, "_start": 7 },
-                { "signature": "Receiving the document", "_end": 947, "_start": 786 },
-                { "signature": "Parsing the document, executing sync. scripts", "_end": 1464, "_start": 820 },
-                { "signature": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
-                { "signature": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
+                { "name": "Requesting the document, waiting for the first byte", "_end": 786, "_start": 7 },
+                { "name": "Receiving the document", "_end": 947, "_start": 786 },
+                { "name": "Parsing the document, executing sync. scripts", "_end": 1464, "_start": 820 },
+                { "name": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
+                { "name": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
             ])
 
         spans = navigationTiming.createNavigationTimingSpans(timings, null)
@@ -60,50 +60,50 @@ describe('navigationTiming', function () {
         spans = navigationTiming.createNavigationTimingSpans(timings, timings.fetchStart)
         expect(spans.map(mapSpan))
             .toEqual([
-                { "signature": "Receiving the document", "_end": 947, "_start": 786 },
-                { "signature": "Parsing the document, executing sync. scripts", "_end": 1464, "_start": 820 },
-                { "signature": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
-                { "signature": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
+                { "name": "Receiving the document", "_end": 947, "_start": 786 },
+                { "name": "Parsing the document, executing sync. scripts", "_end": 1464, "_start": 820 },
+                { "name": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
+                { "name": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
             ])
 
         timings.requestStart = undefined
         spans = navigationTiming.createNavigationTimingSpans(timings, timings.fetchStart)
         expect(spans.map(mapSpan))
             .toEqual([
-                { "signature": "Receiving the document", "_end": 947, "_start": 786 },
-                { "signature": "Parsing the document, executing sync. scripts", "_end": 1464, "_start": 820 },
-                { "signature": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
-                { "signature": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
+                { "name": "Receiving the document", "_end": 947, "_start": 786 },
+                { "name": "Parsing the document, executing sync. scripts", "_end": 1464, "_start": 820 },
+                { "name": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
+                { "name": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
             ])
 
         timings.requestStart = 0
         spans = navigationTiming.createNavigationTimingSpans(timings, timings.fetchStart)
         expect(spans.map(mapSpan))
             .toEqual([
-                { "signature": "Receiving the document", "_end": 947, "_start": 786 },
-                { "signature": "Parsing the document, executing sync. scripts", "_end": 1464, "_start": 820 },
-                { "signature": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
-                { "signature": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
+                { "name": "Receiving the document", "_end": 947, "_start": 786 },
+                { "name": "Parsing the document, executing sync. scripts", "_end": 1464, "_start": 820 },
+                { "name": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
+                { "name": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
             ])
 
         timings.requestStart = 1
         spans = navigationTiming.createNavigationTimingSpans(timings, timings.fetchStart)
         expect(spans.map(mapSpan))
             .toEqual([
-                { "signature": "Receiving the document", "_end": 947, "_start": 786 },
-                { "signature": "Parsing the document, executing sync. scripts", "_end": 1464, "_start": 820 },
-                { "signature": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
-                { "signature": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
+                { "name": "Receiving the document", "_end": 947, "_start": 786 },
+                { "name": "Parsing the document, executing sync. scripts", "_end": 1464, "_start": 820 },
+                { "name": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
+                { "name": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
             ])
 
         timings.requestStart = Number(new Date())
         spans = navigationTiming.createNavigationTimingSpans(timings, timings.fetchStart)
         expect(spans.map(mapSpan))
             .toEqual([
-                { "signature": "Receiving the document", "_end": 947, "_start": 786 },
-                { "signature": "Parsing the document, executing sync. scripts", "_end": 1464, "_start": 820 },
-                { "signature": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
-                { "signature": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
+                { "name": "Receiving the document", "_end": 947, "_start": 786 },
+                { "name": "Parsing the document, executing sync. scripts", "_end": 1464, "_start": 820 },
+                { "name": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
+                { "name": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
             ])
 
 
@@ -112,45 +112,45 @@ describe('navigationTiming', function () {
         spans = navigationTiming.createNavigationTimingSpans(timings, timings.fetchStart)
         expect(spans.map(mapSpan))
             .toEqual([
-                { "signature": "Receiving the document", "_end": 947, "_start": 786 },
-                { "signature": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
-                { "signature": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
+                { "name": "Receiving the document", "_end": 947, "_start": 786 },
+                { "name": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
+                { "name": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
             ])
 
         timings.domInteractive = undefined
         spans = navigationTiming.createNavigationTimingSpans(timings, timings.fetchStart)
         expect(spans.map(mapSpan))
             .toEqual([
-                { "signature": "Receiving the document", "_end": 947, "_start": 786 },
-                { "signature": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
-                { "signature": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
+                { "name": "Receiving the document", "_end": 947, "_start": 786 },
+                { "name": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
+                { "name": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
             ])
 
         timings.domInteractive = 0
         spans = navigationTiming.createNavigationTimingSpans(timings, timings.fetchStart)
         expect(spans.map(mapSpan))
             .toEqual([
-                { "signature": "Receiving the document", "_end": 947, "_start": 786 },
-                { "signature": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
-                { "signature": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
+                { "name": "Receiving the document", "_end": 947, "_start": 786 },
+                { "name": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
+                { "name": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
             ])
 
         timings.domInteractive = 1
         spans = navigationTiming.createNavigationTimingSpans(timings, timings.fetchStart)
         expect(spans.map(mapSpan))
             .toEqual([
-                { "signature": "Receiving the document", "_end": 947, "_start": 786 },
-                { "signature": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
-                { "signature": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
+                { "name": "Receiving the document", "_end": 947, "_start": 786 },
+                { "name": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
+                { "name": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
             ])
 
         timings.domInteractive = Number(new Date())
         spans = navigationTiming.createNavigationTimingSpans(timings, timings.fetchStart)
         expect(spans.map(mapSpan))
             .toEqual([
-                { "signature": "Receiving the document", "_end": 947, "_start": 786 },
-                { "signature": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
-                { "signature": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
+                { "name": "Receiving the document", "_end": 947, "_start": 786 },
+                { "name": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
+                { "name": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
             ])
 
         timings.domLoading = null
@@ -158,9 +158,9 @@ describe('navigationTiming', function () {
         spans = navigationTiming.createNavigationTimingSpans(timings, timings.fetchStart)
         expect(spans.map(mapSpan))
             .toEqual([
-                { "signature": "Receiving the document", "_end": 947, "_start": 786 },
-                { "signature": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
-                { "signature": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
+                { "name": "Receiving the document", "_end": 947, "_start": 786 },
+                { "name": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
+                { "name": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
             ])
 
         timings.domLoading = undefined
@@ -168,9 +168,9 @@ describe('navigationTiming', function () {
         spans = navigationTiming.createNavigationTimingSpans(timings, timings.fetchStart)
         expect(spans.map(mapSpan))
             .toEqual([
-                { "signature": "Receiving the document", "_end": 947, "_start": 786 },
-                { "signature": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
-                { "signature": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
+                { "name": "Receiving the document", "_end": 947, "_start": 786 },
+                { "name": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
+                { "name": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
             ])
 
         timings.domLoading = 0
@@ -178,9 +178,9 @@ describe('navigationTiming', function () {
         spans = navigationTiming.createNavigationTimingSpans(timings, timings.fetchStart)
         expect(spans.map(mapSpan))
             .toEqual([
-                { "signature": "Receiving the document", "_end": 947, "_start": 786 },
-                { "signature": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
-                { "signature": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
+                { "name": "Receiving the document", "_end": 947, "_start": 786 },
+                { "name": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
+                { "name": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
             ])
 
 
@@ -189,9 +189,9 @@ describe('navigationTiming', function () {
         spans = navigationTiming.createNavigationTimingSpans(timings, timings.fetchStart)
         expect(spans.map(mapSpan))
             .toEqual([
-                { "signature": "Receiving the document", "_end": 947, "_start": 786 },
-                { "signature": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
-                { "signature": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
+                { "name": "Receiving the document", "_end": 947, "_start": 786 },
+                { "name": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
+                { "name": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
             ])
 
 
@@ -200,9 +200,9 @@ describe('navigationTiming', function () {
         spans = navigationTiming.createNavigationTimingSpans(timings, timings.fetchStart)
         expect(spans.map(mapSpan))
             .toEqual([
-                { "signature": "Receiving the document", "_end": 947, "_start": 786 },
-                { "signature": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
-                { "signature": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
+                { "name": "Receiving the document", "_end": 947, "_start": 786 },
+                { "name": "Fire \"DOMContentLoaded\" event", "_end": 1498, "_start": 1464 },
+                { "name": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
             ])
 
 
@@ -211,10 +211,10 @@ describe('navigationTiming', function () {
         spans = navigationTiming.createNavigationTimingSpans(timings, timings.fetchStart)
         expect(spans.map(mapSpan))
             .toEqual([
-                { "signature": "Receiving the document", "_end": 947, "_start": 786 },
-                { "signature": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
+                { "name": "Receiving the document", "_end": 947, "_start": 786 },
+                { "name": "Fire \"load\" event", "_end": 2874, "_start": 2852 }
             ])
-        // console.log(spans.map(s => `${s._start}, ${s._end}, ${s.duration()}, ${s.signature}`).join('\n'))
+        // console.log(spans.map(s => `${s._start}, ${s._end}, ${s.duration()}, ${s.name}`).join('\n'))
     })
 
 

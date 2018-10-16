@@ -5,7 +5,7 @@ describe('transaction.Transaction', function () {
   beforeEach(function () {})
 
   it('should contain correct number of spans in the end', function (done) {
-    var firstSpan = new Span('first-span-signature', 'first-span')
+    var firstSpan = new Span('first-span-name', 'first-span')
     firstSpan.end()
 
     var transaction = new Transaction('/', 'transaction', {})
@@ -13,7 +13,7 @@ describe('transaction.Transaction', function () {
     firstSpan.transaction = transaction
     transaction.addEndedSpans([firstSpan])
 
-    var lastSpan = transaction.startSpan('last-span-signature', 'last-span')
+    var lastSpan = transaction.startSpan('last-span-name', 'last-span')
     lastSpan.end()
     transaction.end()
 
@@ -22,7 +22,7 @@ describe('transaction.Transaction', function () {
   })
 
   it('should adjust rootSpan to earliest span', function (done) {
-    var firstSpan = new Span('first-span-signature', 'first-span')
+    var firstSpan = new Span('first-span-name', 'first-span')
     firstSpan.end()
 
     var transaction = new Transaction('/', 'transaction', {})
@@ -34,7 +34,7 @@ describe('transaction.Transaction', function () {
     firstSpan.transaction = transaction
     transaction.addEndedSpans([firstSpan])
 
-    var lastSpan = transaction.startSpan('last-span-signature', 'last-span')
+    var lastSpan = transaction.startSpan('last-span-name', 'last-span')
 
     lastSpan.end()
     transaction.detectFinish()
@@ -44,12 +44,12 @@ describe('transaction.Transaction', function () {
     var transaction = new Transaction('/', 'transaction', {})
     var rootSpanStart = transaction._rootSpan._start
 
-    var firstSpan = transaction.startSpan('first-span-signature', 'first-span')
+    var firstSpan = transaction.startSpan('first-span-name', 'first-span')
     firstSpan.end()
 
-    var longSpan = transaction.startSpan('long-span-signature', 'long-span')
+    var longSpan = transaction.startSpan('long-span-name', 'long-span')
 
-    var lastSpan = transaction.startSpan('last-span-signature', 'last-span')
+    var lastSpan = transaction.startSpan('last-span-name', 'last-span')
     lastSpan.end()
 
     setTimeout(function () {
@@ -67,12 +67,12 @@ describe('transaction.Transaction', function () {
   xit('should not start any spans after transaction has been added to queue', function (done) {
     var transaction = new Transaction('/', 'transaction', {})
     transaction.end()
-    var firstSpan = transaction.startSpan('first-span-signature', 'first-span')
+    var firstSpan = transaction.startSpan('first-span-name', 'first-span')
     firstSpan.end()
     setTimeout(function () {
       // todo: transaction has already been added to the queue, shouldn't accept more spans
 
-      var lastSpan = transaction.startSpan('last-span-signature', 'last-span')
+      var lastSpan = transaction.startSpan('last-span-name', 'last-span')
       fail('done transaction should not accept more spans, now we simply ignore the newly stared span.')
       lastSpan.end()
     })
@@ -85,7 +85,7 @@ describe('transaction.Transaction', function () {
       expect(secondSpan.frames).toBeUndefined()
       done()
     }
-    var firstSpan = tr.startSpan('first-span-signature', 'first-span')
+    var firstSpan = tr.startSpan('first-span-name', 'first-span')
     firstSpan.end()
 
     var secondSpan = tr.startSpan('second-span', 'second-span')
