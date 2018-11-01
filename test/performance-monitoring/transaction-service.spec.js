@@ -260,4 +260,34 @@ describe('TransactionService', function () {
     span = transactionService.startSpan('testspan', 'test')
     expect(span.sampled).toBe(false)
   })
+
+  it('should consider page load traceId and spanId', function (done) {
+    config.setConfig({
+      distributedTracingPageLoadTraceId: 'test-trace-id',
+      distributedTracingPageLoadSpanId: 'test-span-id',
+      distributedTracingPageLoadSampled: true
+    })
+    transactionService = new TransactionService(logger, config)
+    var tr
+
+    tr = transactionService.sendPageLoadMetrics()
+    expect(tr.traceId).toBe('test-trace-id')
+    expect(tr.sampled).toBe(true)
+
+    setTimeout(() => {
+      var spans = tr.spans.filter(function (span) {
+        return span.name == 'Receiving the document'
+      })
+      if (spans.length > 0) {
+        expect(spans[0].id).toBe('test-span-id')
+        expect(spans.length).toBe(1)
+        expect(spans[0].traceId).toBe('test-trace-id')
+        expect(spans[0].sampled).toBe(true)
+        expect(spans[0].id).toBe('test-span-id')
+        expect(spans[0].name).toBe('Receiving the document')
+      }
+      done()
+    });
+
+  })
 })

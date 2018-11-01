@@ -85,10 +85,8 @@ class TransactionService {
     tr = this.getCurrentTransaction()
 
     var trName = name || this.initialPageLoadName
-    var unknownName = false
     if (!trName) {
       trName = 'Unknown'
-      unknownName = true
     }
 
     if (tr && tr.name === 'ZoneTransaction') {
@@ -97,7 +95,15 @@ class TransactionService {
       tr = new Transaction(trName, 'page-load', perfOptions, this._logger)
     }
     tr.isHardNavigation = true
-    tr.unknownName = unknownName
+
+    if (
+      perfOptions.distributedTracingPageLoadTraceId &&
+      perfOptions.distributedTracingPageLoadSpanId &&
+      typeof perfOptions.distributedTracingPageLoadSampled !== 'undefined'
+    ) {
+      tr.traceId = perfOptions.distributedTracingPageLoadTraceId
+      tr.sampled = perfOptions.distributedTracingPageLoadSampled
+    }
 
     tr.doneCallback = function () {
       self.applyAsync(function () {

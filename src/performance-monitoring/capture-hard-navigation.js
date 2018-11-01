@@ -38,6 +38,9 @@ function createNavigationTimingSpans (timings, baseTime) {
       end - baseTime < spanThreshold
     ) {
       var span = new Span(eventPairs[i][2], 'hard-navigation.browser-timing')
+      if (eventPairs[i][0] === 'responseStart') {
+        span.pageResponse = true
+      }
       span._start = start - baseTime
       span.ended = true
       span._end = end - baseTime
@@ -116,6 +119,11 @@ function captureHardNavigation (transaction) {
 
     createNavigationTimingSpans(timings, baseTime).forEach(function (span) {
       if (isValidSpan(transaction, span)) {
+        span.traceId = transaction.traceId
+        span.sampled = transaction.sampled
+        if (transaction._options.distributedTracingPageLoadSpanId && span.pageResponse) {
+          span.id = transaction._options.distributedTracingPageLoadSpanId
+        }
         transaction.spans.push(span)
       }
     })
