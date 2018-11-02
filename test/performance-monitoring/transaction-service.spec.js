@@ -263,9 +263,9 @@ describe('TransactionService', function () {
 
   it('should consider page load traceId and spanId', function (done) {
     config.setConfig({
-      distributedTracingPageLoadTraceId: 'test-trace-id',
-      distributedTracingPageLoadSpanId: 'test-span-id',
-      distributedTracingPageLoadSampled: true
+      pageLoadTraceId: 'test-trace-id',
+      pageLoadSpanId: 'test-span-id',
+      pageLoadSampled: true
     })
     transactionService = new TransactionService(logger, config)
     var tr

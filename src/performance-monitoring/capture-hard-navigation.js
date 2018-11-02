@@ -121,8 +121,8 @@ function captureHardNavigation (transaction) {
       if (isValidSpan(transaction, span)) {
         span.traceId = transaction.traceId
         span.sampled = transaction.sampled
-        if (transaction._options.distributedTracingPageLoadSpanId && span.pageResponse) {
-          span.id = transaction._options.distributedTracingPageLoadSpanId
+        if (transaction._options.pageLoadSpanId && span.pageResponse) {
+          span.id = transaction._options.pageLoadSpanId
         }
         transaction.spans.push(span)
       }

@@ -96,13 +96,11 @@ class TransactionService {
     }
     tr.isHardNavigation = true
 
-    if (
-      perfOptions.distributedTracingPageLoadTraceId &&
-      perfOptions.distributedTracingPageLoadSpanId &&
-      typeof perfOptions.distributedTracingPageLoadSampled !== 'undefined'
-    ) {
-      tr.traceId = perfOptions.distributedTracingPageLoadTraceId
-      tr.sampled = perfOptions.distributedTracingPageLoadSampled
+    if (perfOptions.pageLoadTraceId) {
+      tr.traceId = perfOptions.pageLoadTraceId
+    }
+    if (typeof perfOptions.pageLoadSampled !== 'undefined') {
+      tr.sampled = perfOptions.pageLoadSampled
     }
 
     tr.doneCallback = function () {

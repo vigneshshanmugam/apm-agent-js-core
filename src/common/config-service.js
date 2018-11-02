@@ -46,9 +46,9 @@ function Config () {
     distributedTracingHeaderValueCallback: undefined,
     distributedTracingHeaderName: 'elastic-apm-traceparent',
 
-    distributedTracingPageLoadTraceId: undefined,
-    distributedTracingPageLoadSpanId: undefined,
-    distributedTracingPageLoadSampled: undefined,
+    pageLoadTraceId: undefined,
+    pageLoadSpanId: undefined,
+    pageLoadSampled: undefined,
 
     transactionSampleRate: 1.0,
 
