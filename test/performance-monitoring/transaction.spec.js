@@ -2,7 +2,7 @@ var Transaction = require('../../src/performance-monitoring/transaction')
 var Span = require('../../src/performance-monitoring/span')
 
 describe('transaction.Transaction', function () {
-  beforeEach(function () {})
+  beforeEach(function () { })
 
   it('should contain correct number of spans in the end', function (done) {
     var firstSpan = new Span('first-span-name', 'first-span')
@@ -102,7 +102,7 @@ describe('transaction.Transaction', function () {
   })
 
   it('should store debug.log in contextInfo', function () {
-    var tr = new Transaction('/', 'transaction', {sendVerboseDebugInfo: true})
+    var tr = new Transaction('/', 'transaction', { sendVerboseDebugInfo: true })
     expect(tr.contextInfo._debug.log.length).toBeGreaterThan(0)
   })
 
@@ -112,27 +112,34 @@ describe('transaction.Transaction', function () {
   })
 
   it('should redefine transaction', function () {
-    var tr = new Transaction('/', 'transaction', {sendVerboseDebugInfo: true})
-    tr.redefine('name', 'type', {test: 'test'})
+    var tr = new Transaction('/', 'transaction', { sendVerboseDebugInfo: true })
+    tr.redefine('name', 'type', { test: 'test' })
     expect(tr.name).toBe('name')
     expect(tr.type).toBe('type')
-    expect(tr._options).toEqual({test: 'test'})
+    expect(tr._options).toEqual({ test: 'test' })
   })
 
   it('should add and remove tasks', function () {
-    var tr = new Transaction('/', 'transaction', {sendVerboseDebugInfo: true})
+    var tr = new Transaction('/', 'transaction', { sendVerboseDebugInfo: true })
     expect(tr._scheduledTasks).toEqual({})
     tr.addTask('task1')
-    expect(tr._scheduledTasks).toEqual({'task1': 'task1'})
+    expect(tr._scheduledTasks).toEqual({ 'task1': 'task1' })
     tr.removeTask('task1')
     expect(tr._scheduledTasks).toEqual({})
   })
 
-  it('should mark events',function () {
+  it('should mark events', function () {
     var transaction = new Transaction('transaction', 'transaction')
     transaction.mark('new.mark')
     transaction.mark('mark')
     expect(typeof transaction.marks.custom.new_mark).toBe('number')
     expect(typeof transaction.marks.custom.mark).toBe('number')
+  })
+
+  it('should not start spans after end', function () {
+    var transaction = new Transaction('transaction', 'transaction')
+    transaction.end()
+    var span = transaction.startSpan('test', 'test')
+    expect(span).toBe(undefined)
   })
 })

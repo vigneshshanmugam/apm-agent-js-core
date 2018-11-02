@@ -95,7 +95,9 @@ class Transaction {
   }
 
   startSpan (name, type, options) {
-    // todo: should not accept more spans if the transaction is alreadyFinished
+    if (this.ended) {
+      return
+    }
     var transaction = this
     this.debugLog('startSpan', name, type)
     var opts = typeof options === 'undefined' ? {} : options
