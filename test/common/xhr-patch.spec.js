@@ -1,10 +1,10 @@
 var xhrPatch = require('../../src/common/patching/xhr-patch')
 var urlSympbol = xhrPatch.XHR_URL
 var methodSymbol = xhrPatch.XHR_METHOD
+var xhrIgnore = xhrPatch.XHR_IGNORE
 
 require('./patch')
 var patchSubscription = window['__patchSubscription']
-
 
 
 describe('xhrPatch', function () {
@@ -56,12 +56,13 @@ describe('xhrPatch', function () {
                 "source": "XMLHttpRequest.send",
                 "state": "invoke",
                 "type": "macroTask",
+                "ignore": undefined,
                 "data": {
                   "method": "GET",
                   "url": "/",
                   "sync": false,
                   "args": [],
-                  "aborted": false
+                  "aborted": false,
                 }
               }
             },
@@ -71,12 +72,13 @@ describe('xhrPatch', function () {
                 "source": "XMLHttpRequest.send",
                 "state": "invoke",
                 "type": "macroTask",
+                "ignore": undefined,
                 "data": {
                   "method": "GET",
                   "url": "/",
                   "sync": false,
                   "args": [],
-                  "aborted": false
+                  "aborted": false,
                 }
               }
             }
@@ -208,6 +210,18 @@ describe('xhrPatch', function () {
       };
       expect(func).not.toThrow();
     });
+
+  it('should consider xhr ignore', function (done) {
+    var req = new window.XMLHttpRequest()
+    req[xhrIgnore] = true
+    req.open('GET', '/')
+    req.addEventListener("load", function () {
+      done()
+    });
+
+    req.send()
+    expect(events.map(e => e.event)).toEqual([])
+  })
 })
 
 

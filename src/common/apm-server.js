@@ -2,6 +2,7 @@ var Queue = require('./queue')
 var throttle = require('./throttle')
 var utils = require('./utils')
 var NDJSON = require('./ndjson')
+var xhrIgnore = require('./patching/xhr-patch').XHR_IGNORE
 
 class ApmServer {
   constructor (configService, loggingService) {
@@ -58,6 +59,7 @@ class ApmServer {
   _makeHttpRequest (method, url, payload, headers) {
     return new Promise(function (resolve, reject) {
       var xhr = new window.XMLHttpRequest()
+      xhr[xhrIgnore] = true
       xhr.open(method, url, true)
       xhr.timeout = 10000
 

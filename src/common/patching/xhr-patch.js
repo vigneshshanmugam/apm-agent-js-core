@@ -15,6 +15,8 @@ const ADD_EVENT_LISTENER_STR = 'addEventListener'
 const REMOVE_EVENT_LISTENER_STR = 'removeEventListener'
 var alreadyPatched = false
 
+var XHR_IGNORE = apmSymbol('xhrIgnore')
+
 function patchXMLHttpRequest (callback) {
   if (alreadyPatched) {
     return
@@ -42,13 +44,17 @@ function patchXMLHttpRequest (callback) {
 
   function invokeTask (task) {
     task.state = INVOKE
-    callback(INVOKE, task)
+    if (!task.ignore) {
+      callback(INVOKE, task)
+    }
   }
 
   function scheduleTask (task) {
     XMLHttpRequest[XHR_SCHEDULED] = false
     task.state = SCHEDULE
-    callback(SCHEDULE, task)
+    if (!task.ignore) {
+      callback(SCHEDULE, task)
+    }
     const data = task.data
     const target = data.target
     // remove existing event listener
@@ -113,6 +119,7 @@ function patchXMLHttpRequest (callback) {
           source: XMLHTTPREQUEST_SOURCE,
           state: '',
           type: 'macroTask',
+          ignore: self[XHR_IGNORE],
           data: {
             target: self,
             method: self[XHR_METHOD],
@@ -152,5 +159,6 @@ function patchXMLHttpRequest (callback) {
 module.exports = {
   patchXMLHttpRequest: patchXMLHttpRequest,
   XHR_URL,
-  XHR_METHOD
+  XHR_METHOD,
+  XHR_IGNORE
 }
