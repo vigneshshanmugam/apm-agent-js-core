@@ -48,7 +48,8 @@ class PerformanceMonitoring {
             }
 
             var headerValue = headerValueCallback(span)
-            if (headerName && headerValue) {
+            var isHeaderValid = utils.isDtHeaderValid(headerValue)
+            if (headerName && headerValue && isHeaderValid) {
               target.setRequestHeader(headerName, headerValue)
             }
           }

@@ -178,4 +178,27 @@ describe('lib/utils', function () {
     headerValue = utils.getDtHeaderValue(span)
     expect(headerValue).toBe('00-traceId-spanId-00')
   })
+
+  it('should validate DT header', function () {
+    var result = utils.isDtHeaderValid('00-a1bc6db567095621cdc01dd11359217b-0b5a9e8b3c8fd252-01')
+    expect(result).toBe(true)
+    
+    result = utils.isDtHeaderValid('00-a1bc6db567095621cdc01dd11359217b-null-01')
+    expect(result).toBe(false)
+    
+    result = utils.isDtHeaderValid('00-null-0b5a9e8b3c8fd252-01')
+    expect(result).toBe(false)
+    
+    result = utils.isDtHeaderValid('00-00000000000000000000000000000000-0b5a9e8b3c8fd252-00')
+    expect(result).toBe(false)
+    
+    result = utils.isDtHeaderValid('00-a1bc6db567095621cdc01dd11359217b-0000000000000000-00')
+    expect(result).toBe(false)
+    
+    result = utils.isDtHeaderValid('00-12345678901234567890123456789012-.234567890123456-01')
+    expect(result).toBe(false)
+
+    result = utils.isDtHeaderValid('00-12345678901234567890123456789012-1234567890123456-01-what-the-future-will-be-like')
+    expect(result).toBe(false)
+  })
 })

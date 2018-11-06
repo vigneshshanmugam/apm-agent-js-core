@@ -78,6 +78,14 @@ function getDtHeaderValue (span) {
   }
 }
 
+function isDtHeaderValid (header) {
+  return (
+    /^[\da-f]{2}-[\da-f]{32}-[\da-f]{16}-[\da-f]{2}$/.test(header) &&
+    header.slice(3, 35) !== '00000000000000000000000000000000' &&
+    header.slice(36, 52) !== '0000000000000000'
+  )
+}
+
 var URL = require('url-parse')
 
 function isSameOrigin (source, target) {
@@ -400,7 +408,8 @@ module.exports = {
   rng: rng,
   generateRandomId: generateRandomId,
   isSameOrigin: isSameOrigin,
-  getDtHeaderValue: getDtHeaderValue
+  getDtHeaderValue: getDtHeaderValue,
+  isDtHeaderValid: isDtHeaderValid
 }
 
 function isObject (value) {
