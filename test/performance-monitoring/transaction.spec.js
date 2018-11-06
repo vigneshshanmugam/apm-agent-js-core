@@ -142,4 +142,20 @@ describe('transaction.Transaction', function () {
     var span = transaction.startSpan('test', 'test')
     expect(span).toBe(undefined)
   })
+
+  it('should not produce negative durations while adjusting to the spans', function () {
+
+    var transaction = new Transaction('transaction', 'transaction')
+    var span = transaction.startSpan('test', 'test')
+    span.end()
+    span._end += 100
+    span = transaction.startSpan('test', 'ext.HttpRequest')
+
+    span.end()
+    span._start = 10000000
+    span._end = 11000000
+    transaction.end()
+    expect(span.duration()).toBe(0)
+
+  })
 })

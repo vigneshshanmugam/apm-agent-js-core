@@ -181,6 +181,9 @@ class Transaction {
           span._end = this._rootSpan._end
           span.type = span.type + '.truncated'
         }
+        if (span._start > this._rootSpan._end) {
+          span._start = this._rootSpan._end
+        }
       }
     }
   }

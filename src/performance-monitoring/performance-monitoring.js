@@ -123,6 +123,17 @@ class PerformanceMonitoring {
         similarSpanThreshold
       )
     }
+
+    transaction.spans = transaction.spans.filter(function (span) {
+      return (
+        span.duration() > 0 &&
+        span._start >= transaction._rootSpan._start &&
+        span._end > transaction._rootSpan._start &&
+        span._start < transaction._rootSpan._end &&
+        span._end <= transaction._rootSpan._end
+      )
+    })
+
     performanceMonitoring.setTransactionContextInfo(transaction)
   }
 

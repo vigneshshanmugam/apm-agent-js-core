@@ -159,6 +159,7 @@ describe('PerformanceMonitoring', function () {
     var tr = new Transaction('test transaction', 'transaction', { transactionSampleRate: 1 }, logger)
     var span = tr.startSpan('test span', 'test span thype')
     span.end()
+    span._end += 10
     tr.detectFinish()
     expect(tr._rootSpan._end).toBeDefined()
     if (tr._rootSpan._end === tr._rootSpan._start) {
@@ -218,6 +219,7 @@ describe('PerformanceMonitoring', function () {
     var tr = new Transaction('transaction1', 'transaction1type', { transactionSampleRate: 1 })
     var span = tr.startSpan('span1', 'span1type')
     span.end()
+    span._end += 10
     tr.detectFinish()
 
     expect(tr._rootSpan._end).toBeDefined()
