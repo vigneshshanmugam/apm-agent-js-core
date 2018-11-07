@@ -158,4 +158,15 @@ describe('transaction.Transaction', function () {
     expect(span.duration()).toBe(0)
 
   })
+
+  it('should truncate active spans', function () {
+    var transaction = new Transaction('transaction', 'transaction')
+    var span = transaction.startSpan('test', 'test')
+    expect(transaction.spans.length).toBe(0)
+    expect(Object.keys(transaction._activeSpans).length).toBe(1)
+    transaction.end()
+    expect(transaction.spans.length).toBe(1)
+    expect(Object.keys(transaction._activeSpans).length).toBe(0)
+    expect(span.type).toContain('.truncated')
+  })
 })

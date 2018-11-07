@@ -130,6 +130,13 @@ class Transaction {
     this.debugLog('end')
     this.ended = true
 
+    // truncate active spans
+    for (var sid in this._activeSpans) {
+      var span = this._activeSpans[sid]
+      span.type = span.type + '.truncated'
+      span.end()
+    }
+
     var metadata = utils.getPageMetadata()
     this.addContextInfo(metadata)
     this._rootSpan.end()
