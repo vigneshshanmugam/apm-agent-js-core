@@ -56,10 +56,10 @@ class PerformanceMonitoring {
           span.setContext({
             http: {
               method: task.data.method,
-              url: task.data.url,
-              sync: task.data.sync
+              url: task.data.url
             }
           })
+          span.sync = task.data.sync
           task.data.span = span
         }
       } else if (event === 'invoke' && task.data && task.data.span) {
