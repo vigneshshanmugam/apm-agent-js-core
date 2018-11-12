@@ -77,40 +77,9 @@ class TransactionService {
       }, interval)
     })
   }
+
   sendPageLoadMetrics (name) {
-    var self = this
-    var perfOptions = this._config.config
-    var tr
-
-    tr = this.getCurrentTransaction()
-
-    var trName = name || this.initialPageLoadName
-    if (!trName) {
-      trName = 'Unknown'
-    }
-
-    if (tr && tr.name === 'ZoneTransaction') {
-      tr.redefine(trName, 'page-load', perfOptions)
-    } else {
-      tr = new Transaction(trName, 'page-load', perfOptions, this._logger)
-    }
-    tr.isHardNavigation = true
-
-    if (perfOptions.pageLoadTraceId) {
-      tr.traceId = perfOptions.pageLoadTraceId
-    }
-    if (typeof perfOptions.pageLoadSampled !== 'undefined') {
-      tr.sampled = perfOptions.pageLoadSampled
-    }
-
-    tr.doneCallback = function () {
-      self.applyAsync(function () {
-        var captured = self.capturePageLoadMetrics(tr)
-        if (captured) {
-          self.add(tr)
-        }
-      })
-    }
+    var tr = this.startTransaction(name || this.initialPageLoadName, 'page-load')
     tr.detectFinish()
     return tr
   }
@@ -133,35 +102,53 @@ class TransactionService {
       type = 'custom'
     }
 
-    if (type === 'interaction' && !perfOptions.captureInteractions) {
-      return
+    if (!name) {
+      name = 'Unknown'
     }
 
     // this will create a zone transaction if possible
     var tr = this.getOrCreateCurrentTransaction()
 
     if (tr) {
-      if (tr.name !== 'ZoneTransaction') {
-        // todo: need to handle cases in which the transaction has active spans and/or scheduled tasks
-        this.logInTransaction('Ending early to start a new transaction:', name, type)
+      if (tr.name === 'ZoneTransaction') {
+        tr.redefine(name, type, perfOptions)
+      } else {
+        this.logInTransaction('ElasticEnding early to start a new transaction:', name, type)
         this._logger.debug('Ending old transaction', tr)
         tr.end()
-        tr = this.createTransaction(name, type)
-      } else {
-        tr.redefine(name, type, perfOptions)
+        tr = this.createTransaction(name, type, perfOptions)
       }
     } else {
       return
+    }
+
+    if (type === 'page-load') {
+      tr.isHardNavigation = true
+
+      if (perfOptions.pageLoadTraceId) {
+        tr.traceId = perfOptions.pageLoadTraceId
+      }
+      if (typeof perfOptions.pageLoadSampled !== 'undefined') {
+        tr.sampled = perfOptions.pageLoadSampled
+      }
     }
 
     this._logger.debug('TransactionService.startTransaction', tr)
     tr.doneCallback = function () {
       self.applyAsync(function () {
         self._logger.debug('TransactionService transaction finished', tr)
-
-        if (tr.spans.length > 0 && !self.shouldIgnoreTransaction(tr.name)) {
-          self.capturePageLoadMetrics(tr)
-          self.add(tr)
+        if (!self.shouldIgnoreTransaction(tr.name)) {
+          if (type === 'page-load') {
+            if (tr.name === 'Unknown' && self.initialPageLoadName) {
+              tr.name = self.initialPageLoadName
+            }
+            var captured = self.capturePageLoadMetrics(tr)
+            if (captured) {
+              self.add(tr)
+            }
+          } else {
+            self.add(tr)
+          }
         }
       })
     }

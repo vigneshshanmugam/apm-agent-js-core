@@ -97,14 +97,6 @@ describe('TransactionService', function () {
     expect(result).toBeUndefined()
   })
 
-  it('should not start interactions by default', function () {
-    config.set('active', true)
-    transactionService = new TransactionService(logger, config)
-
-    var trans = transactionService.startTransaction('interaction', 'interaction')
-    expect(trans).toBeUndefined()
-  })
-
   it('should capture page load on first transaction', function (done) {
     // todo: can't test hard navigation metrics since karma runs tests inside an iframe
     config.set('active', true)

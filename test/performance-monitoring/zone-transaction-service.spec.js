@@ -97,14 +97,6 @@ describe('ZoneTransactionService', function () {
     expect(result).toBeUndefined()
   })
 
-  it('should not start interactions by default', function () {
-    config.set('active', true)
-    transactionService = new ZoneTransactionService(zoneServiceMock, logger, config)
-
-    var trans = transactionService.startTransaction('interaction', 'interaction')
-    expect(trans).toBeUndefined()
-  })
-
   it('should call startSpan on current Transaction', function () {
     var tr = new Transaction('transaction', 'transaction')
     transactionService.setCurrentTransaction(tr)
