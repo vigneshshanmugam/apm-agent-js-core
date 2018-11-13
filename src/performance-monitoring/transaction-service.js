@@ -13,7 +13,6 @@ class TransactionService {
 
     this.marks = {}
 
-    this.initialPageLoadName = undefined
     this.currentTransaction = undefined
 
     this._subscription = new Subscription()
@@ -79,7 +78,7 @@ class TransactionService {
   }
 
   sendPageLoadMetrics (name) {
-    var tr = this.startTransaction(name || this.initialPageLoadName, 'page-load')
+    var tr = this.startTransaction(name, 'page-load')
     tr.detectFinish()
     return tr
   }
@@ -96,7 +95,7 @@ class TransactionService {
 
   startTransaction (name, type) {
     var self = this
-    var perfOptions = this._config.config
+    var perfOptions = self._config.config
 
     if (!type) {
       type = 'custom'
@@ -131,6 +130,10 @@ class TransactionService {
       if (typeof perfOptions.pageLoadSampled !== 'undefined') {
         tr.sampled = perfOptions.pageLoadSampled
       }
+
+      if (tr.name === 'Unknown' && self._config.config.pageLoadTransactionName) {
+        tr.name = self._config.config.pageLoadTransactionName
+      }
     }
 
     this._logger.debug('TransactionService.startTransaction', tr)
@@ -139,8 +142,8 @@ class TransactionService {
         self._logger.debug('TransactionService transaction finished', tr)
         if (!self.shouldIgnoreTransaction(tr.name)) {
           if (type === 'page-load') {
-            if (tr.name === 'Unknown' && self.initialPageLoadName) {
-              tr.name = self.initialPageLoadName
+            if (tr.name === 'Unknown' && self._config.config.pageLoadTransactionName) {
+              tr.name = self._config.config.pageLoadTransactionName
             }
             var captured = self.capturePageLoadMetrics(tr)
             if (captured) {

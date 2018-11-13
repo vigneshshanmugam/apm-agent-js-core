@@ -48,6 +48,7 @@ function Config () {
     pageLoadTraceId: undefined,
     pageLoadSpanId: undefined,
     pageLoadSampled: undefined,
+    pageLoadTransactionName: undefined,
 
     transactionSampleRate: 1.0,
 

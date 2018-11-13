@@ -158,7 +158,7 @@ describe('TransactionService', function () {
     tr = transactionService.sendPageLoadMetrics()
     expect(tr.name).toBe('Unknown')
 
-    transactionService.initialPageLoadName = 'page load name'
+    config.set('pageLoadTransactionName', 'page load name')
     tr = transactionService.sendPageLoadMetrics()
     expect(tr.name).toBe('page load name')
 
