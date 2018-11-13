@@ -259,16 +259,20 @@ describe('TransactionService', function () {
       pageLoadSpanId: 'test-span-id',
       pageLoadSampled: true
     })
-    transactionService = new TransactionService(logger, config)
-    var tr
 
-    tr = transactionService.sendPageLoadMetrics()
+    window.performance.getEntriesByType = function (type) {
+      expect(type).toBe('resource')
+      return resourceEntries
+    }
+
+    transactionService = new TransactionService(logger, config)
+    var tr = transactionService.sendPageLoadMetrics()
     expect(tr.traceId).toBe('test-trace-id')
     expect(tr.sampled).toBe(true)
 
     setTimeout(() => {
       var spans = tr.spans.filter(function (span) {
-        return span.name == 'Receiving the document'
+        return span.pageResponse
       })
       if (spans.length > 0) {
         expect(spans[0].id).toBe('test-span-id')
@@ -276,7 +280,7 @@ describe('TransactionService', function () {
         expect(spans[0].traceId).toBe('test-trace-id')
         expect(spans[0].sampled).toBe(true)
         expect(spans[0].id).toBe('test-span-id')
-        expect(spans[0].name).toBe('Receiving the document')
+        expect(spans[0].name).toBe('Requesting and receiving the document')
       }
       done()
     });

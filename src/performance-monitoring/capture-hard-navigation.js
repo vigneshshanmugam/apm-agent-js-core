@@ -4,8 +4,7 @@ var utils = require('../common/utils')
 var eventPairs = [
   ['domainLookupStart', 'domainLookupEnd', 'Domain lookup'],
   ['connectStart', 'connectEnd', 'Making a connection to the server'],
-  ['requestStart', 'responseStart', 'Requesting the document, waiting for the first byte'],
-  ['responseStart', 'responseEnd', 'Receiving the document'],
+  ['requestStart', 'responseEnd', 'Requesting and receiving the document'],
   ['domLoading', 'domInteractive', 'Parsing the document, executing sync. scripts'],
   ['domContentLoadedEventStart', 'domContentLoadedEventEnd', 'Fire "DOMContentLoaded" event'],
   ['loadEventStart', 'loadEventEnd', 'Fire "load" event']
@@ -38,7 +37,7 @@ function createNavigationTimingSpans (timings, baseTime) {
       end - baseTime < spanThreshold
     ) {
       var span = new Span(eventPairs[i][2], 'hard-navigation.browser-timing')
-      if (eventPairs[i][0] === 'responseStart') {
+      if (eventPairs[i][0] === 'requestStart') {
         span.pageResponse = true
       }
       span._start = start - baseTime
