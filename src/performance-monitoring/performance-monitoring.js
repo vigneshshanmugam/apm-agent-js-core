@@ -32,10 +32,11 @@ class PerformanceMonitoring {
     var transactionService = this._transactionService
     return function (event, task) {
       if (
-        (task.source === 'XMLHttpRequest.send' && !patchUtils.globalState.fetchInProgress) ||
+        (task.source === patchUtils.XMLHTTPREQUEST_SOURCE &&
+          !patchUtils.globalState.fetchInProgress) ||
         task.source === patchUtils.FETCH_SOURCE
       ) {
-        if (event === 'schedule' && task.data) {
+        if (event === patchUtils.SCHEDULE && task.data) {
           var spanName = task.data.method + ' ' + task.data.url
           var span = transactionService.startSpan(spanName, 'ext.HttpRequest')
           if (span) {
@@ -71,8 +72,12 @@ class PerformanceMonitoring {
             span.sync = task.data.sync
             task.data.span = span
           }
-        } else if (event === 'invoke' && task.data && task.data.span) {
-          task.data.span.setContext({ http: { status_code: task.data.target.status } })
+        } else if (event === patchUtils.INVOKE && task.data && task.data.span) {
+          if (typeof task.data.target.status !== 'undefined') {
+            task.data.span.setContext({ http: { status_code: task.data.target.status } })
+          } else if (task.data.response) {
+            task.data.span.setContext({ http: { status_code: task.data.response.status } })
+          }
           task.data.span.end()
         }
       }

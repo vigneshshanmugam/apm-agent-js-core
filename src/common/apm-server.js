@@ -2,7 +2,7 @@ var Queue = require('./queue')
 var throttle = require('./throttle')
 var utils = require('./utils')
 var NDJSON = require('./ndjson')
-var xhrIgnore = require('./patching/xhr-patch').XHR_IGNORE
+var xhrIgnore = require('./patching/patch-utils').XHR_IGNORE
 
 class ApmServer {
   constructor (configService, loggingService) {

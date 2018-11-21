@@ -7,16 +7,22 @@ const XHR_TASK = apmSymbol('xhrTask')
 const XHR_LISTENER = apmSymbol('xhrListener')
 const XHR_SCHEDULED = apmSymbol('xhrScheduled')
 
-const XHR_SYNC = apmSymbol('xhrSync')
-const XHR_URL = apmSymbol('xhrURL')
-const XHR_METHOD = apmSymbol('xhrMethod')
+const XHR_SYNC = patchUtils.XHR_SYNC
+const XHR_URL = patchUtils.XHR_URL
+const XHR_METHOD = patchUtils.XHR_METHOD
 
 const ADD_EVENT_LISTENER_STR = 'addEventListener'
 const REMOVE_EVENT_LISTENER_STR = 'removeEventListener'
+
+var XHR_IGNORE = patchUtils.XHR_IGNORE
+
+const XMLHTTPREQUEST_SOURCE = patchUtils.XMLHTTPREQUEST_SOURCE
+
+const SCHEDULE = patchUtils.SCHEDULE
+const INVOKE = patchUtils.INVOKE
+const CLEAR = patchUtils.CLEAR
+
 var alreadyPatched = false
-
-var XHR_IGNORE = apmSymbol('xhrIgnore')
-
 function patchXMLHttpRequest (callback) {
   if (alreadyPatched) {
     return
@@ -38,9 +44,6 @@ function patchXMLHttpRequest (callback) {
   }
 
   const READY_STATE_CHANGE = 'readystatechange'
-  const SCHEDULE = 'schedule'
-  const INVOKE = 'invoke'
-  const CLEAR = 'clear'
 
   function invokeTask (task) {
     task.state = INVOKE
@@ -109,7 +112,6 @@ function patchXMLHttpRequest (callback) {
       }
   )
 
-  const XMLHTTPREQUEST_SOURCE = 'XMLHttpRequest.send'
   const sendNative = patchMethod(
     XMLHttpRequestPrototype,
     'send',
@@ -157,8 +159,5 @@ function patchXMLHttpRequest (callback) {
 }
 
 module.exports = {
-  patchXMLHttpRequest: patchXMLHttpRequest,
-  XHR_URL,
-  XHR_METHOD,
-  XHR_IGNORE
+  patchXMLHttpRequest: patchXMLHttpRequest
 }

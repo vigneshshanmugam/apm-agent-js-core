@@ -367,15 +367,14 @@ describe('PerformanceMonitoring', function () {
 
   if (window.fetch) {
     it('should create fetch spans', function (done) {
-      performanceMonitoring.init()
       var fn = performanceMonitoring.getXhrPatchSubFn()
-      var dTHeaderValue =
-        performanceMonitoring.cancelPatchSub = patchSub.subscribe(function (event, task) {
-          fn(event, task)
-          if (event === patchUtils.SCHEDULE) {
-            dTHeaderValue = task.data.target.headers.get(configService.get('distributedTracingHeaderName'))
-          }
-        })
+      var dTHeaderValue
+      performanceMonitoring.cancelPatchSub = patchSub.subscribe(function (event, task) {
+        fn(event, task)
+        if (event === patchUtils.SCHEDULE) {
+          dTHeaderValue = task.data.target.headers.get(configService.get('distributedTracingHeaderName'))
+        }
+      })
       var transactionService = performanceMonitoring._transactionService
       var tr = transactionService.startTransaction('fetch transaction', 'custom')
       spyOn(transactionService, 'startSpan').and.callThrough()
@@ -385,6 +384,13 @@ describe('PerformanceMonitoring', function () {
           setTimeout(() => {
             expect(tr.spans.length).toBe(1)
             expect(tr.spans[0].name).toBe('GET /')
+            expect(tr.spans[0].context).toEqual({
+              http: {
+                method: 'GET',
+                url: '/',
+                status_code: 200
+              }
+            })
             expect(dTHeaderValue).toBeDefined()
             performanceMonitoring.cancelPatchSub()
             done()
@@ -393,8 +399,67 @@ describe('PerformanceMonitoring', function () {
       expect(transactionService.startSpan).toHaveBeenCalledWith('GET /', 'ext.HttpRequest')
     })
 
-    it('should not duplicate xhr spans if fetch is a polyfill', function () {
+    it('should not duplicate xhr spans if fetch is a polyfill', function (done) {
+      var fn = performanceMonitoring.getXhrPatchSubFn()
 
+      var events = []
+      performanceMonitoring.cancelPatchSub = patchSub.subscribe(function (event, task) {
+        events.push({ event, source: task.source })
+        fn(event, task)
+      })
+
+      window['__fetchDelegate'] = function (url) {
+        return new Promise(function (resolve, reject) {
+          var req = new window.XMLHttpRequest()
+          req.open('GET', url, true)
+          req.addEventListener('readystatechange', function () {
+            // to guarantee the order of event execution 
+            setTimeout(() => {
+              if (req.readyState === req.DONE) {
+                resolve(req.responseText)
+              }
+            });
+          })
+
+          // Can't rely on the fetch-patch to set this flag because of the way karma executes tests
+          patchUtils.globalState.fetchInProgress = true
+          req.send()
+          patchUtils.globalState.fetchInProgress = false
+        })
+      }
+      var transactionService = performanceMonitoring._transactionService
+      var tr = transactionService.startTransaction('fetch transaction', 'custom')
+
+
+      var promise = window.fetch('/')
+      expect(promise).toBeDefined()
+      promise.then(function (response) {
+        setTimeout(() => {
+          expect(response).toBeDefined()
+          expect(tr.spans.length).toBe(1)
+          expect(events).toEqual([
+            {
+              "event": "schedule",
+              "source": "fetch"
+            },
+            {
+              "event": "schedule",
+              "source": "XMLHttpRequest.send"
+            },
+            {
+              "event": "invoke",
+              "source": "XMLHttpRequest.send"
+            },
+            {
+              "event": "invoke",
+              "source": "fetch"
+            }
+          ])
+          done()
+        });
+      })
+
+      window['__fetchDelegate'] = undefined
     })
   }
 })

@@ -3,6 +3,8 @@ const INVOKE = 'invoke'
 const CLEAR = 'clear'
 
 const FETCH_SOURCE = 'fetch'
+const XMLHTTPREQUEST_SOURCE = 'XMLHttpRequest.send'
+
 var globalState = {
   fetchInProgress: false
 }
@@ -62,5 +64,10 @@ module.exports = {
   SCHEDULE,
   INVOKE,
   CLEAR,
-  FETCH_SOURCE
+  FETCH_SOURCE,
+  XMLHTTPREQUEST_SOURCE,
+  XHR_IGNORE: apmSymbol('xhrIgnore'),
+  XHR_SYNC: apmSymbol('xhrSync'),
+  XHR_URL: apmSymbol('xhrURL'),
+  XHR_METHOD: apmSymbol('xhrMethod')
 }

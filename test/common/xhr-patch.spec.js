@@ -1,10 +1,11 @@
-var xhrPatch = require('../../src/common/patching/xhr-patch')
-var urlSympbol = xhrPatch.XHR_URL
-var methodSymbol = xhrPatch.XHR_METHOD
-var xhrIgnore = xhrPatch.XHR_IGNORE
+var patchUtils = require('../../src/common/patching/patch-utils')
 
-require('./patch')
-var patchSubscription = window['__patchSubscription']
+var urlSympbol = patchUtils.XHR_URL
+var methodSymbol = patchUtils.XHR_METHOD
+var xhrIgnore = patchUtils.XHR_IGNORE
+
+
+var patchSubscription = require('./patch')
 
 
 describe('xhrPatch', function () {

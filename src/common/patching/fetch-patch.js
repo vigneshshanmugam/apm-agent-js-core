@@ -58,19 +58,22 @@ function patchFetch (callback) {
 
     return new Promise(function (resolve, reject) {
       patchUtils.globalState.fetchInProgress = true
+      scheduleTask(task)
       var promise
       try {
-        promise = nativeFetch.apply(fetchSelf, args)
+        promise = nativeFetch.apply(fetchSelf, [request])
       } catch (error) {
         reject(error)
+        task.data.error = error
+        invokeTask(task)
         patchUtils.globalState.fetchInProgress = false
         return
       }
-      scheduleTask(task)
 
       promise.then(
         function (response) {
           resolve(response)
+          task.data.response = response
           invokeTask(task)
         },
         function (error) {
