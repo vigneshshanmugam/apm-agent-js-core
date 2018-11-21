@@ -1,5 +1,6 @@
 var utils = require('../common/utils')
 var patchingSub = require('../common/patching').subscription
+var patchUtils = require('../common/patching/patch-utils')
 
 class PerformanceMonitoring {
   constructor (apmServer, configService, loggingService, zoneService, transactionService) {
@@ -30,41 +31,50 @@ class PerformanceMonitoring {
     var configService = this._configService
     var transactionService = this._transactionService
     return function (event, task) {
-      if (event === 'schedule' && task.source === 'XMLHttpRequest.send' && task.data) {
-        var spanName = task.data.method + ' ' + task.data.url
-        var span = transactionService.startSpan(spanName, 'ext.HttpRequest')
-        if (span) {
-          var isDtEnabled = configService.get('distributedTracing')
-          var origins = configService.get('distributedTracingOrigins')
-          var isSameOrigin =
-            utils.isSameOrigin(task.data.url, window.location.href) ||
-            utils.isSameOrigin(task.data.url, origins)
-          var target = task.data.target
-          if (isDtEnabled && isSameOrigin && target) {
-            var headerName = configService.get('distributedTracingHeaderName')
-            var headerValueCallback = configService.get('distributedTracingHeaderValueCallback')
-            if (typeof headerValueCallback !== 'function') {
-              headerValueCallback = utils.getDtHeaderValue
-            }
+      if (
+        (task.source === 'XMLHttpRequest.send' && !patchUtils.globalState.fetchInProgress) ||
+        task.source === patchUtils.FETCH_SOURCE
+      ) {
+        if (event === 'schedule' && task.data) {
+          var spanName = task.data.method + ' ' + task.data.url
+          var span = transactionService.startSpan(spanName, 'ext.HttpRequest')
+          if (span) {
+            var isDtEnabled = configService.get('distributedTracing')
+            var origins = configService.get('distributedTracingOrigins')
+            var isSameOrigin =
+              utils.isSameOrigin(task.data.url, window.location.href) ||
+              utils.isSameOrigin(task.data.url, origins)
+            var target = task.data.target
+            if (isDtEnabled && isSameOrigin && target) {
+              var headerName = configService.get('distributedTracingHeaderName')
+              var headerValueCallback = configService.get('distributedTracingHeaderValueCallback')
+              if (typeof headerValueCallback !== 'function') {
+                headerValueCallback = utils.getDtHeaderValue
+              }
 
-            var headerValue = headerValueCallback(span)
-            var isHeaderValid = utils.isDtHeaderValid(headerValue)
-            if (headerName && headerValue && isHeaderValid) {
-              target.setRequestHeader(headerName, headerValue)
+              var headerValue = headerValueCallback(span)
+              var isHeaderValid = utils.isDtHeaderValid(headerValue)
+              if (headerName && headerValue && isHeaderValid) {
+                if (typeof target.setRequestHeader === 'function') {
+                  target.setRequestHeader(headerName, headerValue)
+                } else if (target.headers && typeof target.headers.append === 'function') {
+                  target.headers.append(headerName, headerValue)
+                }
+              }
             }
+            span.setContext({
+              http: {
+                method: task.data.method,
+                url: task.data.url
+              }
+            })
+            span.sync = task.data.sync
+            task.data.span = span
           }
-          span.setContext({
-            http: {
-              method: task.data.method,
-              url: task.data.url
-            }
-          })
-          span.sync = task.data.sync
-          task.data.span = span
+        } else if (event === 'invoke' && task.data && task.data.span) {
+          task.data.span.setContext({ http: { status_code: task.data.target.status } })
+          task.data.span.end()
         }
-      } else if (event === 'invoke' && task.data && task.data.span) {
-        task.data.span.setContext({ http: { status_code: task.data.target.status } })
-        task.data.span.end()
       }
     }
   }

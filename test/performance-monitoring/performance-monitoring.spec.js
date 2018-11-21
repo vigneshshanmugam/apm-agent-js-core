@@ -5,6 +5,8 @@ var apmTestConfig = require('../apm-test-config')()
 
 var resourceEntries = require('./resource-entries.js')
 var utils = require('../../src/common/utils')
+var patchUtils = require('../../src/common/patching/patch-utils')
+var patchSub = require('../common/patch')
 
 describe('PerformanceMonitoring', function () {
   var serviceFactory
@@ -330,4 +332,69 @@ describe('PerformanceMonitoring', function () {
     expect(req.setRequestHeader).toHaveBeenCalledWith(headerName, headerValue)
 
   })
+
+  it('should consider fetchInProgress to avoid duplicate spans', function (done) {
+    var fn = performanceMonitoring.getXhrPatchSubFn()
+    expect(typeof fn).toBe('function')
+    var req = new window.XMLHttpRequest()
+    req.open('GET', '/', true)
+    var task = {
+      source: 'XMLHttpRequest.send',
+      data: {
+        target: req
+      }
+    }
+
+    req.addEventListener('readystatechange', function () {
+      if (req.readyState === req.DONE) {
+        fn('invoke', task)
+        expect(task.data.span.ended).toBeTruthy()
+        done()
+      }
+    })
+
+    patchUtils.globalState.fetchInProgress = true
+    fn('schedule', task)
+    expect(task.data.span).toBeUndefined()
+
+    patchUtils.globalState.fetchInProgress = false
+    fn('schedule', task)
+    req.send()
+    expect(task.data.span).toBeDefined()
+    expect(task.data.span.ended).toBeFalsy()
+
+  })
+
+  if (window.fetch) {
+    it('should create fetch spans', function (done) {
+      performanceMonitoring.init()
+      var fn = performanceMonitoring.getXhrPatchSubFn()
+      var dTHeaderValue =
+        performanceMonitoring.cancelPatchSub = patchSub.subscribe(function (event, task) {
+          fn(event, task)
+          if (event === patchUtils.SCHEDULE) {
+            dTHeaderValue = task.data.target.headers.get(configService.get('distributedTracingHeaderName'))
+          }
+        })
+      var transactionService = performanceMonitoring._transactionService
+      var tr = transactionService.startTransaction('fetch transaction', 'custom')
+      spyOn(transactionService, 'startSpan').and.callThrough()
+
+      window.fetch('/')
+        .then(function () {
+          setTimeout(() => {
+            expect(tr.spans.length).toBe(1)
+            expect(tr.spans[0].name).toBe('GET /')
+            expect(dTHeaderValue).toBeDefined()
+            performanceMonitoring.cancelPatchSub()
+            done()
+          });
+        })
+      expect(transactionService.startSpan).toHaveBeenCalledWith('GET /', 'ext.HttpRequest')
+    })
+
+    it('should not duplicate xhr spans if fetch is a polyfill', function () {
+
+    })
+  }
 })

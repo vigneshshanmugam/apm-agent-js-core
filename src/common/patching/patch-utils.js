@@ -1,6 +1,10 @@
-module.exports = {
-  apmSymbol: apmSymbol,
-  patchMethod: patchMethod
+const SCHEDULE = 'schedule'
+const INVOKE = 'invoke'
+const CLEAR = 'clear'
+
+const FETCH_SOURCE = 'fetch'
+var globalState = {
+  fetchInProgress: false
 }
 
 function apmSymbol (name) {
@@ -49,4 +53,14 @@ function patchMethod (target, name, patchFn) {
     }
   }
   return delegate
+}
+
+module.exports = {
+  apmSymbol: apmSymbol,
+  patchMethod: patchMethod,
+  globalState: globalState,
+  SCHEDULE,
+  INVOKE,
+  CLEAR,
+  FETCH_SOURCE
 }
