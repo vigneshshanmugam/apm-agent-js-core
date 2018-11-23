@@ -1,3 +1,13 @@
+<a name="2.1.0"></a>
+# [2.1.0](https://github.com/elastic/apm-agent-js-core/compare/v2.0.0...v2.1.0) (2018-11-23)
+
+
+### Features
+
+* instrument fetch API ([2375a60](https://github.com/elastic/apm-agent-js-core/commit/2375a60))
+
+
+
 <a name="2.0.0"></a>
 # [2.0.0](https://github.com/elastic/apm-agent-js-core/compare/v1.0.0...v2.0.0) (2018-11-14)
 
