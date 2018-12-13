@@ -173,18 +173,41 @@ var navigationTimingKeys = [
 ]
 
 function getNavigationTimingMarks () {
-  if (window.performance && window.performance.timing) {
-    var timing = window.performance.timing
-    var marks = {}
-    var fetchStart = timing.fetchStart
-    navigationTimingKeys.forEach(function (timingKey) {
-      var m = timing[timingKey]
-      if (m && m >= fetchStart) {
-        marks[timingKey] = m - fetchStart
+  var timing = window.performance.timing
+  var fetchStart = timing.fetchStart
+  var marks = {}
+  navigationTimingKeys.forEach(function (timingKey) {
+    var m = timing[timingKey]
+    if (m && m >= fetchStart) {
+      marks[timingKey] = m - fetchStart
+    }
+  })
+  return marks
+}
+
+/**
+ * Paint Timing Metrics that is available during page load
+ * https://www.w3.org/TR/paint-timing/
+ */
+function getPaintTimingMarks () {
+  var paints = {}
+  var perf = window.performance
+  if (perf.getEntriesByType) {
+    var entries = perf.getEntriesByType('paint')
+    if (entries.length > 0) {
+      var timings = perf.timing
+      /**
+       * To avoid capturing the unload event handler effect in paint timings
+       */
+      var unloadDiff = timings.fetchStart - timings.navigationStart
+      for (var i = 0; i < entries.length; i++) {
+        var data = entries[i]
+        var calcPaintTime = unloadDiff >= 0 ? data.startTime - unloadDiff : data.startTime
+        paints[data.name] = calcPaintTime
       }
-    })
-    return marks
+    }
   }
+  return paints
 }
 
 function getPageMetadata () {
@@ -404,6 +427,7 @@ module.exports = {
   sanitizeString: sanitizeString,
   sanitizeObjectStrings: sanitizeObjectStrings,
   getNavigationTimingMarks: getNavigationTimingMarks,
+  getPaintTimingMarks: getPaintTimingMarks,
   bytesToHex: bytesToHex,
   rng: rng,
   generateRandomId: generateRandomId,
