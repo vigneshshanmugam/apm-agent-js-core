@@ -15,10 +15,8 @@ class ServiceFactory {
     var serviceFactory = this
 
     this.registerServiceCreator('ConfigService', function () {
-      var configService = new ConfigService()
-      return configService
+      return new ConfigService()
     })
-
     this.registerServiceCreator('LoggingService', function () {
       return new LoggingService()
     })
@@ -28,6 +26,7 @@ class ServiceFactory {
         serviceFactory.getService('LoggingService')
       )
     })
+
     this.registerServiceInstance('PatchUtils', patchUtils)
     this.registerServiceInstance('Utils', utils)
   }
@@ -51,7 +50,7 @@ class ServiceFactory {
     }
 
     setLogLevel(loggingService, configService)
-    configService.subscribeToChange(function (newConfig) {
+    configService.subscribeToChange(function () {
       setLogLevel(loggingService, configService)
     })
 
