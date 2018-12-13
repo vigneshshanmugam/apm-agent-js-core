@@ -92,7 +92,7 @@ var baseConfig = {
                     ie: '10'
                   },
                   useBuiltIns: false,
-                  modules: false
+                  modules: 'umd'
                 }
               ]
             ]
