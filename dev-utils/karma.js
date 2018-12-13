@@ -88,8 +88,11 @@ var baseConfig = {
               [
                 '@babel/preset-env',
                 {
-                  modules: false,
-                  useBuiltIns: false
+                  targets: {
+                    ie: '10'
+                  },
+                  useBuiltIns: false,
+                  modules: false
                 }
               ]
             ]
