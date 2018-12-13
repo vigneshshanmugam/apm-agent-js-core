@@ -91,8 +91,8 @@ var baseConfig = {
                   targets: {
                     ie: '10'
                   },
-                  useBuiltIns: false,
-                  modules: 'umd'
+                  loose: true,
+                  useBuiltIns: false
                 }
               ]
             ]
