@@ -91,6 +91,10 @@ var baseConfig = {
                   targets: {
                     ie: '10'
                   },
+                  /**
+                   * Enabling loose mode due to IE 10 transformation logic in babel
+                   * https://github.com/babel/babel/pull/3527
+                   */
                   loose: true,
                   useBuiltIns: false
                 }
