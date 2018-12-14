@@ -63,7 +63,7 @@ class PerformanceMonitoring {
                 }
               }
             }
-            span.setContext({
+            span.addContext({
               http: {
                 method: task.data.method,
                 url: task.data.url
@@ -74,9 +74,9 @@ class PerformanceMonitoring {
           }
         } else if (event === patchUtils.INVOKE && task.data && task.data.span) {
           if (typeof task.data.target.status !== 'undefined') {
-            task.data.span.setContext({ http: { status_code: task.data.target.status } })
+            task.data.span.addContext({ http: { status_code: task.data.target.status } })
           } else if (task.data.response) {
-            task.data.span.setContext({ http: { status_code: task.data.response.status } })
+            task.data.span.addContext({ http: { status_code: task.data.response.status } })
           }
           task.data.span.end()
         }
@@ -84,10 +84,10 @@ class PerformanceMonitoring {
     }
   }
 
-  setTransactionContextInfo (transaction) {
+  setTransactionContext (transaction) {
     var context = this._configService.get('context')
     if (context) {
-      transaction.addContextInfo(context)
+      transaction.addContext(context)
     }
   }
 
@@ -150,7 +150,7 @@ class PerformanceMonitoring {
       )
     })
 
-    performanceMonitoring.setTransactionContextInfo(transaction)
+    performanceMonitoring.setTransactionContext(transaction)
   }
 
   createTransactionDataModel (transaction) {
@@ -178,7 +178,7 @@ class PerformanceMonitoring {
       }
     })
 
-    var context = utils.merge({}, configContext, transaction.contextInfo)
+    var context = utils.merge({}, configContext, transaction.context)
     return {
       id: transaction.id,
       trace_id: transaction.traceId,

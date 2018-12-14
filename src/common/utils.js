@@ -1,3 +1,4 @@
+const constants = require('./constants')
 var slice = [].slice
 
 function isCORSSupported () {
@@ -133,6 +134,13 @@ function sanitizeString (value, limit, required, placeholder) {
   } else {
     return value
   }
+}
+
+function setTag (key, value, obj) {
+  if (!obj || !key) return
+  var skey = key.replace(/[.*]/g, '_')
+  obj[skey] = sanitizeString(value, constants.serverStringLimit)
+  return obj
 }
 
 function sanitizeObjectStrings (obj, limit, required, placeholder) {
@@ -433,7 +441,8 @@ module.exports = {
   generateRandomId: generateRandomId,
   isSameOrigin: isSameOrigin,
   getDtHeaderValue: getDtHeaderValue,
-  isDtHeaderValid: isDtHeaderValid
+  isDtHeaderValid: isDtHeaderValid,
+  setTag: setTag
 }
 
 function isObject (value) {

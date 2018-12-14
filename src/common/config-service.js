@@ -1,5 +1,6 @@
-var utils = require('./utils')
-var Subscription = require('../common/subscription')
+const utils = require('./utils')
+const Subscription = require('../common/subscription')
+const constants = require('./constants')
 
 function Config () {
   this.config = {}
@@ -21,7 +22,6 @@ function Config () {
     enable: true,
     groupSimilarSpans: true,
     similarSpanThreshold: 0.05,
-    sendVerboseDebugInfo: false,
     includeXHRQueryString: false,
     capturePageLoad: true,
     ignoreTransactions: [],
@@ -38,7 +38,7 @@ function Config () {
 
     sendPageLoadTransaction: true,
 
-    serverStringLimit: 1024,
+    serverStringLimit: constants.serverStringLimit,
 
     distributedTracing: true,
     distributedTracingOrigins: [],
@@ -144,15 +144,21 @@ Config.prototype.setCustomContext = function (customContext) {
 }
 
 Config.prototype.setTag = function (key, value) {
-  if (!key) return false
+  if (!key) return
   if (!this.config.context.tags) {
     this.config.context.tags = {}
   }
-  var skey = key.replace(/[.*]/g, '_')
-  this.config.context.tags[skey] = utils.sanitizeString(value, this.get('serverStringLimit'))
+
+  utils.setTag(key, value, this.config.context.tags)
 }
 
+// deprecated
 Config.prototype.setTags = function (tags) {
+  console.log('APM: setTags is deprecated, please use addTags instead.')
+  this.addTags(tags)
+}
+
+Config.prototype.addTags = function (tags) {
   var configService = this
   var keys = Object.keys(tags)
   keys.forEach(function (k) {
