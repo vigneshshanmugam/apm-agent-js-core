@@ -1,3 +1,14 @@
+<a name="2.3.0"></a>
+# [2.3.0](https://github.com/elastic/apm-agent-js-core/compare/v2.2.0...v2.3.0) (2018-12-17)
+
+
+### Features
+
+* add addContext and addTags to Spans and Transactions ([#16](https://github.com/elastic/apm-agent-js-core/issues/16)) ([de0d72b](https://github.com/elastic/apm-agent-js-core/commit/de0d72b))
+* add paint timing mark to page-load transaction ([#14](https://github.com/elastic/apm-agent-js-core/issues/14)) ([544530a](https://github.com/elastic/apm-agent-js-core/commit/544530a))
+
+
+
 <a name="2.2.0"></a>
 # [2.2.0](https://github.com/elastic/apm-agent-js-core/compare/v2.1.1...v2.2.0) (2018-12-05)
 
