@@ -26,6 +26,7 @@ class Span extends BaseSpan {
     this.ended = false
     this._end = undefined
     this.context = undefined
+    this.sync = opts.sync
     // Start timers
     this._start = window.performance.now()
   }
