@@ -1,40 +1,40 @@
 // dependencies
 // npm i --save-dev jasmine karma karma-sauce-launcher karma-failed-reporter karma-jasmine karma-spec-reporter webpack karma-webpack karma-chrome-launcher karma-sourcemap-loader babel-core babel-loader babel-preset-es2015 babel-plugin-istanbul
 var baseLaunchers = {
-  'SL_CHROME': {
+  SL_CHROME: {
     base: 'SauceLabs',
     browserName: 'chrome',
     version: '62'
   },
-  'SL_CHROME46': {
+  SL_CHROME46: {
     base: 'SauceLabs',
     browserName: 'chrome',
     version: '46'
   },
-  'SL_FIREFOX': {
+  SL_FIREFOX: {
     base: 'SauceLabs',
     browserName: 'firefox',
     version: '42'
   },
-  'SL_SAFARI9': {
+  SL_SAFARI9: {
     base: 'SauceLabs',
     browserName: 'safari',
     platform: 'OS X 10.11',
     version: '9.0'
   },
-  'SL_IE11': {
+  SL_IE11: {
     base: 'SauceLabs',
     browserName: 'internet explorer',
     platform: 'Windows 8.1',
     version: '11'
   },
-  'SL_IE10': {
+  SL_IE10: {
     base: 'SauceLabs',
     browserName: 'internet explorer',
     platform: 'Windows 2012',
     version: '10'
   },
-  'SL_EDGE': {
+  SL_EDGE: {
     base: 'SauceLabs',
     browserName: 'microsoftedge',
     platform: 'Windows 10',
@@ -46,13 +46,13 @@ var baseLaunchers = {
     platform: 'Linux',
     version: '4.4'
   },
-  'SL_ANDROID': {
+  SL_ANDROID: {
     base: 'SauceLabs',
     browserName: 'android',
     platform: 'Linux',
     version: '5.0'
   },
-  'SL_IOS9': {
+  SL_IOS9: {
     base: 'SauceLabs',
     deviceName: 'iPhone Simulator',
     deviceOrientation: 'portrait',
@@ -65,12 +65,8 @@ var baseLaunchers = {
 var specPattern = 'test/{*.spec.js,!(e2e)/*.spec.js}'
 
 var baseConfig = {
-  exclude: [
-    'e2e/**/*.*'
-  ],
-  files: [
-    specPattern
-  ],
+  exclude: ['e2e/**/*.*'],
+  files: [specPattern],
   frameworks: ['jasmine'],
   plugins: [
     'karma-sauce-launcher',
@@ -81,13 +77,29 @@ var baseConfig = {
     'karma-sourcemap-loader'
   ],
   webpack: {
+    mode: 'none',
     module: {
-      loaders: [
+      rules: [
         {
           test: /\.js$/,
           loader: 'babel-loader',
-          query: {
-            presets: ['babel-preset-es2015'].map(require.resolve)
+          options: {
+            presets: [
+              [
+                '@babel/preset-env',
+                {
+                  targets: {
+                    ie: '10'
+                  },
+                  /**
+                   * Enabling loose mode due to IE 10 transformation logic in babel
+                   * https://github.com/babel/babel/pull/3527
+                   */
+                  loose: true,
+                  useBuiltIns: false
+                }
+              ]
+            ]
           }
         }
       ]
@@ -127,7 +139,13 @@ function prepareConfig (defaultConfig) {
   }
 
   if (isTravis) {
-    buildId = buildId + ' - TRAVIS #' + process.env.TRAVIS_BUILD_NUMBER + ' (' + process.env.TRAVIS_BUILD_ID + ')'
+    buildId =
+      buildId +
+      ' - TRAVIS #' +
+      process.env.TRAVIS_BUILD_NUMBER +
+      ' (' +
+      process.env.TRAVIS_BUILD_ID +
+      ')'
     // 'karma-chrome-launcher',
     defaultConfig.plugins.push('karma-firefox-launcher')
     defaultConfig.browsers.push('Firefox')
@@ -139,15 +157,14 @@ function prepareConfig (defaultConfig) {
       // istanbul code coverage
       defaultConfig.plugins.push('karma-coverage')
 
-      var babelPlugins = defaultConfig.webpack.module.loaders[0].query.plugins || (defaultConfig.webpack.module.loaders[0].query.plugins = [])
+      var babelPlugins =
+        defaultConfig.webpack.module.loaders[0].query.plugins ||
+        (defaultConfig.webpack.module.loaders[0].query.plugins = [])
       babelPlugins.push('istanbul')
 
       defaultConfig.coverageReporter = {
         includeAllSources: true,
-        reporters: [
-          {type: 'html', dir: 'coverage/'},
-          {type: 'text-summary'}
-        ],
+        reporters: [{ type: 'html', dir: 'coverage/' }, { type: 'text-summary' }],
         dir: 'coverage/'
       }
       defaultConfig.reporters.push('coverage')
@@ -156,7 +173,8 @@ function prepareConfig (defaultConfig) {
 
   if (isSauce) {
     defaultConfig.concurrency = 3
-    if (testConfig.branch === 'master') { // && process.env.TRAVIS_PULL_REQUEST !== 'false'
+    if (testConfig.branch === 'master') {
+      // && process.env.TRAVIS_PULL_REQUEST !== 'false'
       defaultConfig.sauceLabs.build = buildId
       defaultConfig.sauceLabs.tags = ['master']
       console.log('saucelabs.build:', buildId)
@@ -175,7 +193,11 @@ function prepareConfig (defaultConfig) {
 
     // console.log('globalConfigs:', defaultConfig.globalConfigs)
     var globalConfigs = defaultConfig.globalConfigs
-    fs.writeFileSync(dir + '/globals.js', 'window.globalConfigs = ' + JSON.stringify(globalConfigs) + ';', 'utf8')
+    fs.writeFileSync(
+      dir + '/globals.js',
+      'window.globalConfigs = ' + JSON.stringify(globalConfigs) + ';',
+      'utf8'
+    )
     defaultConfig.files.unshift('tmp/globals.js')
   }
   return defaultConfig
@@ -183,10 +205,13 @@ function prepareConfig (defaultConfig) {
 
 var karma = require('karma')
 function singleRunKarma (configFile, done) {
-  new karma.Server({
-    configFile: configFile,
-    singleRun: true
-  }, done).start()
+  new karma.Server(
+    {
+      configFile: configFile,
+      singleRun: true
+    },
+    done
+  ).start()
 }
 
 module.exports = {
