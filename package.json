@@ -13,7 +13,7 @@
     "prepare-minor": "sh ./dev-utils/prepare-release minor && npm run push-release",
     "prepare-major": "sh ./dev-utils/prepare-release major && npm run push-release",
     "push-release": "git push origin master --follow-tags && npm publish",
-    "changelog": "conventional-changelog-cli  -p angular -i CHANGELOG.md -s",
+    "changelog": "node node_modules/conventional-changelog-cli/cli.js  -p angular -i CHANGELOG.md -s",
     "karma": "karma start",
     "karma-bench": "karma start karma.bench.conf.js",
     "karma-coverage": "karma start --coverage",
