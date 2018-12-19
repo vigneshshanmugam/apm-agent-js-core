@@ -2,6 +2,16 @@ const utils = require('../common/utils')
 class SpanBase {
   // context
 
+  constructor (name, type, options) {
+    this.name = name
+    this.type = type
+    this.options = options || {}
+    this.id = this.options.id || utils.generateRandomId(16)
+    this.traceId = this.options.traceId
+    this.sampled = this.options.sampled
+    this.timestamp = this.options.timestamp || Date.now()
+  }
+
   ensureContext () {
     if (!this.context) {
       this.context = {}
