@@ -1,3 +1,22 @@
+<a name="2.4.0"></a>
+# [2.4.0](https://github.com/elastic/apm-agent-js-core/compare/v2.3.0...v2.4.0) (2019-01-15)
+
+
+### Bug Fixes
+
+* remove query strings from xhr and fetch span name ([#24](https://github.com/elastic/apm-agent-js-core/issues/24)) ([cc82e92](https://github.com/elastic/apm-agent-js-core/commit/cc82e92))
+* set pageLoadTransactionName when transaction ends from configs ([#25](https://github.com/elastic/apm-agent-js-core/issues/25)) ([afdacee](https://github.com/elastic/apm-agent-js-core/commit/afdacee))
+
+
+### Features
+
+* add parsing distributed tracing header, and time origin to utils ([#21](https://github.com/elastic/apm-agent-js-core/issues/21)) ([b3601c2](https://github.com/elastic/apm-agent-js-core/commit/b3601c2))
+* implement OpenTracing Tracer ([#23](https://github.com/elastic/apm-agent-js-core/issues/23)) ([2a3c411](https://github.com/elastic/apm-agent-js-core/commit/2a3c411))
+* send span sync field to apm server ([#17](https://github.com/elastic/apm-agent-js-core/issues/17)) ([abad58b](https://github.com/elastic/apm-agent-js-core/commit/abad58b))
+* use parentId in Spans ([#19](https://github.com/elastic/apm-agent-js-core/issues/19)) ([4aa5773](https://github.com/elastic/apm-agent-js-core/commit/4aa5773))
+
+
+
 <a name="2.3.0"></a>
 # [2.3.0](https://github.com/elastic/apm-agent-js-core/compare/v2.2.0...v2.3.0) (2018-12-17)
 
