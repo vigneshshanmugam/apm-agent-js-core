@@ -1,3 +1,8 @@
+<a name="2.5.0"></a>
+# [2.5.0](https://github.com/elastic/apm-agent-js-core/compare/v2.4.0...v2.5.0) (2019-01-21)
+
+Added product notice.
+
 <a name="2.4.0"></a>
 # [2.4.0](https://github.com/elastic/apm-agent-js-core/compare/v2.3.0...v2.4.0) (2019-01-15)
 
