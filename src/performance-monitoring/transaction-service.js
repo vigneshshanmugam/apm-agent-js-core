@@ -45,6 +45,7 @@ class TransactionService {
   shouldCreateTransaction () {
     return this._config.isActive()
   }
+
   getOrCreateCurrentTransaction () {
     if (!this.shouldCreateTransaction()) {
       return
@@ -55,12 +56,15 @@ class TransactionService {
     }
     return this.createZoneTransaction()
   }
+
   getCurrentTransaction () {
     return this.currentTransaction
   }
+
   setCurrentTransaction (value) {
     this.currentTransaction = value
   }
+
   createTransaction (name, type, options) {
     var perfOptions = options
     if (utils.isUndefined(perfOptions)) {
@@ -104,6 +108,7 @@ class TransactionService {
     tr.detectFinish()
     return tr
   }
+
   capturePageLoadMetrics (tr) {
     var self = this
     var capturePageLoad = self._config.get('capturePageLoad')
@@ -202,6 +207,7 @@ class TransactionService {
       )
     })
   }
+
   shouldIgnoreTransaction (transactionName) {
     var ignoreList = this._config.get('ignoreTransactions')
 
@@ -217,6 +223,7 @@ class TransactionService {
     }
     return false
   }
+
   startSpan (name, type, options) {
     var trans = this.getOrCreateCurrentTransaction()
 
@@ -226,6 +233,7 @@ class TransactionService {
       return span
     }
   }
+
   add (transaction) {
     if (!this._config.isActive()) {
       return
@@ -234,9 +242,11 @@ class TransactionService {
     this._subscription.applyAll(this, [transaction])
     this._logger.debug('TransactionService.add', transaction)
   }
+
   subscribe (fn) {
     return this._subscription.subscribe(fn)
   }
+
   addTask (taskId) {
     var tr = this.getOrCreateCurrentTransaction()
     if (tr) {
@@ -245,6 +255,7 @@ class TransactionService {
     }
     return taskId
   }
+
   removeTask (taskId) {
     var tr = this.getCurrentTransaction()
     if (!utils.isUndefined(tr) && !tr.ended) {
@@ -260,6 +271,7 @@ class TransactionService {
       this._logger.debug('TransactionService.detectFinish')
     }
   }
+
   runOuter (fn, applyThis, applyArgs) {
     return fn.apply(applyThis, applyArgs)
   }

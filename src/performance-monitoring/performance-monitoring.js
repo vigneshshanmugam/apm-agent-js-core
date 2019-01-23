@@ -141,8 +141,16 @@ class PerformanceMonitoring {
     var performanceMonitoring = this
     var transactionDurationThreshold = this._configService.get('transactionDurationThreshold')
     var duration = tr.duration()
-    if (!duration || duration > transactionDurationThreshold || !tr.spans.length || !tr.sampled) {
+    if (!duration || duration > transactionDurationThreshold || !tr.spans.length) {
       return false
+    }
+
+    /**
+     * In case of unsampled transaction, send only the transaction to apm server
+     *  without any spans to reduce the payload size
+     */
+    if (!tr.sampled) {
+      tr.resetSpans()
     }
 
     var browserResponsivenessInterval = this._configService.get('browserResponsivenessInterval')
