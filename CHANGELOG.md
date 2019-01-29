@@ -1,3 +1,28 @@
+<a name="3.0.0"></a>
+# [3.0.0](https://github.com/elastic/apm-agent-js-core/compare/v2.5.0...v3.0.0) (2019-01-29)
+
+### BREAKING CHANGE
+
+* remove setTags in favor of addTags API (#28)
+
+
+### Bug Fixes
+
+* propagate transaction ID for unsampled transactions ([#30](https://github.com/elastic/apm-agent-js-core/issues/30)) ([3884806](https://github.com/elastic/apm-agent-js-core/commit/3884806))
+* remove invalid chars in span tags and marks ([#34](https://github.com/elastic/apm-agent-js-core/issues/34)) ([9bdc575](https://github.com/elastic/apm-agent-js-core/commit/9bdc575))
+
+
+### Features
+
+* include transaction flags on error ([#29](https://github.com/elastic/apm-agent-js-core/issues/29)) ([36c13f3](https://github.com/elastic/apm-agent-js-core/commit/36c13f3))
+
+
+### Performance Improvements
+
+* introduce minimal url parser to reduce bundle size ([#32](https://github.com/elastic/apm-agent-js-core/issues/32)) ([2000ee2](https://github.com/elastic/apm-agent-js-core/commit/2000ee2))
+
+
+
 <a name="2.5.0"></a>
 # [2.5.0](https://github.com/elastic/apm-agent-js-core/compare/v2.4.0...v2.5.0) (2019-01-21)
 
