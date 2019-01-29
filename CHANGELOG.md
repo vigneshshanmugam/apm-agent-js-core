@@ -1,3 +1,8 @@
+<a name="3.0.1"></a>
+## [3.0.1](https://github.com/elastic/apm-agent-js-core/compare/v3.0.0...v3.0.1) (2019-01-29)
+
+
+
 <a name="3.0.0"></a>
 # [3.0.0](https://github.com/elastic/apm-agent-js-core/compare/v2.5.0...v3.0.0) (2019-01-29)
 
